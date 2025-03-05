@@ -77,3 +77,33 @@ include(cmake/LSLCMake.cmake)
 ```
 
 </details>
+
+To build the multiplatform framework, the following steps need to be taken manually
+
+1. Use CMake to make platform specific frameworks. Run
+
+```bash
+# For iOS devices
+cmake -G "Xcode" -B build/ios -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES="arm64"
+
+# For iOS simulators
+cmake -G "Xcode" -B build/ios-sim \
+    -DCMAKE_SYSTEM_NAME=iOS \
+    -DCMAKE_OSX_SYSROOT=iphonesimulator \
+    -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
+
+# For macOS devices
+cmake -G "Xcode" -B build/macos -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+```
+
+2. Then create an xcframework by running
+
+```bash
+xcodebuild -create-xcframework \
+  -framework build/macos/Release/lsl.framework \
+  -framework build/ios/Release-iphoneos/lsl.framework \
+  -framework build/ios-sim/Release-iphonesimulator/lsl.framework \
+  -output xcframeworks/lsl.xcframework
+```
+
+This will create multiplatform framework located in `xcframeworks/lsl.xcframework` which can be used in the `lsl_plugin` plugin.
