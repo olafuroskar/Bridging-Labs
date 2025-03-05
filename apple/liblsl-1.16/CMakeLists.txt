@@ -289,6 +289,21 @@ if(LSL_BUILD_STATIC)
 	list(APPEND LSLTargets lslobj lslboost)
 endif()
 
+# +++ Apple specific settings for generating a framework
+if(APPLE)
+	set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64") # Universal binary support
+	set(CMAKE_MACOSX_RPATH 1)
+	set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
+
+	set_target_properties(lsl PROPERTIES
+		FRAMEWORK TRUE
+		FRAMEWORK_VERSION A
+		MACOSX_FRAMEWORK_IDENTIFIER "dk.dtu.liblsl"
+		MACOSX_FRAMEWORK_BUNDLE_VERSION "1.0"
+	)
+endif()
+# +++
+
 install(TARGETS ${LSLTargets}
 	EXPORT LSLTargets
 	COMPONENT liblsl
@@ -296,6 +311,9 @@ install(TARGETS ${LSLTargets}
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+	# +++ Apple specific settings for generating a framework
+	FRAMEWORK DESTINATION Library/Frameworks
+	# +++
 )
 
 export(EXPORT LSLTargets
@@ -342,20 +360,6 @@ if(NOT WIN32 AND LSL_TOOLS)
 	target_include_directories(blackhole PRIVATE "thirdparty/asio/")
 	installLSLApp(blackhole)
 endif()
-
-# +++
-# Applied https://github.com/sccn/liblsl/issues/186#issuecomment-1824833598
-if(APPLE)
-	set_target_properties(lsl PROPERTIES
-    MACOSX_BUNDLE TRUE
-    MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist
-    XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.my.bundle"
-    # This is my personal developer team id
-		XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "C72RZ3VKH3"
-		XCODE_ATTRIBUTE_CODE_SIGN_STYLE "Automatic"
-  )
-endif()
-# +++
 
 set(LSL_INSTALL_ROOT ${CMAKE_CURRENT_BINARY_DIR})
 if(LSL_UNITTESTS)
