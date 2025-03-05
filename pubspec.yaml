@@ -1,0 +1,14 @@
+name: bridging_labs
+
+environment:
+  sdk: ^3.6.0
+
+# For each package provdided here, remember to add
+# ```yaml
+# environment:
+#   sdk: ^3.6.0
+# resolution: workspace
+# ```
+# to the pubspec.yaml file of the package
+workspace:
+  - plugins/lsl_plugin
