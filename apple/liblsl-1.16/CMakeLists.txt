@@ -329,9 +329,12 @@ install(FILES
 
 include(cmake/LSLCMake.cmake)
 
-add_executable(lslver testing/lslver.c)
-target_link_libraries(lslver PRIVATE lsl)
-installLSLApp(lslver)
+# Applied https://github.com/sccn/liblsl/issues/186#issuecomment-1824833598
+# ---
+# add_executable(lslver testing/lslver.c)
+# target_link_libraries(lslver PRIVATE lsl)
+# installLSLApp(lslver)
+# ---
 
 if(NOT WIN32 AND LSL_TOOLS)
 	add_executable(blackhole testing/blackhole.cpp)
@@ -339,6 +342,20 @@ if(NOT WIN32 AND LSL_TOOLS)
 	target_include_directories(blackhole PRIVATE "thirdparty/asio/")
 	installLSLApp(blackhole)
 endif()
+
+# +++
+# Applied https://github.com/sccn/liblsl/issues/186#issuecomment-1824833598
+if(APPLE)
+	set_target_properties(lsl PROPERTIES
+    MACOSX_BUNDLE TRUE
+    MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist
+    XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.my.bundle"
+    # This is my personal developer team id
+		XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "C72RZ3VKH3"
+		XCODE_ATTRIBUTE_CODE_SIGN_STYLE "Automatic"
+  )
+endif()
+# +++
 
 set(LSL_INSTALL_ROOT ${CMAKE_CURRENT_BINARY_DIR})
 if(LSL_UNITTESTS)
