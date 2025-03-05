@@ -340,6 +340,11 @@ if(NOT WIN32 AND LSL_TOOLS)
 	installLSLApp(blackhole)
 endif()
 
+if (ANDROID)
+  # Support Android 15 16k page size
+  target_link_options(lsl PRIVATE "-Wl,-z,max-page-size=16384")
+endif()
+
 set(LSL_INSTALL_ROOT ${CMAKE_CURRENT_BINARY_DIR})
 if(LSL_UNITTESTS)
 	add_subdirectory(testing)
