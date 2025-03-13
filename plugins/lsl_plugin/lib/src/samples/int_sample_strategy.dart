@@ -10,10 +10,11 @@ import 'package:lsl_plugin/src/utils/result.dart';
 import 'package:lsl_plugin/src/utils/unit.dart';
 
 class IntSampleStrategy implements SampleStrategy<int> {
+  final LslInterface _lsl;
   final lsl_outlet _outlet;
   final ChannelFormat _channelFormat;
 
-  IntSampleStrategy(this._outlet, this._channelFormat);
+  IntSampleStrategy(this._outlet, this._channelFormat, this._lsl);
 
   @override
   Result<Unit> pushSample(List<int> sample,
@@ -49,10 +50,10 @@ class IntSampleStrategy implements SampleStrategy<int> {
           nativeSamplePointer[i] = sample[i];
         }
         if (timestamp != null) {
-          bindings.lsl_push_sample_stp(
+          _lsl.bindings.lsl_push_sample_stp(
               outlet, nativeSamplePointer, timestamp, pushthrough ? 1 : 0);
         } else {
-          bindings.lsl_push_sample_s(outlet, nativeSamplePointer);
+          _lsl.bindings.lsl_push_sample_s(outlet, nativeSamplePointer);
         }
       } else if (T == Int32) {
         final nativeSamplePointer =
@@ -61,10 +62,10 @@ class IntSampleStrategy implements SampleStrategy<int> {
           nativeSamplePointer[i] = sample[i];
         }
         if (timestamp != null) {
-          bindings.lsl_push_sample_itp(
+          _lsl.bindings.lsl_push_sample_itp(
               outlet, nativeSamplePointer, timestamp, pushthrough ? 1 : 0);
         } else {
-          bindings.lsl_push_sample_i(outlet, nativeSamplePointer);
+          _lsl.bindings.lsl_push_sample_i(outlet, nativeSamplePointer);
         }
       } else if (T == Int64) {
         final nativeSamplePointer =
@@ -73,10 +74,10 @@ class IntSampleStrategy implements SampleStrategy<int> {
           nativeSamplePointer[i] = sample[i];
         }
         if (timestamp != null) {
-          bindings.lsl_push_sample_ltp(
+          _lsl.bindings.lsl_push_sample_ltp(
               outlet, nativeSamplePointer, timestamp, pushthrough ? 1 : 0);
         } else {
-          bindings.lsl_push_sample_l(outlet, nativeSamplePointer);
+          _lsl.bindings.lsl_push_sample_l(outlet, nativeSamplePointer);
         }
       } else {
         return sampleTypeChannelFormatMismatchError(

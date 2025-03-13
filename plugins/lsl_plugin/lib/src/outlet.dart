@@ -1,6 +1,14 @@
 part of '../lsl_plugin.dart';
 
-class Outlet<T> {
+class Outlet {
+  /// {@macro bindings}
+  static LslInterface _lsl = Lsl();
+
+  /// {@macro set_bindings}
+  static void setBindings(LslInterface lsl) {
+    _lsl = lsl;
+  }
+
   late final lsl_outlet _outlet;
   late final SampleStrategy _sampleStrategy;
   bool _isDestroyed = false;
@@ -20,13 +28,13 @@ class Outlet<T> {
   /// value here to avoid running out of RAM.
   Outlet(StreamInfo streamInfo, [int chunkSize = 0, int maxBuffered = 360]) {
     // Required on Android, TODO: Explain more...
-    MulticastLock().acquire();
+    // MulticastLock().acquire();
 
-    _outlet =
-        bindings.lsl_create_outlet(streamInfo.handle(), chunkSize, maxBuffered);
+    _outlet = _lsl.bindings
+        .lsl_create_outlet(streamInfo.handle(), chunkSize, maxBuffered);
 
     _sampleStrategy = SampleStrategyFactory.sampleStrategyFor(
-        _outlet, streamInfo.getChannelFormat());
+        _outlet, streamInfo.getChannelFormat(), _lsl);
   }
 
   /// Destroys the outlet.
@@ -34,8 +42,8 @@ class Outlet<T> {
   /// Should be called when the outlet is no longer in use.
   /// Consider also destroying the connected stream info.
   void destroy() {
-    bindings.lsl_destroy_outlet(_outlet);
-    MulticastLock().release();
+    _lsl.bindings.lsl_destroy_outlet(_outlet);
+    // MulticastLock().release();
     _isDestroyed = true;
   }
 
@@ -45,13 +53,19 @@ class Outlet<T> {
   }
 
   /// {@macro push_sample}
-  Result<Unit> pushSample(List<T> sample,
+  Result<Unit> pushSample<T>(List<T> sample,
       [double? timestamp, bool pushthrough = false]) {
     if (sample.isEmpty) {
       // Do nothing if sample does not contain any values
       return Result.ok(unit);
     }
 
-    return _sampleStrategy.pushSample(sample);
+    try {
+      return _sampleStrategy.pushSample(sample);
+    } on Exception catch (e) {
+      return Result.error(e);
+    } on TypeError catch (e) {
+      return Result.error(Exception(e.toString()));
+    }
   }
 }

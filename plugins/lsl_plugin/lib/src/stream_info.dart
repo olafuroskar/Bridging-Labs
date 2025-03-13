@@ -1,6 +1,22 @@
 part of '../lsl_plugin.dart';
 
 class StreamInfo {
+  /// {@template bindings}
+  /// Gets the Lsl singleton containing the native bindings
+  ///
+  /// In order to mock the native bindings we must use dependency injection. Therefore we wrap
+  /// the bindings in an object. Furthermore, we do not want to call [DynamicLibrary.open] each time
+  /// we instantiate the binding class, therefore we use a singleton.
+  /// {@endtemplate}
+  static LslInterface _lsl = Lsl();
+
+  /// {@template set_bindings}
+  /// Sets the LslInterface object. This is mainly done for testing purposes.
+  /// {@endtemplate}
+  static void setBindings(LslInterface lsl) {
+    _lsl = lsl;
+  }
+
   late final Pointer<lsl_streaminfo_struct_> _streamInfo;
   late final ChannelFormat _channelFormat;
 
@@ -33,14 +49,15 @@ class StreamInfo {
     final streamName = name.toNativeUtf8().cast<Char>();
     final streamType = type.toNativeUtf8().cast<Char>();
     final streamSourceId = sourceId.toNativeUtf8().cast<Char>();
+    _channelFormat = channelFormat;
 
-    _streamInfo = bindings.lsl_create_streaminfo(streamName, streamType,
+    _streamInfo = _lsl.bindings.lsl_create_streaminfo(streamName, streamType,
         channelCount, nominalSRate, channelFormat.value, streamSourceId);
   }
 
   /// Destroys the native stream info object
   void destroy() {
-    bindings.lsl_destroy_streaminfo(_streamInfo);
+    _lsl.bindings.lsl_destroy_streaminfo(_streamInfo);
   }
 
   /// Returns the native handle of the stream info object

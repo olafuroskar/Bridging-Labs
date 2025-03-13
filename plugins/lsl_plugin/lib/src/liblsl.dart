@@ -11,7 +11,6 @@ final DynamicLibrary _dylib = () {
     return DynamicLibrary.open('$_libName.framework/$_libName');
   }
   if (Platform.isAndroid || Platform.isLinux) {
-//    return DynamicLibrary.open('lib$_libName.so');
     return DynamicLibrary.open('liblsl.so');
   }
   if (Platform.isWindows) {
@@ -21,4 +20,22 @@ final DynamicLibrary _dylib = () {
 }();
 
 /// The bindings to the native functions in [_dylib].
-final LslPluginBindings bindings = LslPluginBindings(_dylib);
+// final LslPluginBindings bindings = LslPluginBindings(_dylib);
+
+abstract class LslInterface {
+  LslPluginBindings get bindings;
+}
+
+class Lsl implements LslInterface {
+  static final Lsl _singleton = Lsl._internal();
+  static final _bindings = LslPluginBindings(_dylib);
+
+  factory Lsl() {
+    return _singleton;
+  }
+
+  @override
+  LslPluginBindings get bindings => _bindings;
+
+  Lsl._internal();
+}
