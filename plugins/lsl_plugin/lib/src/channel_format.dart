@@ -1,4 +1,4 @@
-import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
+part of '../lsl_plugin.dart';
 
 enum ChannelFormat {
   float32(lsl_channel_format_t.cft_float32),
