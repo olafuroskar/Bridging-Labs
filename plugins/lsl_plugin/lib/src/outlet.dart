@@ -3,10 +3,15 @@ part of '../lsl_plugin.dart';
 class Outlet {
   /// {@macro bindings}
   static LslInterface _lsl = Lsl();
+  static MulticastLock _multicastLock = MulticastLock();
 
   /// {@macro set_bindings}
   static void setBindings(LslInterface lsl) {
     _lsl = lsl;
+  }
+
+  static void setMulticastLock(MulticastLock multicastLock) {
+    _multicastLock = multicastLock;
   }
 
   late final lsl_outlet _outlet;
@@ -28,7 +33,7 @@ class Outlet {
   /// value here to avoid running out of RAM.
   Outlet(StreamInfo streamInfo, [int chunkSize = 0, int maxBuffered = 360]) {
     // Required on Android, TODO: Explain more...
-    // MulticastLock().acquire();
+    _multicastLock.acquire();
 
     _outlet = _lsl.bindings
         .lsl_create_outlet(streamInfo.handle(), chunkSize, maxBuffered);
@@ -43,7 +48,7 @@ class Outlet {
   /// Consider also destroying the connected stream info.
   void destroy() {
     _lsl.bindings.lsl_destroy_outlet(_outlet);
-    // MulticastLock().release();
+    _multicastLock.release();
     _isDestroyed = true;
   }
 

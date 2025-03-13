@@ -3,7 +3,7 @@ library;
 
 import 'dart:ffi';
 
-// import 'package:android_multicast_lock/android_multicast_lock.dart';
+import 'package:android_multicast_lock/android_multicast_lock.dart';
 import 'package:ffi/ffi.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';

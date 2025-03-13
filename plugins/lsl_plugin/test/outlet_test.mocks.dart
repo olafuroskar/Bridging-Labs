@@ -3,8 +3,10 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'dart:async' as _i6;
 import 'dart:ffi' as _i3;
 
+import 'package:android_multicast_lock/android_multicast_lock.dart' as _i5;
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i4;
@@ -2844,4 +2846,36 @@ class MockLslPluginBindings extends _i1.Mock implements _i2.LslPluginBindings {
             returnValueForMissingStub: 0,
           )
           as int);
+}
+
+/// A class which mocks [MulticastLock].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockMulticastLock extends _i1.Mock implements _i5.MulticastLock {
+  @override
+  _i6.Future<void> acquire() =>
+      (super.noSuchMethod(
+            Invocation.method(#acquire, []),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
+
+  @override
+  _i6.Future<void> release() =>
+      (super.noSuchMethod(
+            Invocation.method(#release, []),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
+
+  @override
+  _i6.Future<bool?> isHeld() =>
+      (super.noSuchMethod(
+            Invocation.method(#isHeld, []),
+            returnValue: _i6.Future<bool?>.value(),
+            returnValueForMissingStub: _i6.Future<bool?>.value(),
+          )
+          as _i6.Future<bool?>);
 }

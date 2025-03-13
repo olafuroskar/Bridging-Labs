@@ -1,5 +1,6 @@
 import 'dart:ffi';
 
+import 'package:android_multicast_lock/android_multicast_lock.dart';
 import 'package:ffi/ffi.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
@@ -17,16 +18,18 @@ class MockLsl implements LslInterface {
   LslPluginBindings get bindings => _bindings;
 }
 
-@GenerateNiceMocks([MockSpec<LslPluginBindings>()])
+@GenerateNiceMocks([MockSpec<LslPluginBindings>(), MockSpec<MulticastLock>()])
 void main() {
   late Pointer<lsl_streaminfo_struct_> streamInfoPointer;
   late Pointer<lsl_outlet_struct_> outletPointer;
 
   setUpAll(() {
-    // Use the mock native bindings
+    // Use the mock native bindings and mock mutlicast lock
     MockLsl mockLsl = MockLsl();
+    MockMulticastLock mockMulticastLock = MockMulticastLock();
     StreamInfo.setBindings(mockLsl);
     Outlet.setBindings(mockLsl);
+    Outlet.setMulticastLock(mockMulticastLock);
 
     // Mockito does not know how to make dummy native values so we must provide them
     streamInfoPointer = malloc.allocate<lsl_streaminfo_struct_>(
