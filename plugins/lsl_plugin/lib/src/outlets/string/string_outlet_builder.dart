@@ -77,7 +77,7 @@ class StringOutletBuilder implements OutletBuilder<String> {
   }
 
   @override
-  Result<OutletRename<String>> build() {
+  Result<Outlet<String>> build() {
     try {
       StreamInfo streamInfo = StreamInfo(_name, _type, _channelCount,
           _nominalSRate, _channelFormat, _sourceId);

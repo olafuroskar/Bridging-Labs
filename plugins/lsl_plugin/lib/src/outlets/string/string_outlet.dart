@@ -1,6 +1,6 @@
 part of '../../../lsl_plugin.dart';
 
-class StringOutlet implements OutletRename<String> {
+class StringOutlet implements Outlet<String> {
   late final SampleStrategy<String> _sampleStrategy;
   late final lsl_outlet _outlet;
   bool _isDestroyed = false;

@@ -77,7 +77,7 @@ class IntOutletBuilder implements OutletBuilder<int> {
   }
 
   @override
-  Result<OutletRename<int>> build() {
+  Result<Outlet<int>> build() {
     try {
       StreamInfo streamInfo = StreamInfo(_name, _type, _channelCount,
           _nominalSRate, _channelFormat, _sourceId);

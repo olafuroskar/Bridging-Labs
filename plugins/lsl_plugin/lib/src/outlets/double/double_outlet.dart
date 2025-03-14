@@ -1,6 +1,6 @@
 part of '../../../lsl_plugin.dart';
 
-class DoubleOutlet implements OutletRename<double> {
+class DoubleOutlet implements Outlet<double> {
   late final SampleStrategy<double> _sampleStrategy;
   late final lsl_outlet _outlet;
   bool _isDestroyed = false;

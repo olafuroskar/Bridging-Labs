@@ -27,5 +27,5 @@ abstract class OutletBuilder<T> {
   int get maxBuffered;
   set maxBuffered(int maxBuffered);
 
-  Result<OutletRename<T>> build();
+  Result<Outlet<T>> build();
 }

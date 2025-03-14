@@ -77,7 +77,7 @@ class DoubleOutletBuilder implements OutletBuilder<double> {
   }
 
   @override
-  Result<OutletRename<double>> build() {
+  Result<Outlet<double>> build() {
     try {
       StreamInfo streamInfo = StreamInfo(_name, _type, _channelCount,
           _nominalSRate, _channelFormat, _sourceId);
