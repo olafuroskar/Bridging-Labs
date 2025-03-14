@@ -71,8 +71,8 @@ class IntOutletBuilder implements OutletBuilder<int> {
   @override
   Result<Outlet<int>> build() {
     try {
-      StreamInfo streamInfo = StreamInfo(
-          _name, _type, _channelCount, _nominalSRate, channelFormat, _sourceId);
+      final streamInfo = StreamInfo(
+          _name, _type, channelFormat, _channelCount, _nominalSRate, _sourceId);
 
       final outlet = IntOutlet(streamInfo, chunkSize, maxBuffered);
 

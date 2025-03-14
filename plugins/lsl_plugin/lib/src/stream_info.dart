@@ -1,6 +1,6 @@
 part of '../lsl_plugin.dart';
 
-class StreamInfo {
+class StreamInfo<T extends ChannelFormat> {
   /// {@template bindings}
   /// Gets the Lsl singleton containing the native bindings
   ///
@@ -18,7 +18,7 @@ class StreamInfo {
   }
 
   late final Pointer<lsl_streaminfo_struct_> _streamInfo;
-  late final ChannelFormat _channelFormat;
+  late final T _channelFormat;
 
   /// Construct a new streaminfo object.
   ///
@@ -41,15 +41,12 @@ class StreamInfo {
   /// [sourceId] Unique identifier of the source or device, if available (e.g. a serial number).
   /// Allows recipients to recover from failure even after the serving app or device crashes.
   /// May in some cases also be constructed from device settings.
-  StreamInfo(String name, String type,
-      [int channelCount = 8,
-      double nominalSRate = 100,
-      ChannelFormat? channelFormat,
-      String sourceId = ""]) {
+  StreamInfo(String name, String type, T channelFormat,
+      [int channelCount = 8, double nominalSRate = 100, String sourceId = ""]) {
     final streamName = name.toNativeUtf8().cast<Char>();
     final streamType = type.toNativeUtf8().cast<Char>();
     final streamSourceId = sourceId.toNativeUtf8().cast<Char>();
-    _channelFormat = channelFormat ?? Int32ChannelFormat();
+    _channelFormat = channelFormat;
 
     _streamInfo = _lsl.bindings.lsl_create_streaminfo(
         streamName,
@@ -71,7 +68,7 @@ class StreamInfo {
   }
 
   /// Returns the channel format of the stream info object
-  ChannelFormat getChannelFormat() {
+  T getChannelFormat() {
     return _channelFormat;
   }
 }

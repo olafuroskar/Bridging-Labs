@@ -19,7 +19,7 @@ class DoubleOutlet implements Outlet<double> {
   }
 
   /// {@macro outlet}
-  DoubleOutlet(StreamInfo streamInfo,
+  DoubleOutlet(StreamInfo<DoubleChannelFormat> streamInfo,
       [int chunkSize = 0, int maxBuffered = 360]) {
     // Required on Android, TODO: Explain more...
     _multicastLock.acquire();

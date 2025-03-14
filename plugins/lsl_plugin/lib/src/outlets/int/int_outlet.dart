@@ -33,7 +33,8 @@ class IntOutlet implements Outlet<int> {
   /// minutes of data. Note that, for high-bandwidth data you will almost certainly want to use a lower
   /// value here to avoid running out of RAM.
   /// {@endtemplate}
-  IntOutlet(StreamInfo streamInfo, [int chunkSize = 0, int maxBuffered = 360]) {
+  IntOutlet(StreamInfo<IntChannelFormat> streamInfo,
+      [int chunkSize = 0, int maxBuffered = 360]) {
     // Required on Android, TODO: Explain more...
     _multicastLock.acquire();
 

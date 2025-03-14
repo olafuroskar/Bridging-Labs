@@ -19,7 +19,7 @@ class StringOutlet implements Outlet<String> {
   }
 
   /// {@macro outlet}
-  StringOutlet(StreamInfo streamInfo,
+  StringOutlet(StreamInfo<StringChannelFormat> streamInfo,
       [int chunkSize = 0, int maxBuffered = 360]) {
     // Required on Android, TODO: Explain more...
     _multicastLock.acquire();

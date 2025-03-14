@@ -71,8 +71,8 @@ class StringOutletBuilder implements OutletBuilder<String> {
   @override
   Result<Outlet<String>> build() {
     try {
-      StreamInfo streamInfo = StreamInfo(
-          _name, _type, _channelCount, _nominalSRate, channelFormat, _sourceId);
+      final streamInfo = StreamInfo(
+          _name, _type, channelFormat, _channelCount, _nominalSRate, _sourceId);
 
       final outlet = StringOutlet(streamInfo, chunkSize, maxBuffered);
 
