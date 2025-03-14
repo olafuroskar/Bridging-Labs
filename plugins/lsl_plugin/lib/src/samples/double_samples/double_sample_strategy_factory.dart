@@ -1,4 +1,5 @@
-import 'package:lsl_plugin/lsl_plugin.dart';
+import 'package:lsl_plugin/src/channel_formats/channel_format.dart';
+import 'package:lsl_plugin/src/channel_formats/double_channel_format.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
 import 'package:lsl_plugin/src/samples/double_samples/double_sample_strategy.dart';
@@ -10,9 +11,9 @@ class DoubleSampleStrategyFactory {
   static SampleStrategy<double> sampleStrategyFor(
       lsl_outlet outlet, ChannelFormat channelFormat, LslInterface lsl) {
     switch (channelFormat) {
-      case ChannelFormat.float32:
+      case Float32ChannelFormat():
         return FloatSampleStrategy(outlet, lsl);
-      case ChannelFormat.double64:
+      case Double64ChannelFormat():
         return DoubleSampleStrategy(outlet, lsl);
       default:
         throw Exception(

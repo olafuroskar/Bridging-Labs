@@ -5,6 +5,10 @@ import 'dart:ffi';
 
 import 'package:android_multicast_lock/android_multicast_lock.dart';
 import 'package:ffi/ffi.dart';
+import 'package:lsl_plugin/src/channel_formats/channel_format.dart';
+import 'package:lsl_plugin/src/channel_formats/double_channel_format.dart';
+import 'package:lsl_plugin/src/channel_formats/int_channel_format.dart';
+import 'package:lsl_plugin/src/channel_formats/string_channel_format.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
 import 'package:lsl_plugin/src/outlets/outlet.dart';
@@ -24,4 +28,3 @@ part 'src/outlets/double/double_outlet_builder.dart';
 part 'src/outlets/string/string_outlet.dart';
 part 'src/outlets/string/string_outlet_builder.dart';
 part 'src/stream_info.dart';
-part 'src/channel_format.dart';

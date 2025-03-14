@@ -5,20 +5,12 @@ class StringOutletBuilder implements OutletBuilder<String> {
   double _nominalSRate = 100;
   int _chunkSize = 0;
   int _maxBuffered = 360;
-  ChannelFormat _channelFormat = ChannelFormat.string;
+  StringChannelFormat channelFormat = CftStringChannelFormat();
   String _name = "";
   String _sourceId = "";
   String _type = "";
 
   StringOutletBuilder();
-
-  @override
-  ChannelFormat get channelFormat => _channelFormat;
-
-  @override
-  set channelFormat(ChannelFormat value) {
-    _channelFormat = value;
-  }
 
   @override
   String get name => _name;
@@ -79,8 +71,8 @@ class StringOutletBuilder implements OutletBuilder<String> {
   @override
   Result<Outlet<String>> build() {
     try {
-      StreamInfo streamInfo = StreamInfo(_name, _type, _channelCount,
-          _nominalSRate, _channelFormat, _sourceId);
+      StreamInfo streamInfo = StreamInfo(
+          _name, _type, _channelCount, _nominalSRate, channelFormat, _sourceId);
 
       final outlet = StringOutlet(streamInfo, chunkSize, maxBuffered);
 

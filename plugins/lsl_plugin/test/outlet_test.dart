@@ -3,6 +3,8 @@ import 'dart:ffi';
 import 'package:android_multicast_lock/android_multicast_lock.dart';
 import 'package:ffi/ffi.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
+import 'package:lsl_plugin/src/channel_formats/double_channel_format.dart';
+import 'package:lsl_plugin/src/channel_formats/int_channel_format.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
 import 'package:lsl_plugin/src/utils/result.dart';
@@ -52,26 +54,13 @@ void main() {
 
   group('Integer outlets', () {
     test(
-        "Setting the channel format to a floating point format should cause a runtime error",
-        () {
-      final outletBuilder = IntOutletBuilder();
-      outletBuilder.name = "Test";
-      outletBuilder.type = "EEG";
-      outletBuilder.sourceId = "Testing Id";
-      outletBuilder.channelFormat = ChannelFormat.float32;
-      final result = outletBuilder.build();
-
-      expect(result is Error, true);
-    });
-
-    test(
         "Setting the channel format to an 8 bit integer should be ok, and pushing a valid sample should work",
         () {
       final outletBuilder = IntOutletBuilder();
       outletBuilder.name = "Test";
       outletBuilder.type = "EEG";
       outletBuilder.sourceId = "Testing Id";
-      outletBuilder.channelFormat = ChannelFormat.int8;
+      outletBuilder.channelFormat = Int8ChannelFormat();
       final outlet = outletBuilder.build();
 
       switch (outlet) {
@@ -90,7 +79,7 @@ void main() {
       outletBuilder.name = "Test";
       outletBuilder.type = "EEG";
       outletBuilder.sourceId = "Testing Id";
-      outletBuilder.channelFormat = ChannelFormat.int16;
+      outletBuilder.channelFormat = Int16ChannelFormat();
       final outlet = outletBuilder.build();
 
       switch (outlet) {
@@ -109,7 +98,7 @@ void main() {
       outletBuilder.name = "Test";
       outletBuilder.type = "EEG";
       outletBuilder.sourceId = "Testing Id";
-      outletBuilder.channelFormat = ChannelFormat.int32;
+      outletBuilder.channelFormat = Int32ChannelFormat();
       final outlet = outletBuilder.build();
 
       switch (outlet) {
@@ -128,7 +117,7 @@ void main() {
       outletBuilder.name = "Test";
       outletBuilder.type = "EEG";
       outletBuilder.sourceId = "Testing Id";
-      outletBuilder.channelFormat = ChannelFormat.int64;
+      outletBuilder.channelFormat = Int64ChannelFormat();
       final outlet = outletBuilder.build();
 
       switch (outlet) {
@@ -143,26 +132,13 @@ void main() {
 
   group("Double outlets", () {
     test(
-        "Setting the channel format to an 64 bit integer cause a runtime error",
-        () {
-      final outletBuilder = DoubleOutletBuilder();
-      outletBuilder.name = "Test";
-      outletBuilder.type = "EEG";
-      outletBuilder.sourceId = "Testing Id";
-      outletBuilder.channelFormat = ChannelFormat.int64;
-      final result = outletBuilder.build();
-
-      expect(result is Error, true);
-    });
-
-    test(
         "Setting the channel format to a 32 bit float should be ok, and pushing a valid sample should work",
         () {
       final outletBuilder = DoubleOutletBuilder();
       outletBuilder.name = "Test";
       outletBuilder.type = "EEG";
       outletBuilder.sourceId = "Testing Id";
-      outletBuilder.channelFormat = ChannelFormat.float32;
+      outletBuilder.channelFormat = Float32ChannelFormat();
       final outlet = outletBuilder.build();
 
       switch (outlet) {
@@ -181,7 +157,7 @@ void main() {
       outletBuilder.name = "Test";
       outletBuilder.type = "EEG";
       outletBuilder.sourceId = "Testing Id";
-      outletBuilder.channelFormat = ChannelFormat.double64;
+      outletBuilder.channelFormat = Double64ChannelFormat();
       final outlet = outletBuilder.build();
 
       switch (outlet) {

@@ -44,15 +44,20 @@ class StreamInfo {
   StreamInfo(String name, String type,
       [int channelCount = 8,
       double nominalSRate = 100,
-      ChannelFormat channelFormat = ChannelFormat.float32,
+      ChannelFormat? channelFormat,
       String sourceId = ""]) {
     final streamName = name.toNativeUtf8().cast<Char>();
     final streamType = type.toNativeUtf8().cast<Char>();
     final streamSourceId = sourceId.toNativeUtf8().cast<Char>();
-    _channelFormat = channelFormat;
+    _channelFormat = channelFormat ?? Int32ChannelFormat();
 
-    _streamInfo = _lsl.bindings.lsl_create_streaminfo(streamName, streamType,
-        channelCount, nominalSRate, channelFormat.value, streamSourceId);
+    _streamInfo = _lsl.bindings.lsl_create_streaminfo(
+        streamName,
+        streamType,
+        channelCount,
+        nominalSRate,
+        _channelFormat.nativeChannelFormat,
+        streamSourceId);
   }
 
   /// Destroys the native stream info object

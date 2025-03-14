@@ -1,4 +1,5 @@
-import 'package:lsl_plugin/lsl_plugin.dart';
+import 'package:lsl_plugin/src/channel_formats/channel_format.dart';
+import 'package:lsl_plugin/src/channel_formats/string_channel_format.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
 import 'package:lsl_plugin/src/samples/sample_strategy.dart';
@@ -9,7 +10,7 @@ class StringSampleStrategyFactory {
   static SampleStrategy<String> sampleStrategyFor(
       lsl_outlet outlet, ChannelFormat channelFormat, LslInterface lsl) {
     switch (channelFormat) {
-      case ChannelFormat.string:
+      case CftStringChannelFormat():
         return StringSampleStrategy(outlet, lsl);
       default:
         throw Exception(
