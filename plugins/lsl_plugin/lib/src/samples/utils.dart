@@ -6,3 +6,7 @@ Result<T> sampleTypeChannelFormatMismatchError<T>(
   return Result.error(Exception(
       "The type of sample ($sampleType) and the channel format (${channelFormat.value.toString()}) are not compatible"));
 }
+
+Result<T> unexpectedError<T>(String e) {
+  return Result.error(Exception("An unexpected error was encountered: $e"));
+}

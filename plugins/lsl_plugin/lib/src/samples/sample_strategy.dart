@@ -1,4 +1,3 @@
-import 'package:lsl_plugin/src/liblsl.dart';
 import 'package:lsl_plugin/src/utils/result.dart';
 import 'package:lsl_plugin/src/utils/unit.dart';
 

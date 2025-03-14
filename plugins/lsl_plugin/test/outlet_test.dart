@@ -28,8 +28,8 @@ void main() {
     MockLsl mockLsl = MockLsl();
     MockMulticastLock mockMulticastLock = MockMulticastLock();
     StreamInfo.setBindings(mockLsl);
-    Outlet.setBindings(mockLsl);
-    Outlet.setMulticastLock(mockMulticastLock);
+    IntOutlet.setBindings(mockLsl);
+    IntOutlet.setMulticastLock(mockMulticastLock);
 
     // Mockito does not know how to make dummy native values so we must provide them
     streamInfoPointer = malloc.allocate<lsl_streaminfo_struct_>(
@@ -47,28 +47,34 @@ void main() {
   });
 
   test(
-      "Outlet with 32 bit floating point channel format can push explicitly integer samples",
+      "Setting the channel format to a floating point format on an integer outlet should cause a runtime error",
       () {
-    StreamInfo streamInfo = StreamInfo("Test Stream", "EEG");
-    Outlet outlet = Outlet(streamInfo);
-
-    List<int> sample = [1, 0, 2, 3];
-
-    var result = outlet.pushSample(sample);
+    final outletBuilder = IntOutletBuilder();
+    outletBuilder.name = "Test";
+    outletBuilder.type = "EEG";
+    outletBuilder.sourceId = "Testing Id";
+    outletBuilder.channelFormat = ChannelFormat.float32;
+    final result = outletBuilder.build();
 
     expect(result is Error, true);
   });
 
   test(
-      "Outlet with 32 bit floating point channel format can push explicitly double samples",
+      "Setting the channel format to a 8 bit integer format on an integer outlet should be ok",
       () {
-    StreamInfo streamInfo = StreamInfo("Test Stream", "EEG");
-    Outlet outlet = Outlet(streamInfo);
+    final outletBuilder = IntOutletBuilder();
+    outletBuilder.name = "Test";
+    outletBuilder.type = "EEG";
+    outletBuilder.sourceId = "Testing Id";
+    outletBuilder.channelFormat = ChannelFormat.int8;
+    final outlet = outletBuilder.build();
 
-    List<double> sample = [1.0, 0, 2, 3.2];
-
-    var result = outlet.pushSample(sample);
-
-    expect(result is Ok, true);
+    switch (outlet) {
+      case Ok(value: var outlet):
+        var result = outlet.pushSample([1, 3, 4, 5]);
+        expect(result is Ok, true);
+      default:
+        fail("Should not fail");
+    }
   });
 }

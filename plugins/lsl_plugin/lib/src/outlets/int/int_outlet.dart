@@ -1,6 +1,10 @@
-part of '../lsl_plugin.dart';
+part of '../../../lsl_plugin.dart';
 
-class Outlet {
+class IntOutlet implements OutletRename<int> {
+  late final SampleStrategy<int> _sampleStrategy;
+  late final lsl_outlet _outlet;
+  bool _isDestroyed = false;
+
   /// {@macro bindings}
   static LslInterface _lsl = Lsl();
   static MulticastLock _multicastLock = MulticastLock();
@@ -14,10 +18,7 @@ class Outlet {
     _multicastLock = multicastLock;
   }
 
-  late final lsl_outlet _outlet;
-  late final SampleStrategy _sampleStrategy;
-  bool _isDestroyed = false;
-
+  /// {@template outlet}
   /// Establish a new stream outlet. This makes the stream discoverable.
   ///
   /// * [streamInfo] The stream information to use for creating this stream.
@@ -31,34 +32,35 @@ class Outlet {
   /// nominal sampling rate, otherwise x100 in samples). A good default is 360, which corresponds to 6
   /// minutes of data. Note that, for high-bandwidth data you will almost certainly want to use a lower
   /// value here to avoid running out of RAM.
-  Outlet(StreamInfo streamInfo, [int chunkSize = 0, int maxBuffered = 360]) {
+  /// {@endtemplate}
+  IntOutlet(StreamInfo streamInfo, [int chunkSize = 0, int maxBuffered = 360]) {
     // Required on Android, TODO: Explain more...
     _multicastLock.acquire();
 
     _outlet = _lsl.bindings
         .lsl_create_outlet(streamInfo.handle(), chunkSize, maxBuffered);
 
-    _sampleStrategy = SampleStrategyFactory.sampleStrategyFor(
+    _sampleStrategy = IntSampleStrategyFactory.sampleStrategyFor(
         _outlet, streamInfo.getChannelFormat(), _lsl);
   }
 
-  /// Destroys the outlet.
-  ///
-  /// Should be called when the outlet is no longer in use.
-  /// Consider also destroying the connected stream info.
-  void destroy() {
-    _lsl.bindings.lsl_destroy_outlet(_outlet);
-    _multicastLock.release();
-    _isDestroyed = true;
+  @override
+  Result<Unit> destroy() {
+    try {
+      _lsl.bindings.lsl_destroy_outlet(_outlet);
+      _multicastLock.release();
+      _isDestroyed = true;
+      return Result.ok(unit);
+    } catch (e) {
+      return unexpectedError("$e");
+    }
   }
 
-  /// Whether the outlet has been destroyed or not
-  bool isDestroyed() {
-    return _isDestroyed;
-  }
+  @override
+  bool get isDestroyed => _isDestroyed;
 
-  /// {@macro push_sample}
-  Result<Unit> pushSample<T>(List<T> sample,
+  @override
+  Result<Unit> pushSample(List<int> sample,
       [double? timestamp, bool pushthrough = false]) {
     if (sample.isEmpty) {
       // Do nothing if sample does not contain any values
