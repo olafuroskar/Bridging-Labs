@@ -16,6 +16,10 @@ class ShortSampleStrategy implements SampleStrategy<int> {
   @override
   Result<Unit> pushSample(List<int> sample,
       [double? timestamp, bool pushthrough = false]) {
+    if (sample.isEmpty) {
+      return Result.ok(unit);
+    }
+
     try {
       final nativeSamplePointer =
           malloc.allocate<Int16>(sample.length * sizeOf<Int16>());

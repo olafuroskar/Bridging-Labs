@@ -17,6 +17,10 @@ class StringSampleStrategy implements SampleStrategy<String> {
   @override
   Result<Unit> pushSample(List<String> sample,
       [double? timestamp, bool pushthrough = false]) {
+    if (sample.isEmpty) {
+      return Result.ok(unit);
+    }
+
     try {
       Pointer<Char> toString(String text) => text.toNativeUtf8().cast<Char>();
       final encodedStrings = sample.map(toString).toList();

@@ -3,7 +3,6 @@ part of '../../../lsl_plugin.dart';
 class DoubleOutlet implements Outlet<double> {
   late final SampleStrategy<double> _sampleStrategy;
   late final lsl_outlet _outlet;
-  bool _isDestroyed = false;
 
   /// {@macro bindings}
   static LslInterface _lsl = Lsl();
@@ -33,33 +32,12 @@ class DoubleOutlet implements Outlet<double> {
 
   @override
   Result<Unit> destroy() {
-    try {
-      _lsl.bindings.lsl_destroy_outlet(_outlet);
-      _multicastLock.release();
-      _isDestroyed = true;
-      return Result.ok(unit);
-    } catch (e) {
-      return unexpectedError("$e");
-    }
+    return destroyOutlet(_lsl, _outlet, _multicastLock);
   }
-
-  @override
-  bool get isDestroyed => _isDestroyed;
 
   @override
   Result<Unit> pushSample(List<double> sample,
       [double? timestamp, bool pushthrough = false]) {
-    if (sample.isEmpty) {
-      // Do nothing if sample does not contain any values
-      return Result.ok(unit);
-    }
-
-    try {
-      return _sampleStrategy.pushSample(sample);
-    } on Exception catch (e) {
-      return Result.error(e);
-    } on TypeError catch (e) {
-      return Result.error(Exception(e.toString()));
-    }
+    return _sampleStrategy.pushSample(sample);
   }
 }

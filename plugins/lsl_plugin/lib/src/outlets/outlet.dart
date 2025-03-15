@@ -9,9 +9,6 @@ abstract class Outlet<T> {
   /// Consider also destroying the connected stream info.
   Result<Unit> destroy();
 
-  /// Whether the outlet has been destroyed or not
-  bool get isDestroyed;
-
   /// {@macro push_sample}
   Result<Unit> pushSample(List<T> sample,
       [double? timestamp, bool pushthrough = false]);

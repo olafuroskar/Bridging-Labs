@@ -17,6 +17,10 @@ class FloatSampleStrategy implements SampleStrategy<double> {
   @override
   Result<Unit> pushSample(List<double> sample,
       [double? timestamp, bool pushthrough = false]) {
+    if (sample.isEmpty) {
+      return Result.ok(unit);
+    }
+
     try {
       final nativeSamplePointer =
           malloc.allocate<Float>(sample.length * sizeOf<Float>());
