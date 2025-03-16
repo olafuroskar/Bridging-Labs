@@ -1,14 +1,9 @@
-import 'dart:developer';
 import 'dart:ffi';
 
 import 'package:android_multicast_lock/android_multicast_lock.dart';
 import 'package:ffi/ffi.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
-import 'package:lsl_plugin/src/channel_formats/channel_format.dart';
 import 'package:lsl_plugin/src/channel_formats/double_channel_format.dart';
-import 'package:lsl_plugin/src/channel_formats/int_channel_format.dart';
-import 'package:lsl_plugin/src/domain/outlet.dart';
-import 'package:lsl_plugin/src/domain/stream_info.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
 import 'package:lsl_plugin/src/services/stream_info_service.dart';
