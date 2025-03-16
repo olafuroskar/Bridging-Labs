@@ -1,6 +1,10 @@
-import 'package:lsl_plugin/src/channel_formats/channel_format.dart';
-import 'package:lsl_plugin/src/domain/stream_info.dart';
+part of '../../lsl_plugin.dart';
 
+/// Handles the creation of stream info objects depending on data type
+///
+/// Creating [StreamInfo] objects manually allows for dynamic typing of the channel format generic.
+/// This is undesirable as it facilitates weak typing. Therefore users of the package are required to
+/// create a stream info object through this service.
 class StreamInfoService {
   StreamInfo<int> createIntStreamInfo(
       String name, String type, ChannelFormat<int> channelFormat,

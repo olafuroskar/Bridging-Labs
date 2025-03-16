@@ -1,5 +1,4 @@
-import 'package:lsl_plugin/src/channel_formats/channel_format.dart';
-import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
+part of '../../lsl_plugin.dart';
 
 sealed class StringChannelFormat implements ChannelFormat<String> {
   const StringChannelFormat();

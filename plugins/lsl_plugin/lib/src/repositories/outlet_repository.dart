@@ -1,4 +1,6 @@
-part of '../../lsl_plugin.dart';
+import 'package:lsl_plugin/src/domain/outlet.dart';
+import 'package:lsl_plugin/src/utils/result.dart';
+import 'package:lsl_plugin/src/utils/unit.dart';
 
 /// An interface for outlet repositories
 abstract class OutletRepository<S> {
