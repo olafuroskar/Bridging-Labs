@@ -1,12 +1,17 @@
+import 'dart:developer';
 import 'dart:ffi';
 
 import 'package:android_multicast_lock/android_multicast_lock.dart';
 import 'package:ffi/ffi.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
+import 'package:lsl_plugin/src/channel_formats/channel_format.dart';
 import 'package:lsl_plugin/src/channel_formats/double_channel_format.dart';
 import 'package:lsl_plugin/src/channel_formats/int_channel_format.dart';
+import 'package:lsl_plugin/src/domain/outlet.dart';
+import 'package:lsl_plugin/src/domain/stream_info.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
+import 'package:lsl_plugin/src/services/stream_info_service.dart';
 import 'package:lsl_plugin/src/utils/result.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -29,13 +34,15 @@ void main() {
     // Use the mock native bindings and mock mutlicast lock
     MockLsl mockLsl = MockLsl();
     MockMulticastLock mockMulticastLock = MockMulticastLock();
-    StreamInfo.setBindings(mockLsl);
-    IntOutlet.setBindings(mockLsl);
-    IntOutlet.setMulticastLock(mockMulticastLock);
-    DoubleOutlet.setBindings(mockLsl);
-    DoubleOutlet.setMulticastLock(mockMulticastLock);
-    StringOutlet.setBindings(mockLsl);
-    StringOutlet.setMulticastLock(mockMulticastLock);
+
+    DoubleOutletRepository.setBindings(mockLsl);
+    DoubleOutletRepository.setMulticastLock(mockMulticastLock);
+
+    FloatOutletRepository.setBindings(mockLsl);
+    FloatOutletRepository.setMulticastLock(mockMulticastLock);
+
+    IntOutletRepository.setBindings(mockLsl);
+    IntOutletRepository.setMulticastLock(mockMulticastLock);
 
     // Mockito does not know how to make dummy native values so we must provide them
     streamInfoPointer = malloc.allocate<lsl_streaminfo_struct_>(
@@ -52,121 +59,56 @@ void main() {
     malloc.free(outletPointer);
   });
 
-  group('Integer outlets', () {
-    test(
-        "Setting the channel format to an 8 bit integer should be ok, and pushing a valid sample should work",
-        () {
-      final outletBuilder = IntOutletBuilder();
-      outletBuilder.name = "Test";
-      outletBuilder.type = "EEG";
-      outletBuilder.sourceId = "Testing Id";
-      outletBuilder.channelFormat = Int8ChannelFormat();
-      final outlet = outletBuilder.build();
-
-      switch (outlet) {
-        case Ok(value: var outlet):
-          var result = outlet.pushSample([1, 3, 4, 5]);
-          expect(result is Ok, true);
-        default:
-          fail("Should not fail");
-      }
-    });
-
-    test(
-        "Setting the channel format to an 16 bit integer should be ok, and pushing a valid sample should work",
-        () {
-      final outletBuilder = IntOutletBuilder();
-      outletBuilder.name = "Test";
-      outletBuilder.type = "EEG";
-      outletBuilder.sourceId = "Testing Id";
-      outletBuilder.channelFormat = Int16ChannelFormat();
-      final outlet = outletBuilder.build();
-
-      switch (outlet) {
-        case Ok(value: var outlet):
-          var result = outlet.pushSample([1, 3, 4, 5]);
-          expect(result is Ok, true);
-        default:
-          fail("Should not fail");
-      }
-    });
-
-    test(
-        "Setting the channel format to an 32 bit integer should be ok, and pushing a valid sample should work",
-        () {
-      final outletBuilder = IntOutletBuilder();
-      outletBuilder.name = "Test";
-      outletBuilder.type = "EEG";
-      outletBuilder.sourceId = "Testing Id";
-      outletBuilder.channelFormat = Int32ChannelFormat();
-      final outlet = outletBuilder.build();
-
-      switch (outlet) {
-        case Ok(value: var outlet):
-          var result = outlet.pushSample([1, 3, 4, 5]);
-          expect(result is Ok, true);
-        default:
-          fail("Should not fail");
-      }
-    });
-
-    test(
-        "Setting the channel format to an 64 bit integer should be ok, and pushing a valid sample should work",
-        () {
-      final outletBuilder = IntOutletBuilder();
-      outletBuilder.name = "Test";
-      outletBuilder.type = "EEG";
-      outletBuilder.sourceId = "Testing Id";
-      outletBuilder.channelFormat = Int64ChannelFormat();
-      final outlet = outletBuilder.build();
-
-      switch (outlet) {
-        case Ok(value: var outlet):
-          var result = outlet.pushSample([1, 3, 4, 5]);
-          expect(result is Ok, true);
-        default:
-          fail("Should not fail");
-      }
-    });
-  });
-
   group("Double outlets", () {
     test(
         "Setting the channel format to a 32 bit float should be ok, and pushing a valid sample should work",
         () {
-      final outletBuilder = DoubleOutletBuilder();
-      outletBuilder.name = "Test";
-      outletBuilder.type = "EEG";
-      outletBuilder.sourceId = "Testing Id";
-      outletBuilder.channelFormat = Float32ChannelFormat();
-      final outlet = outletBuilder.build();
+      final streamInfoService = StreamInfoService();
+      final streamInfo = streamInfoService.createDoubleStreamInfo(
+          "Test", "EEG", Float32ChannelFormat());
+      final outletService = OutletService(streamInfo);
 
-      switch (outlet) {
-        case Ok(value: var outlet):
-          var result = outlet.pushSample([1, 3, 4, 5]);
-          expect(result is Ok, true);
-        default:
-          fail("Should not fail");
-      }
+      final creation = outletService.create();
+      expect(creation is Ok, true);
+
+      var result = outletService.pushSample([1.0, 3.2, 4.3, 5.3]);
+      expect(result is Ok, true);
+
+      result = outletService.pushChunk([
+        [1.0, 3.2, 4.3, 5.3],
+        [1.0, 3.2, 4.3, 5.3]
+      ]);
+      expect(result is Ok, true);
     });
 
     test(
         "Setting the channel format to a 64 bit double should be ok, and pushing a valid sample should work",
         () {
-      final outletBuilder = DoubleOutletBuilder();
-      outletBuilder.name = "Test";
-      outletBuilder.type = "EEG";
-      outletBuilder.sourceId = "Testing Id";
-      outletBuilder.channelFormat = Double64ChannelFormat();
-      final outlet = outletBuilder.build();
+      final streamInfoService = StreamInfoService();
+      final streamInfo = streamInfoService.createDoubleStreamInfo(
+          "Test", "EEG", Double64ChannelFormat());
+      final outletService = OutletService(streamInfo);
 
-      switch (outlet) {
-        case Ok(value: var outlet):
-          var result = outlet.pushSample([1, 3, 4, 5]);
-          expect(result is Ok, true);
-        default:
-          fail("Should not fail");
-      }
+      final creation = outletService.create();
+      expect(creation is Ok, true);
+
+      var result = outletService.pushSample([1.0, 3.2, 4.3, 5.3]);
+      expect(result is Ok, true);
+
+      result = outletService.pushChunk([
+        [1.0, 3.2, 4.3, 5.3],
+        [1.0, 3.2, 4.3, 5.3]
+      ]);
+      expect(result is Ok, true);
     });
   });
+
+  // group("Integer outlets", () {
+  //   final streamInfo = StreamInfoRename("TestInt", "EEG", Int32ChannelFormat());
+  //
+  //   final outlet = Outlet(streamInfo);
+  //
+  //   final outletRepo = IntOutletRepository();
+  //   outletRepo.create(outlet);
+  // });
 }

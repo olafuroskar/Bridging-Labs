@@ -1,7 +1,7 @@
 import 'package:lsl_plugin/src/channel_formats/channel_format.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
 
-sealed class DoubleChannelFormat implements ChannelFormat {
+sealed class DoubleChannelFormat implements ChannelFormat<double> {
   const DoubleChannelFormat();
 
   static const float32 = Float32ChannelFormat();
