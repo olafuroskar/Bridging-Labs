@@ -1,5 +1,5 @@
 import 'package:lsl_plugin/src/channel_formats/channel_format.dart';
-import 'package:lsl_plugin/src/repositories/outlet_repository.dart';
+import 'package:lsl_plugin/src/repositories/outlets/outlet_repository.dart';
 import 'package:lsl_plugin/src/utils/result.dart';
 
 /// "Unwraps" the nullable outlet repository
