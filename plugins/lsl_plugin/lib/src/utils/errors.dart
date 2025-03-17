@@ -1,5 +1,5 @@
+import 'package:lsl_plugin/lsl_plugin.dart';
 import 'package:lsl_plugin/src/channel_formats/channel_format.dart';
-import 'package:lsl_plugin/src/utils/result.dart';
 
 Result<T> sampleTypeChannelFormatMismatchError<T>(
     String sampleType, ChannelFormat channelFormat) {

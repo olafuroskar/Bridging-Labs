@@ -1,4 +1,4 @@
-import 'package:lsl_plugin/src/channel_formats/channel_format.dart';
+part of '../../lsl_plugin.dart';
 
 class StreamInfo<S> {
   String name;

@@ -8,7 +8,6 @@ import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
 import 'package:lsl_plugin/src/repositories/outlets/implementations/double_outlet_repository.dart';
 import 'package:lsl_plugin/src/repositories/outlets/implementations/float_outlet_repository.dart';
 import 'package:lsl_plugin/src/repositories/outlets/implementations/int_outlet_repository.dart';
-import 'package:lsl_plugin/src/utils/result.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';

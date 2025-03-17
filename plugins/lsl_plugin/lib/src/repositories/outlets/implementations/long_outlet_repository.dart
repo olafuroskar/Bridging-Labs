@@ -3,13 +3,11 @@ import 'dart:ffi';
 import 'package:android_multicast_lock/android_multicast_lock.dart';
 import 'package:ffi/ffi.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
-import 'package:lsl_plugin/src/domain/outlet.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
 import 'package:lsl_plugin/src/repositories/outlets/outlet_repository.dart';
 import 'package:lsl_plugin/src/repositories/outlets/utils.dart';
 import 'package:lsl_plugin/src/utils/errors.dart';
-import 'package:lsl_plugin/src/utils/result.dart';
 import 'package:lsl_plugin/src/utils/unit.dart';
 
 class LongOutletRepository implements OutletRepository<int> {

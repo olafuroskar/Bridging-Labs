@@ -1,6 +1,6 @@
 part of '../../lsl_plugin.dart';
 
-class OutletService<S, T extends ChannelFormat<S>> {
+class OutletService<S> {
   int chunkSize;
   int maxBuffered;
   final StreamInfo<S> _streamInfo;

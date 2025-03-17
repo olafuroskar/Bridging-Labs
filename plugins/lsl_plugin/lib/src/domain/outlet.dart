@@ -1,4 +1,4 @@
-import 'package:lsl_plugin/src/domain/stream_info.dart';
+part of '../../lsl_plugin.dart';
 
 class Outlet<S> {
   StreamInfo<S> streamInfo;

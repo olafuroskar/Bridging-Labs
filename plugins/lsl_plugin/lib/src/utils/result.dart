@@ -1,3 +1,5 @@
+part of '../../lsl_plugin.dart';
+
 /// Utility class that simplifies handling errors.
 ///
 /// Return a [Result] from a function to indicate success or failure.
