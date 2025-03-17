@@ -31,4 +31,9 @@ A new Flutter FFI plugin project.
   s.platform = :osx, '10.11'
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
   s.swift_version = '5.0'
+
+  # TODO: Fetch from releases on github
+  s.macos.vendored_frameworks = "lsl.xcframework"
+  s.preserve_paths = "lsl.xcframework"
+  s.frameworks = "lsl"
 end

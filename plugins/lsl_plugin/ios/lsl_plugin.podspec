@@ -14,6 +14,7 @@ A new Flutter FFI plugin project.
   s.author           = { 'Technical University of Denmark' => 's232410@dtu.dk' }
 
   s.source           = { :path => '.' }
+  s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
   s.platform = :ios, '12.0'
 
