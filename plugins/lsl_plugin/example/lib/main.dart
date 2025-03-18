@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
-import 'dart:async';
+import 'dart:developer';
 
-import 'package:lsl_plugin/lsl_plugin.dart' as lsl_plugin;
+import 'package:flutter/material.dart';
+
+import 'package:lsl_plugin/lsl_plugin.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,14 +16,17 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late int sumResult;
-  late Future<int> sumAsyncResult;
+  // late int sumResult;
+  // late Future<int> sumAsyncResult;
+  OutletService<int>? outletService;
+  String? error;
 
   @override
   void initState() {
     super.initState();
-    sumResult = lsl_plugin.sum(1, 2);
-    sumAsyncResult = lsl_plugin.sumAsync(3, 4);
+
+    // sumResult = lsl_plugin.sum(1, 2);
+    // sumAsyncResult = lsl_plugin.sumAsync(3, 4);
   }
 
   @override
@@ -46,24 +50,51 @@ class _MyAppState extends State<MyApp> {
                   textAlign: TextAlign.center,
                 ),
                 spacerSmall,
-                Text(
-                  'sum(1, 2) = $sumResult',
-                  style: textStyle,
-                  textAlign: TextAlign.center,
-                ),
+                TextButton(
+                    onPressed: () {
+                      final streamInfoService = StreamInfoService();
+                      final streamInfo = streamInfoService.createIntStreamInfo(
+                          "Test", "EEG", Int32ChannelFormat());
+
+                      log("creating outlet");
+                      setState(() {
+                        final service = OutletService(streamInfo);
+                        final result = service.create();
+                        switch (result) {
+                          case Error(error: var e):
+                            error = e.toString();
+                            break;
+                          default:
+                            outletService = service;
+                        }
+                      });
+                    },
+                    child: Text("Create outlet")),
                 spacerSmall,
-                FutureBuilder<int>(
-                  future: sumAsyncResult,
-                  builder: (BuildContext context, AsyncSnapshot<int> value) {
-                    final displayValue =
-                        (value.hasData) ? value.data : 'loading';
-                    return Text(
-                      'await sumAsync(3, 4) = $displayValue',
-                      style: textStyle,
-                      textAlign: TextAlign.center,
-                    );
-                  },
-                ),
+                TextButton(
+                    onPressed: () {
+                      log("destroying outlet");
+                      setState(() {
+                        outletService?.destroy();
+                      });
+                    },
+                    child: Text("Destroy outlet")),
+                spacerSmall,
+                Text(error == null ? "No error" : error!)
+                // TextButton(
+                //     onPressed: () {
+                //       var inlet = test_ffi.Inlet();
+                //       setState(() {
+                //         numStreams = inlet.getNumStreams();
+                //       });
+                //     },
+                //     child: Text("Find streams")),
+                // spacerSmall,
+                // Text("NumStreams: $numStreams"),
+                // spacerSmall,
+                // Text(
+                //   outlet == null ? "Outlet is null" : outlet!.getStreamXml(),
+                // )
               ],
             ),
           ),
