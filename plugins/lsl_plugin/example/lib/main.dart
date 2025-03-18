@@ -1,4 +1,5 @@
-import 'dart:developer';
+import 'dart:developer' as dev;
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 
@@ -18,7 +19,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   // late int sumResult;
   // late Future<int> sumAsyncResult;
-  OutletService<int>? outletService;
+  OutletService<double>? outletService;
   String? error;
 
   @override
@@ -53,10 +54,11 @@ class _MyAppState extends State<MyApp> {
                 TextButton(
                     onPressed: () {
                       final streamInfoService = StreamInfoService();
-                      final streamInfo = streamInfoService.createIntStreamInfo(
-                          "Test", "EEG", Int32ChannelFormat());
+                      final streamInfo =
+                          streamInfoService.createDoubleStreamInfo(
+                              "Test", "EEG", Double64ChannelFormat());
 
-                      log("creating outlet");
+                      dev.log("creating outlet");
                       setState(() {
                         final service = OutletService(streamInfo);
                         final result = service.create();
@@ -70,10 +72,23 @@ class _MyAppState extends State<MyApp> {
                       });
                     },
                     child: Text("Create outlet")),
+                TextButton(
+                    onPressed: () {
+                      final result = outletService
+                          ?.pushSample([Random().nextDouble() * 100]);
+
+                      switch (result) {
+                        case Error(error: var e):
+                          error = e.toString();
+                          break;
+                        default:
+                      }
+                    },
+                    child: Text("Push sample")),
                 spacerSmall,
                 TextButton(
                     onPressed: () {
-                      log("destroying outlet");
+                      dev.log("destroying outlet");
                       setState(() {
                         outletService?.destroy();
                       });
