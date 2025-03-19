@@ -15,7 +15,7 @@ part 'src/utils/result.dart';
 part 'package:lsl_plugin/src/domain/outlet.dart';
 part 'package:lsl_plugin/src/domain/stream_info.dart';
 
-// Services
+// Managers
 part 'src/services/outlet_service.dart';
 part 'src/services/stream_info_service.dart';
 

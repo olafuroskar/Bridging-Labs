@@ -19,7 +19,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   // late int sumResult;
   // late Future<int> sumAsyncResult;
-  OutletService<double>? outletService;
+  OutletManager<double>? outletManager;
   String? error;
 
   @override
@@ -53,28 +53,27 @@ class _MyAppState extends State<MyApp> {
                 spacerSmall,
                 TextButton(
                     onPressed: () {
-                      final streamInfoService = StreamInfoService();
                       final streamInfo =
-                          streamInfoService.createDoubleStreamInfo(
+                          StreamInfoFactory.createDoubleStreamInfo(
                               "Test", "EEG", Double64ChannelFormat());
 
                       dev.log("creating outlet");
                       setState(() {
-                        final service = OutletService(streamInfo);
-                        final result = service.create();
+                        final manager = OutletManager(streamInfo);
+                        final result = manager.create();
                         switch (result) {
                           case Error(error: var e):
                             error = e.toString();
                             break;
                           default:
-                            outletService = service;
+                            outletManager = manager;
                         }
                       });
                     },
                     child: Text("Create outlet")),
                 TextButton(
                     onPressed: () {
-                      final result = outletService
+                      final result = outletManager
                           ?.pushSample([Random().nextDouble() * 100]);
 
                       switch (result) {
@@ -90,7 +89,7 @@ class _MyAppState extends State<MyApp> {
                     onPressed: () {
                       dev.log("destroying outlet");
                       setState(() {
-                        outletService?.destroy();
+                        outletManager?.destroy();
                       });
                     },
                     child: Text("Destroy outlet")),

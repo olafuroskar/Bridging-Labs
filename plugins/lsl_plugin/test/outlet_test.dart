@@ -58,18 +58,17 @@ void main() {
     test(
         "Setting the channel format to a 32 bit float should be ok, and pushing a valid sample should work",
         () {
-      final streamInfoService = StreamInfoService();
-      final streamInfo = streamInfoService.createDoubleStreamInfo(
+      final streamInfo = StreamInfoFactory.createDoubleStreamInfo(
           "Test", "EEG", Float32ChannelFormat());
-      final outletService = OutletService(streamInfo);
+      final outletManager = OutletManager(streamInfo);
 
-      final creation = outletService.create();
+      final creation = outletManager.create();
       expect(creation is Ok, true);
 
-      var result = outletService.pushSample([1.0, 3.2, 4.3, 5.3]);
+      var result = outletManager.pushSample([1.0, 3.2, 4.3, 5.3]);
       expect(result is Ok, true);
 
-      result = outletService.pushChunk([
+      result = outletManager.pushChunk([
         [1.0, 3.2, 4.3, 5.3],
         [1.0, 3.2, 4.3, 5.3]
       ]);
@@ -79,18 +78,17 @@ void main() {
     test(
         "Setting the channel format to a 64 bit double should be ok, and pushing a valid sample should work",
         () {
-      final streamInfoService = StreamInfoService();
-      final streamInfo = streamInfoService.createDoubleStreamInfo(
+      final streamInfo = StreamInfoFactory.createDoubleStreamInfo(
           "Test", "EEG", Double64ChannelFormat());
-      final outletService = OutletService(streamInfo);
+      final outletManager = OutletManager(streamInfo);
 
-      final creation = outletService.create();
+      final creation = outletManager.create();
       expect(creation is Ok, true);
 
-      var result = outletService.pushSample([1.0, 3.2, 4.3, 5.3]);
+      var result = outletManager.pushSample([1.0, 3.2, 4.3, 5.3]);
       expect(result is Ok, true);
 
-      result = outletService.pushChunk([
+      result = outletManager.pushChunk([
         [1.0, 3.2, 4.3, 5.3],
         [1.0, 3.2, 4.3, 5.3]
       ]);

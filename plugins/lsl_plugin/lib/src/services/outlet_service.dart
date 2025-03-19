@@ -4,14 +4,14 @@ part of '../../lsl_plugin.dart';
 ///
 /// An instance can be re-used for multiple outlets (after being destroyed of course), but
 /// creaing new instances instead is incouraged for clarity.
-class OutletService<S> {
+class OutletManager<S> {
   int chunkSize;
   int maxBuffered;
   final StreamInfo<S> _streamInfo;
 
   OutletAdapter<S>? _outletAdapter;
 
-  OutletService(this._streamInfo, [this.chunkSize = 0, this.maxBuffered = 360]);
+  OutletManager(this._streamInfo, [this.chunkSize = 0, this.maxBuffered = 360]);
 
   /// {@macro create}
   Result<Unit> create() {
@@ -25,10 +25,8 @@ class OutletService<S> {
       /// Here we have already established that S is in fact int
       /// Furthermore, from the `T extends ChannelFormat<T>` type constraint we know that streamInfo.channelFormat
       /// must be of type ChannelFormat<int>. The factory returns a narrower type but we must cast it back to a wider one.
-      outletAdapter =
-          OutletAdapterFactory.createIntRepositoryFromChannelFormat(
-                  _streamInfo.channelFormat as ChannelFormat<int>)
-              as OutletAdapter<S>;
+      outletAdapter = OutletAdapterFactory.createIntRepositoryFromChannelFormat(
+          _streamInfo.channelFormat as ChannelFormat<int>) as OutletAdapter<S>;
     } else if (S == double) {
       /// Get the appropriate outlet repository for the given double channel format
       ///
