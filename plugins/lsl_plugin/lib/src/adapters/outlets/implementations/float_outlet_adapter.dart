@@ -5,12 +5,12 @@ import 'package:ffi/ffi.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
-import 'package:lsl_plugin/src/repositories/outlets/outlet_adapter.dart';
-import 'package:lsl_plugin/src/repositories/outlets/utils.dart';
+import 'package:lsl_plugin/src/adapters/outlets/outlet_adapter.dart';
+import 'package:lsl_plugin/src/adapters/outlets/utils.dart';
 import 'package:lsl_plugin/src/utils/errors.dart';
 import 'package:lsl_plugin/src/utils/unit.dart';
 
-class LongOutletAdapter implements OutletAdapter<int> {
+class FloatOutletAdapter implements OutletAdapter<double> {
   lsl_outlet? _outletPointer;
 
   /// {@macro bindings}
@@ -26,11 +26,12 @@ class LongOutletAdapter implements OutletAdapter<int> {
     _multicastLock = multicastLock;
   }
 
-  LongOutletAdapter();
+  FloatOutletAdapter();
 
   @override
-  Result<Unit> create(Outlet<int> outlet) {
-    switch (createOutlet(_lsl, _multicastLock, outlet, Int64ChannelFormat())) {
+  Result<Unit> create(Outlet<double> outlet) {
+    switch (
+        createOutlet(_lsl, _multicastLock, outlet, Float32ChannelFormat())) {
       case Ok(value: var nativeOutlet):
         _outletPointer = nativeOutlet;
         return Result.ok(unit);
@@ -45,7 +46,7 @@ class LongOutletAdapter implements OutletAdapter<int> {
   }
 
   @override
-  Result<Unit> pushSample(List<int> sample,
+  Result<Unit> pushSample(List<double> sample,
       [double? timestamp, bool pushthrough = false]) {
     if (sample.isEmpty) {
       return Result.ok(unit);
@@ -55,18 +56,17 @@ class LongOutletAdapter implements OutletAdapter<int> {
       final outletPointer = getOutlet(_outletPointer);
 
       final nativeSamplePointer =
-          malloc.allocate<Int64>(sample.length * sizeOf<Int64>());
+          malloc.allocate<Float>(sample.length * sizeOf<Float>());
       for (var i = 0; i < sample.length; i++) {
         nativeSamplePointer[i] = sample[i];
       }
       if (timestamp != null) {
-        _lsl.bindings.lsl_push_sample_ltp(
+        _lsl.bindings.lsl_push_sample_ftp(
             outletPointer, nativeSamplePointer, timestamp, pushthrough ? 1 : 0);
       } else {
-        _lsl.bindings.lsl_push_sample_l(outletPointer, nativeSamplePointer);
+        _lsl.bindings.lsl_push_sample_f(outletPointer, nativeSamplePointer);
       }
       malloc.free(nativeSamplePointer);
-
       return Result.ok(unit);
     } on Exception catch (e) {
       return Result.error(e);
@@ -76,7 +76,7 @@ class LongOutletAdapter implements OutletAdapter<int> {
   }
 
   @override
-  Result<Unit> pushChunk(List<List<int>> chunk,
+  Result<Unit> pushChunk(List<List<double>> chunk,
       [double? timestamp, bool pushthrough = false]) {
     if (chunk.isEmpty) {
       return Result.ok(unit);
@@ -89,7 +89,7 @@ class LongOutletAdapter implements OutletAdapter<int> {
       final channelCount = chunk[0].length;
 
       final nativeSamplePointer =
-          malloc.allocate<Int64>(dataElements * channelCount * sizeOf<Int64>());
+          malloc.allocate<Float>(dataElements * channelCount * sizeOf<Float>());
       for (var i = 0; i < dataElements; i++) {
         for (var j = 0; j < channelCount; j++) {
           nativeSamplePointer[i * dataElements + j] = chunk[i][j];
@@ -97,17 +97,15 @@ class LongOutletAdapter implements OutletAdapter<int> {
       }
 
       if (timestamp != null) {
-        _lsl.bindings.lsl_push_chunk_ltp(outletPointer, nativeSamplePointer,
+        _lsl.bindings.lsl_push_chunk_ftp(outletPointer, nativeSamplePointer,
             dataElements, timestamp, pushthrough ? 1 : 0);
       } else {
         _lsl.bindings
-            .lsl_push_chunk_l(outletPointer, nativeSamplePointer, dataElements);
+            .lsl_push_chunk_f(outletPointer, nativeSamplePointer, dataElements);
       }
       malloc.free(nativeSamplePointer);
 
       return Result.ok(unit);
-    } on Exception catch (e) {
-      return Result.error(e);
     } catch (e) {
       return unexpectedError("$e");
     }

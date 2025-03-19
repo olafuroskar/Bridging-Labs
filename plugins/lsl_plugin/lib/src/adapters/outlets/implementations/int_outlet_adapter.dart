@@ -5,8 +5,8 @@ import 'package:ffi/ffi.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
-import 'package:lsl_plugin/src/repositories/outlets/outlet_adapter.dart';
-import 'package:lsl_plugin/src/repositories/outlets/utils.dart';
+import 'package:lsl_plugin/src/adapters/outlets/outlet_adapter.dart';
+import 'package:lsl_plugin/src/adapters/outlets/utils.dart';
 import 'package:lsl_plugin/src/utils/errors.dart';
 import 'package:lsl_plugin/src/utils/unit.dart';
 
