@@ -5,12 +5,12 @@ import 'package:ffi/ffi.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
-import 'package:lsl_plugin/src/repositories/outlets/outlet_repository.dart';
+import 'package:lsl_plugin/src/repositories/outlets/outlet_adapter.dart';
 import 'package:lsl_plugin/src/repositories/outlets/utils.dart';
 import 'package:lsl_plugin/src/utils/errors.dart';
 import 'package:lsl_plugin/src/utils/unit.dart';
 
-class StringOutletAdapter implements OutletAdapter<String> {
+class LongOutletAdapter implements OutletAdapter<int> {
   lsl_outlet? _outletPointer;
 
   /// {@macro bindings}
@@ -26,12 +26,11 @@ class StringOutletAdapter implements OutletAdapter<String> {
     _multicastLock = multicastLock;
   }
 
-  StringOutletAdapter();
+  LongOutletAdapter();
 
   @override
-  Result<Unit> create(Outlet<String> outlet) {
-    switch (
-        createOutlet(_lsl, _multicastLock, outlet, CftStringChannelFormat())) {
+  Result<Unit> create(Outlet<int> outlet) {
+    switch (createOutlet(_lsl, _multicastLock, outlet, Int64ChannelFormat())) {
       case Ok(value: var nativeOutlet):
         _outletPointer = nativeOutlet;
         return Result.ok(unit);
@@ -46,7 +45,7 @@ class StringOutletAdapter implements OutletAdapter<String> {
   }
 
   @override
-  Result<Unit> pushSample(List<String> sample,
+  Result<Unit> pushSample(List<int> sample,
       [double? timestamp, bool pushthrough = false]) {
     if (sample.isEmpty) {
       return Result.ok(unit);
@@ -55,25 +54,16 @@ class StringOutletAdapter implements OutletAdapter<String> {
     try {
       final outletPointer = getOutlet(_outletPointer);
 
-      Pointer<Char> toString(String text) => text.toNativeUtf8().cast<Char>();
-      final encodedStrings = sample.map(toString).toList();
-
-      final nativeSamplePointer = malloc
-          .allocate<Pointer<Char>>(sample.length * sizeOf<Pointer<Char>>());
-
+      final nativeSamplePointer =
+          malloc.allocate<Int64>(sample.length * sizeOf<Int64>());
       for (var i = 0; i < sample.length; i++) {
-        nativeSamplePointer[i] = encodedStrings[i];
+        nativeSamplePointer[i] = sample[i];
       }
-
       if (timestamp != null) {
-        _lsl.bindings.lsl_push_sample_strtp(
+        _lsl.bindings.lsl_push_sample_ltp(
             outletPointer, nativeSamplePointer, timestamp, pushthrough ? 1 : 0);
       } else {
-        _lsl.bindings.lsl_push_sample_str(outletPointer, nativeSamplePointer);
-      }
-
-      for (var ptr in encodedStrings) {
-        malloc.free(ptr);
+        _lsl.bindings.lsl_push_sample_l(outletPointer, nativeSamplePointer);
       }
       malloc.free(nativeSamplePointer);
 
@@ -86,7 +76,7 @@ class StringOutletAdapter implements OutletAdapter<String> {
   }
 
   @override
-  Result<Unit> pushChunk(List<List<String>> chunk,
+  Result<Unit> pushChunk(List<List<int>> chunk,
       [double? timestamp, bool pushthrough = false]) {
     if (chunk.isEmpty) {
       return Result.ok(unit);
@@ -98,26 +88,21 @@ class StringOutletAdapter implements OutletAdapter<String> {
       final dataElements = chunk.length;
       final channelCount = chunk[0].length;
 
-      Pointer<Char> toString(String text) => text.toNativeUtf8().cast<Char>();
-
-      final nativeSamplePointer = malloc.allocate<Pointer<Char>>(
-          dataElements * channelCount * sizeOf<Pointer<Char>>());
-
+      final nativeSamplePointer =
+          malloc.allocate<Int64>(dataElements * channelCount * sizeOf<Int64>());
       for (var i = 0; i < dataElements; i++) {
-        final encodedStrings = chunk[i].map(toString).toList();
         for (var j = 0; j < channelCount; j++) {
-          nativeSamplePointer[i * dataElements + j] = encodedStrings[j];
+          nativeSamplePointer[i * dataElements + j] = chunk[i][j];
         }
       }
 
       if (timestamp != null) {
-        _lsl.bindings.lsl_push_chunk_strtp(outletPointer, nativeSamplePointer,
+        _lsl.bindings.lsl_push_chunk_ltp(outletPointer, nativeSamplePointer,
             dataElements, timestamp, pushthrough ? 1 : 0);
       } else {
-        _lsl.bindings.lsl_push_chunk_str(
-            outletPointer, nativeSamplePointer, dataElements);
+        _lsl.bindings
+            .lsl_push_chunk_l(outletPointer, nativeSamplePointer, dataElements);
       }
-
       malloc.free(nativeSamplePointer);
 
       return Result.ok(unit);
@@ -126,17 +111,5 @@ class StringOutletAdapter implements OutletAdapter<String> {
     } catch (e) {
       return unexpectedError("$e");
     }
-  }
-
-  Result<int> testResolveStream() {
-    const bufferSize = 1024;
-
-    Pointer<lsl_streaminfo> buffer =
-        malloc.allocate<lsl_streaminfo>(bufferSize * sizeOf<lsl_streaminfo>());
-
-    var numStreams = _lsl.bindings.lsl_resolve_all(buffer, bufferSize, 2);
-
-    // log("NumStreams: $numStreams");
-    return Result.ok(numStreams);
   }
 }

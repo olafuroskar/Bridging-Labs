@@ -3,8 +3,8 @@ library;
 
 import 'package:lsl_plugin/src/channel_formats/channel_format.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
-import 'package:lsl_plugin/src/repositories/outlets/outlet_repository.dart';
-import 'package:lsl_plugin/src/repositories/outlets/outlet_repository_factory.dart';
+import 'package:lsl_plugin/src/repositories/outlets/outlet_adapter.dart';
+import 'package:lsl_plugin/src/repositories/outlets/outlet_adapter_factory.dart';
 import 'package:lsl_plugin/src/services/utils.dart';
 import 'package:lsl_plugin/src/utils/unit.dart';
 

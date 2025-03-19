@@ -1,12 +1,12 @@
 import 'package:lsl_plugin/src/channel_formats/channel_format.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
-import 'package:lsl_plugin/src/repositories/outlets/implementations/double_outlet_repository.dart';
-import 'package:lsl_plugin/src/repositories/outlets/implementations/float_outlet_repository.dart';
-import 'package:lsl_plugin/src/repositories/outlets/implementations/int_outlet_repository.dart';
-import 'package:lsl_plugin/src/repositories/outlets/implementations/long_outlet_repository.dart';
-import 'package:lsl_plugin/src/repositories/outlets/outlet_repository.dart';
-import 'package:lsl_plugin/src/repositories/outlets/implementations/short_outlet_repository.dart';
-import 'package:lsl_plugin/src/repositories/outlets/implementations/string_outlet_repository.dart';
+import 'package:lsl_plugin/src/repositories/outlets/implementations/double_outlet_adapter.dart';
+import 'package:lsl_plugin/src/repositories/outlets/implementations/float_outlet_adapter.dart';
+import 'package:lsl_plugin/src/repositories/outlets/implementations/int_outlet_adapter.dart';
+import 'package:lsl_plugin/src/repositories/outlets/implementations/long_outlet_adapter.dart';
+import 'package:lsl_plugin/src/repositories/outlets/outlet_adapter.dart';
+import 'package:lsl_plugin/src/repositories/outlets/implementations/short_outlet_adapter.dart';
+import 'package:lsl_plugin/src/repositories/outlets/implementations/string_outlet_adapter.dart';
 
 class OutletAdapterFactory {
   static OutletAdapter<int> createIntRepositoryFromChannelFormat(
