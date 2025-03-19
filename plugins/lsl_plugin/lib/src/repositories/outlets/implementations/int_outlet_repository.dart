@@ -10,7 +10,7 @@ import 'package:lsl_plugin/src/repositories/outlets/utils.dart';
 import 'package:lsl_plugin/src/utils/errors.dart';
 import 'package:lsl_plugin/src/utils/unit.dart';
 
-class IntOutletRepository implements OutletRepository<int> {
+class IntOutletAdapter implements OutletAdapter<int> {
   lsl_outlet? _outletPointer;
 
   /// {@macro bindings}
@@ -26,7 +26,7 @@ class IntOutletRepository implements OutletRepository<int> {
     _multicastLock = multicastLock;
   }
 
-  IntOutletRepository();
+  IntOutletAdapter();
 
   @override
   Result<Unit> create(Outlet<int> outlet) {

@@ -30,14 +30,14 @@ void main() {
     MockLsl mockLsl = MockLsl();
     MockMulticastLock mockMulticastLock = MockMulticastLock();
 
-    DoubleOutletRepository.setBindings(mockLsl);
-    DoubleOutletRepository.setMulticastLock(mockMulticastLock);
+    DoubleOutletAdapter.setBindings(mockLsl);
+    DoubleOutletAdapter.setMulticastLock(mockMulticastLock);
 
-    FloatOutletRepository.setBindings(mockLsl);
-    FloatOutletRepository.setMulticastLock(mockMulticastLock);
+    FloatOutletAdapter.setBindings(mockLsl);
+    FloatOutletAdapter.setMulticastLock(mockMulticastLock);
 
-    IntOutletRepository.setBindings(mockLsl);
-    IntOutletRepository.setMulticastLock(mockMulticastLock);
+    IntOutletAdapter.setBindings(mockLsl);
+    IntOutletAdapter.setMulticastLock(mockMulticastLock);
 
     // Mockito does not know how to make dummy native values so we must provide them
     streamInfoPointer = malloc.allocate<lsl_streaminfo_struct_>(
@@ -103,7 +103,7 @@ void main() {
   //
   //   final outlet = Outlet(streamInfo);
   //
-  //   final outletRepo = IntOutletRepository();
-  //   outletRepo.create(outlet);
+  //   final outletAdapter = IntOutletAdapter();
+  //   outletAdapter.create(outlet);
   // });
 }

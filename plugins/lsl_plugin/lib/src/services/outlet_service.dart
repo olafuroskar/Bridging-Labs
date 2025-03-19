@@ -1,18 +1,23 @@
 part of '../../lsl_plugin.dart';
 
+/// A service for interacting with a single outlet
+///
+/// An instance can be re-used for multiple outlets (after being destroyed of course), but
+/// creaing new instances instead is incouraged for clarity.
 class OutletService<S> {
   int chunkSize;
   int maxBuffered;
   final StreamInfo<S> _streamInfo;
 
-  OutletRepository<S>? _outletRepository;
+  OutletAdapter<S>? _outletAdapter;
 
   OutletService(this._streamInfo, [this.chunkSize = 0, this.maxBuffered = 360]);
 
+  /// {@macro create}
   Result<Unit> create() {
     final outlet = Outlet<S>(_streamInfo, chunkSize, maxBuffered);
 
-    OutletRepository<S>? outletRepository;
+    OutletAdapter<S>? outletAdapter;
 
     if (S == int) {
       /// Get the appropriate outlet repository for the given integer channel format
@@ -20,36 +25,36 @@ class OutletService<S> {
       /// Here we have already established that S is in fact int
       /// Furthermore, from the `T extends ChannelFormat<T>` type constraint we know that streamInfo.channelFormat
       /// must be of type ChannelFormat<int>. The factory returns a narrower type but we must cast it back to a wider one.
-      outletRepository =
-          OutletRepositoryFactory.createIntRepositoryFromChannelFormat(
+      outletAdapter =
+          OutletAdapterFactory.createIntRepositoryFromChannelFormat(
                   _streamInfo.channelFormat as ChannelFormat<int>)
-              as OutletRepository<S>;
+              as OutletAdapter<S>;
     } else if (S == double) {
       /// Get the appropriate outlet repository for the given double channel format
       ///
       /// Here we have already established that S is in fact double
       /// Furthermore, from the `T extends ChannelFormat<T>` type constraint we know that streamInfo.channelFormat
       /// must be of type ChannelFormat<double>. The factory returns a narrower type but we must cast it back to a wider one.
-      outletRepository =
-          OutletRepositoryFactory.createDoubleRepositoryFromChannelFormat(
+      outletAdapter =
+          OutletAdapterFactory.createDoubleRepositoryFromChannelFormat(
                   _streamInfo.channelFormat as ChannelFormat<double>)
-              as OutletRepository<S>;
+              as OutletAdapter<S>;
     } else if (S == String) {
       /// Get the appropriate outlet repository for the given String channel format
       ///
       /// Here we have already established that S is in fact String
       /// Furthermore, from the `T extends ChannelFormat<T>` type constraint we know that streamInfo.channelFormat
       /// must be of type ChannelFormat<String>. The factory returns a narrower type but we must cast it back to a wider one.
-      outletRepository =
-          OutletRepositoryFactory.createStringRepositoryFromChannelFormat(
+      outletAdapter =
+          OutletAdapterFactory.createStringRepositoryFromChannelFormat(
                   _streamInfo.channelFormat as ChannelFormat<String>)
-              as OutletRepository<S>;
+              as OutletAdapter<S>;
     } else {
       return Result.error(Exception("Unsupported type $S"));
     }
 
-    final result = outletRepository.create(outlet);
-    _outletRepository = outletRepository;
+    final result = outletAdapter.create(outlet);
+    _outletAdapter = outletAdapter;
 
     return result;
   }
@@ -57,9 +62,9 @@ class OutletService<S> {
   /// {@macro push_sample}
   Result<Unit> pushSample(List<S> sample,
       [double? timestamp, bool pushthrough = false]) {
-    return switch (getRepository(_outletRepository)) {
-      Ok(value: var outletRepository) =>
-        outletRepository.pushSample(sample, timestamp, pushthrough),
+    return switch (getRepository(_outletAdapter)) {
+      Ok(value: var outletAdapter) =>
+        outletAdapter.pushSample(sample, timestamp, pushthrough),
       Error(error: var e) => Result.error(e)
     };
   }
@@ -67,16 +72,17 @@ class OutletService<S> {
   /// {@macro push_chunk}
   Result<Unit> pushChunk(List<List<S>> chunk,
       [double? timestamp, bool pushthrough = false]) {
-    return switch (getRepository(_outletRepository)) {
-      Ok(value: var outletRepository) =>
-        outletRepository.pushChunk(chunk, timestamp, pushthrough),
+    return switch (getRepository(_outletAdapter)) {
+      Ok(value: var outletAdapter) =>
+        outletAdapter.pushChunk(chunk, timestamp, pushthrough),
       Error(error: var e) => Result.error(e)
     };
   }
 
+  /// {@macro destroy}
   Result<Unit> destroy() {
-    return switch (getRepository(_outletRepository)) {
-      Ok(value: var outletRepository) => outletRepository.destroy(),
+    return switch (getRepository(_outletAdapter)) {
+      Ok(value: var outletAdapter) => outletAdapter.destroy(),
       Error(error: var e) => Result.error(e)
     };
   }

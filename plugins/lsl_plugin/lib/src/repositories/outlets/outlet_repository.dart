@@ -2,8 +2,15 @@ import 'package:lsl_plugin/lsl_plugin.dart';
 import 'package:lsl_plugin/src/utils/unit.dart';
 
 /// An interface for outlet repositories
-abstract class OutletRepository<S> {
+abstract class OutletAdapter<S> {
+  /// {@template create}
+  /// Creates an outlet stream from the given [outlet] object
+  /// {@endtemplate}
   Result<Unit> create(Outlet<S> outlet);
+
+  /// {@template destroy}
+  /// Destroys the given outlet
+  /// {@endtemplate}
   Result<Unit> destroy();
 
   /// {@template push_sample}
@@ -28,4 +35,8 @@ abstract class OutletRepository<S> {
   /// {@endtemplate}
   Result<Unit> pushChunk(List<List<S>> chunk,
       [double? timestamp, bool pushthrough = false]);
+
+  // getStreamInfo
+  // haveConsumers
+  // waitForConsumers - might need isolate
 }

@@ -10,7 +10,7 @@ import 'package:lsl_plugin/src/repositories/outlets/utils.dart';
 import 'package:lsl_plugin/src/utils/errors.dart';
 import 'package:lsl_plugin/src/utils/unit.dart';
 
-class StringOutletRepository implements OutletRepository<String> {
+class StringOutletAdapter implements OutletAdapter<String> {
   lsl_outlet? _outletPointer;
 
   /// {@macro bindings}
@@ -26,7 +26,7 @@ class StringOutletRepository implements OutletRepository<String> {
     _multicastLock = multicastLock;
   }
 
-  StringOutletRepository();
+  StringOutletAdapter();
 
   @override
   Result<Unit> create(Outlet<String> outlet) {
@@ -126,5 +126,17 @@ class StringOutletRepository implements OutletRepository<String> {
     } catch (e) {
       return unexpectedError("$e");
     }
+  }
+
+  Result<int> testResolveStream() {
+    const bufferSize = 1024;
+
+    Pointer<lsl_streaminfo> buffer =
+        malloc.allocate<lsl_streaminfo>(bufferSize * sizeOf<lsl_streaminfo>());
+
+    var numStreams = _lsl.bindings.lsl_resolve_all(buffer, bufferSize, 2);
+
+    // log("NumStreams: $numStreams");
+    return Result.ok(numStreams);
   }
 }

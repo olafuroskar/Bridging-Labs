@@ -5,8 +5,8 @@ import 'package:lsl_plugin/src/repositories/outlets/outlet_repository.dart';
 /// "Unwraps" the nullable outlet repository
 ///
 /// {@macro non_null_members}
-Result<OutletRepository<S>> getRepository<S, T extends ChannelFormat<S>>(
-    OutletRepository<S>? repo) {
+Result<OutletAdapter<S>> getRepository<S, T extends ChannelFormat<S>>(
+    OutletAdapter<S>? repo) {
   if (repo == null) {
     return Result.error(Exception("The repository is null"));
   }

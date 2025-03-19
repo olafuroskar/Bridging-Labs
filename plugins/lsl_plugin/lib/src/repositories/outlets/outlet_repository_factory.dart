@@ -8,39 +8,39 @@ import 'package:lsl_plugin/src/repositories/outlets/outlet_repository.dart';
 import 'package:lsl_plugin/src/repositories/outlets/implementations/short_outlet_repository.dart';
 import 'package:lsl_plugin/src/repositories/outlets/implementations/string_outlet_repository.dart';
 
-class OutletRepositoryFactory {
-  static OutletRepository<int> createIntRepositoryFromChannelFormat(
+class OutletAdapterFactory {
+  static OutletAdapter<int> createIntRepositoryFromChannelFormat(
       ChannelFormat<int> channelFormat) {
     switch (channelFormat) {
       case Int8ChannelFormat():
       case Int16ChannelFormat():
-        return ShortOutletRepository();
+        return ShortOutletAdapter();
       case Int32ChannelFormat():
-        return IntOutletRepository();
+        return IntOutletAdapter();
       case Int64ChannelFormat():
-        return LongOutletRepository();
+        return LongOutletAdapter();
       default:
         throw Exception("Unsupported channel format for integers");
     }
   }
 
-  static OutletRepository<double> createDoubleRepositoryFromChannelFormat(
+  static OutletAdapter<double> createDoubleRepositoryFromChannelFormat(
       ChannelFormat<double> channelFormat) {
     switch (channelFormat) {
       case Float32ChannelFormat():
-        return FloatOutletRepository();
+        return FloatOutletAdapter();
       case Double64ChannelFormat():
-        return DoubleOutletRepository();
+        return DoubleOutletAdapter();
       default:
         throw Exception("Unsupported channel format for doubles");
     }
   }
 
-  static OutletRepository<String> createStringRepositoryFromChannelFormat(
+  static OutletAdapter<String> createStringRepositoryFromChannelFormat(
       ChannelFormat<String> channelFormat) {
     switch (channelFormat) {
       case CftStringChannelFormat():
-        return StringOutletRepository();
+        return StringOutletAdapter();
       default:
         throw Exception("Unsupported channel format for strings");
     }
