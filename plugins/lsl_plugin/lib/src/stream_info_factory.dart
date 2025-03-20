@@ -26,4 +26,7 @@ class StreamInfoFactory {
     return StreamInfo(
         name, type, channelFormat, channelCount, nominalSRate, sourceId);
   }
+
+  // TODO: Add labels property on stream info: https://github.com/NeuropsyOL/RECORDA/blob/master/liblsl-Java/src/examples/HandleMetaData.java
+  // https://github.com/NeuropsyOL/RECORDA/blob/09f68f48b73ad4936caa5cf937d6291b6e6efcb4/liblsl-Java/src/edu/ucsd/sccn/LSL.java#L292
 }
