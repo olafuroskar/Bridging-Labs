@@ -3,6 +3,8 @@ import 'dart:ffi';
 import 'package:android_multicast_lock/android_multicast_lock.dart';
 import 'package:ffi/ffi.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
+import 'package:lsl_plugin/src/adapters/outlets/implementations/long_outlet_adapter.dart';
+import 'package:lsl_plugin/src/adapters/outlets/implementations/short_outlet_adapter.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
 import 'package:lsl_plugin/src/adapters/outlets/implementations/double_outlet_adapter.dart';
@@ -38,6 +40,12 @@ void main() {
 
     IntOutletAdapter.setBindings(mockLsl);
     IntOutletAdapter.setMulticastLock(mockMulticastLock);
+
+    ShortOutletAdapter.setBindings(mockLsl);
+    ShortOutletAdapter.setMulticastLock(mockMulticastLock);
+
+    LongOutletAdapter.setBindings(mockLsl);
+    LongOutletAdapter.setMulticastLock(mockMulticastLock);
 
     // Mockito does not know how to make dummy native values so we must provide them
     streamInfoPointer = malloc.allocate<lsl_streaminfo_struct_>(
@@ -96,12 +104,85 @@ void main() {
     });
   });
 
-  // group("Integer outlets", () {
-  //   final streamInfo = StreamInfoRename("TestInt", "EEG", Int32ChannelFormat());
-  //
-  //   final outlet = Outlet(streamInfo);
-  //
-  //   final outletAdapter = IntOutletAdapter();
-  //   outletAdapter.create(outlet);
-  // });
+  group("Integer outlets", () {
+    test(
+        "Setting the channel format to a 64 bit integer should be ok, and pushing a valid sample should work",
+        () {
+      final streamInfo = StreamInfoFactory.createIntStreamInfo(
+          "Test", "EEG", Int64ChannelFormat());
+      final outletManager = OutletManager(streamInfo);
+
+      final creation = outletManager.create();
+      expect(creation is Ok, true);
+
+      var result = outletManager.pushSample([1, 3, 4, 5]);
+      expect(result is Ok, true);
+
+      result = outletManager.pushChunk([
+        [1, 3, 4, 5],
+        [1, 3, 4, 5]
+      ]);
+      expect(result is Ok, true);
+    });
+
+    test(
+        "Setting the channel format to a 32 bit integer should be ok, and pushing a valid sample should work",
+        () {
+      final streamInfo = StreamInfoFactory.createIntStreamInfo(
+          "Test", "EEG", Int32ChannelFormat());
+      final outletManager = OutletManager(streamInfo);
+
+      final creation = outletManager.create();
+      expect(creation is Ok, true);
+
+      var result = outletManager.pushSample([1, 3, 4, 5]);
+      expect(result is Ok, true);
+
+      result = outletManager.pushChunk([
+        [1, 3, 4, 5],
+        [1, 3, 4, 5]
+      ]);
+      expect(result is Ok, true);
+    });
+
+    test(
+        "Setting the channel format to a 16 bit integer should be ok, and pushing a valid sample should work",
+        () {
+      final streamInfo = StreamInfoFactory.createIntStreamInfo(
+          "Test", "EEG", Int16ChannelFormat());
+      final outletManager = OutletManager(streamInfo);
+
+      final creation = outletManager.create();
+      expect(creation is Ok, true);
+
+      var result = outletManager.pushSample([1, 3, 4, 5]);
+      expect(result is Ok, true);
+
+      result = outletManager.pushChunk([
+        [1, 3, 4, 5],
+        [1, 3, 4, 5]
+      ]);
+      expect(result is Ok, true);
+    });
+
+    test(
+        "Setting the channel format to a 8 bit integer should be ok, and pushing a valid sample should work",
+        () {
+      final streamInfo = StreamInfoFactory.createIntStreamInfo(
+          "Test", "EEG", Int8ChannelFormat());
+      final outletManager = OutletManager(streamInfo);
+
+      final creation = outletManager.create();
+      expect(creation is Ok, true);
+
+      var result = outletManager.pushSample([1, 3, 4, 5]);
+      expect(result is Ok, true);
+
+      result = outletManager.pushChunk([
+        [1, 3, 4, 5],
+        [1, 3, 4, 5]
+      ]);
+      expect(result is Ok, true);
+    });
+  });
 }
