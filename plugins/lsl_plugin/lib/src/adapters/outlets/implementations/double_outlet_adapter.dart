@@ -101,4 +101,9 @@ class DoubleOutletAdapter implements OutletAdapter<double> {
       return unexpectedError("$e");
     }
   }
+
+  @override
+  Result<StreamInfo> getStreamInfo() {
+    return getStreamInfo();
+  }
 }

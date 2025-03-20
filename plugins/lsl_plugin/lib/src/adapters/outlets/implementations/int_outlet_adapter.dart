@@ -99,4 +99,9 @@ class IntOutletAdapter implements OutletAdapter<int> {
       return unexpectedError("$e");
     }
   }
+
+  @override
+  Result<StreamInfo> getStreamInfo() {
+    return getStreamInfo();
+  }
 }

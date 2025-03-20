@@ -126,4 +126,9 @@ class StringOutletAdapter implements OutletAdapter<String> {
     // log("NumStreams: $numStreams");
     return Result.ok(numStreams);
   }
+
+  @override
+  Result<StreamInfo> getStreamInfo() {
+    return getStreamInfo();
+  }
 }

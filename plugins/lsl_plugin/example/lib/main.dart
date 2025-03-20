@@ -95,20 +95,6 @@ class _MyAppState extends State<MyApp> {
                     child: Text("Destroy outlet")),
                 spacerSmall,
                 Text(error == null ? "No error" : error!)
-                // TextButton(
-                //     onPressed: () {
-                //       var inlet = test_ffi.Inlet();
-                //       setState(() {
-                //         numStreams = inlet.getNumStreams();
-                //       });
-                //     },
-                //     child: Text("Find streams")),
-                // spacerSmall,
-                // Text("NumStreams: $numStreams"),
-                // spacerSmall,
-                // Text(
-                //   outlet == null ? "Outlet is null" : outlet!.getStreamXml(),
-                // )
               ],
             ),
           ),

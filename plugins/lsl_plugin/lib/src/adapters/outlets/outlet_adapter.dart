@@ -36,7 +36,14 @@ abstract class OutletAdapter<S> {
   Result<Unit> pushChunk(List<List<S>> chunk,
       [double? timestamp, bool pushthrough = false]);
 
-  // getStreamInfo
+  /// {@template get_stream_info}
+  /// Retrieve the stream info provided by this outlet.
+  ///
+  /// This is what was used to create the stream (and also has the Additional Network Information fields assigned).
+  /// {@endtemplate}
+  Result<StreamInfo> getStreamInfo();
+
+  // TODO:
   // haveConsumers
   // waitForConsumers - might need isolate
 }

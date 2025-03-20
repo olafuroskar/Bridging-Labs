@@ -60,7 +60,7 @@ class OutletManager<S> {
   /// {@macro push_sample}
   Result<Unit> pushSample(List<S> sample,
       [double? timestamp, bool pushthrough = false]) {
-    return switch (getRepository(_outletAdapter)) {
+    return switch (getAdapter(_outletAdapter)) {
       Ok(value: var outletAdapter) =>
         outletAdapter.pushSample(sample, timestamp, pushthrough),
       Error(error: var e) => Result.error(e)
@@ -70,7 +70,7 @@ class OutletManager<S> {
   /// {@macro push_chunk}
   Result<Unit> pushChunk(List<List<S>> chunk,
       [double? timestamp, bool pushthrough = false]) {
-    return switch (getRepository(_outletAdapter)) {
+    return switch (getAdapter(_outletAdapter)) {
       Ok(value: var outletAdapter) =>
         outletAdapter.pushChunk(chunk, timestamp, pushthrough),
       Error(error: var e) => Result.error(e)
@@ -79,15 +79,18 @@ class OutletManager<S> {
 
   /// {@macro destroy}
   Result<Unit> destroy() {
-    return switch (getRepository(_outletAdapter)) {
+    return switch (getAdapter(_outletAdapter)) {
       Ok(value: var outletAdapter) => outletAdapter.destroy(),
       Error(error: var e) => Result.error(e)
     };
   }
 
+  /// {@macro get_stream_info}
   Result<StreamInfo> getStreamInfo() {
-    // TODO: Implement
-    throw Exception("Not implemented");
+    return switch (getAdapter(_outletAdapter)) {
+      Ok(value: var outletAdapter) => outletAdapter.getStreamInfo(),
+      Error(error: var e) => Result.error(e)
+    };
   }
 
   Result<bool> haveConsumers() {

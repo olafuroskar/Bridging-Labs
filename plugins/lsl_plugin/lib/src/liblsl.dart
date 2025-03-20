@@ -20,13 +20,9 @@ final DynamicLibrary _dylib = () {
   throw UnsupportedError('Unknown platform: ${Platform.operatingSystem}');
 }();
 
-// /// An interface encapsulating the bindings to the native functions in [_dylib].
-// ///
-// /// This is an interface for testing purposes
-// abstract class LslInterface {
-//   LslPluginBindings get bindings;
-// }
-
+/// A class encapsulating the bindings to the native functions in [_dylib], as well as multicast lock for Android
+///
+/// This is an interface for testing purposes
 class Lsl {
   /// {@macro bindings}
   static final Lsl _singleton = Lsl._internal();

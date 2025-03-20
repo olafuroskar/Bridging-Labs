@@ -100,4 +100,9 @@ class ShortOutletAdapter implements OutletAdapter<int> {
       return unexpectedError("$e");
     }
   }
+
+  @override
+  Result<StreamInfo> getStreamInfo() {
+    return getStreamInfo();
+  }
 }
