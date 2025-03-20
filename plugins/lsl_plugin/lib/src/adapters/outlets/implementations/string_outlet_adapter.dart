@@ -1,6 +1,5 @@
 import 'dart:ffi';
 
-import 'package:android_multicast_lock/android_multicast_lock.dart';
 import 'package:ffi/ffi.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
@@ -13,25 +12,11 @@ import 'package:lsl_plugin/src/utils/unit.dart';
 class StringOutletAdapter implements OutletAdapter<String> {
   lsl_outlet? _outletPointer;
 
-  /// {@macro bindings}
-  static LslInterface _lsl = Lsl();
-  static MulticastLock _multicastLock = MulticastLock();
-
-  /// {@macro set_bindings}
-  static void setBindings(LslInterface lsl) {
-    _lsl = lsl;
-  }
-
-  static void setMulticastLock(MulticastLock multicastLock) {
-    _multicastLock = multicastLock;
-  }
-
   StringOutletAdapter();
 
   @override
   Result<Unit> create(Outlet<String> outlet) {
-    switch (
-        createOutlet(_lsl, _multicastLock, outlet, CftStringChannelFormat())) {
+    switch (createOutlet(outlet, CftStringChannelFormat())) {
       case Ok(value: var nativeOutlet):
         _outletPointer = nativeOutlet;
         return Result.ok(unit);
@@ -42,7 +27,9 @@ class StringOutletAdapter implements OutletAdapter<String> {
 
   @override
   Result<Unit> destroy() {
-    return destroyOutlet(_lsl, _outletPointer, _multicastLock);
+    return destroyOutlet(
+      _outletPointer,
+    );
   }
 
   @override
@@ -66,10 +53,10 @@ class StringOutletAdapter implements OutletAdapter<String> {
       }
 
       if (timestamp != null) {
-        _lsl.bindings.lsl_push_sample_strtp(
+        lsl.bindings.lsl_push_sample_strtp(
             outletPointer, nativeSamplePointer, timestamp, pushthrough ? 1 : 0);
       } else {
-        _lsl.bindings.lsl_push_sample_str(outletPointer, nativeSamplePointer);
+        lsl.bindings.lsl_push_sample_str(outletPointer, nativeSamplePointer);
       }
 
       for (var ptr in encodedStrings) {
@@ -111,10 +98,10 @@ class StringOutletAdapter implements OutletAdapter<String> {
       }
 
       if (timestamp != null) {
-        _lsl.bindings.lsl_push_chunk_strtp(outletPointer, nativeSamplePointer,
+        lsl.bindings.lsl_push_chunk_strtp(outletPointer, nativeSamplePointer,
             dataElements, timestamp, pushthrough ? 1 : 0);
       } else {
-        _lsl.bindings.lsl_push_chunk_str(
+        lsl.bindings.lsl_push_chunk_str(
             outletPointer, nativeSamplePointer, dataElements);
       }
 
@@ -134,7 +121,7 @@ class StringOutletAdapter implements OutletAdapter<String> {
     Pointer<lsl_streaminfo> buffer =
         malloc.allocate<lsl_streaminfo>(bufferSize * sizeOf<lsl_streaminfo>());
 
-    var numStreams = _lsl.bindings.lsl_resolve_all(buffer, bufferSize, 2);
+    var numStreams = lsl.bindings.lsl_resolve_all(buffer, bufferSize, 2);
 
     // log("NumStreams: $numStreams");
     return Result.ok(numStreams);

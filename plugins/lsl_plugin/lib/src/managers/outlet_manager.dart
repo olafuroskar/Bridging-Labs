@@ -84,4 +84,19 @@ class OutletManager<S> {
       Error(error: var e) => Result.error(e)
     };
   }
+
+  Result<StreamInfo> getStreamInfo() {
+    // TODO: Implement
+    throw Exception("Not implemented");
+  }
+
+  Result<bool> haveConsumers() {
+    // TODO: Implement
+    throw Exception("Not implemented");
+  }
+
+  Result<bool> waitForConsumers() {
+    // TODO: Implement
+    throw Exception("Not implemented");
+  }
 }

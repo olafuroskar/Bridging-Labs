@@ -16,7 +16,7 @@ part 'package:lsl_plugin/src/domain/outlet.dart';
 part 'package:lsl_plugin/src/domain/stream_info.dart';
 
 // Managers
-part 'src/outlet_manager.dart';
+part 'src/managers/outlet_manager.dart';
 
 // Factories
 part 'src/stream_info_factory.dart';

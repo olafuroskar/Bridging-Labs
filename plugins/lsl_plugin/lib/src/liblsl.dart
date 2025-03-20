@@ -1,6 +1,7 @@
 import 'dart:ffi';
 import 'dart:io';
 
+import 'package:android_multicast_lock/android_multicast_lock.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
 
 const String _libName = 'lsl_plugin';
@@ -19,23 +20,38 @@ final DynamicLibrary _dylib = () {
   throw UnsupportedError('Unknown platform: ${Platform.operatingSystem}');
 }();
 
-/// An interface encapsulating the bindings to the native functions in [_dylib].
-///
-/// This is an interface for testing purposes
-abstract class LslInterface {
-  LslPluginBindings get bindings;
-}
+// /// An interface encapsulating the bindings to the native functions in [_dylib].
+// ///
+// /// This is an interface for testing purposes
+// abstract class LslInterface {
+//   LslPluginBindings get bindings;
+// }
 
-class Lsl implements LslInterface {
+class Lsl {
+  /// {@macro bindings}
   static final Lsl _singleton = Lsl._internal();
-  static final _bindings = LslPluginBindings(_dylib);
+
+  static LslPluginBindings _bindings = LslPluginBindings(_dylib);
+  static MulticastLock _multicastLock = MulticastLock();
 
   factory Lsl() {
     return _singleton;
   }
 
-  @override
+  /// {@macro set_bindings}
+  static void setBindings(LslPluginBindings bindings) {
+    _bindings = bindings;
+  }
+
+  static void setMulticastLock(MulticastLock multicastLock) {
+    _multicastLock = multicastLock;
+  }
+
   LslPluginBindings get bindings => _bindings;
+
+  MulticastLock get multicastLock => _multicastLock;
 
   Lsl._internal();
 }
+
+final lsl = Lsl();

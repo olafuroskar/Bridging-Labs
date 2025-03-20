@@ -1,6 +1,5 @@
 import 'dart:ffi';
 
-import 'package:android_multicast_lock/android_multicast_lock.dart';
 import 'package:ffi/ffi.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
 import 'package:lsl_plugin/src/channel_formats/channel_format.dart';
@@ -10,13 +9,10 @@ import 'package:lsl_plugin/src/utils/errors.dart';
 import 'package:lsl_plugin/src/utils/unit.dart';
 
 Result<lsl_outlet> createOutlet<S>(
-    LslInterface lsl,
-    MulticastLock multicastLock,
-    Outlet<S> outlet,
-    ChannelFormat<S> channelFormat) {
+    Outlet<S> outlet, ChannelFormat<S> channelFormat) {
   try {
     // Required on Android, TODO: Explain more...
-    multicastLock.acquire();
+    lsl.multicastLock.acquire();
 
     final streamInfo = lsl.bindings.lsl_create_streaminfo(
         outlet.streamInfo.name.toNativeUtf8().cast<Char>(),
@@ -33,14 +29,13 @@ Result<lsl_outlet> createOutlet<S>(
   }
 }
 
-Result<Unit> destroyOutlet(
-    LslInterface lsl, lsl_outlet? outlet, MulticastLock multicastLock) {
+Result<Unit> destroyOutlet(lsl_outlet? outlet) {
   if (outlet == null) {
     return Result.error(Exception("The native outlet is null"));
   }
   try {
     lsl.bindings.lsl_destroy_outlet(outlet);
-    multicastLock.release();
+    lsl.multicastLock.release();
     return Result.ok(unit);
   } catch (e) {
     return unexpectedError("$e");

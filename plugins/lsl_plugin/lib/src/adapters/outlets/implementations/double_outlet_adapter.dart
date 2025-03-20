@@ -1,6 +1,5 @@
 import 'dart:ffi';
 
-import 'package:android_multicast_lock/android_multicast_lock.dart';
 import 'package:ffi/ffi.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
@@ -13,25 +12,11 @@ import 'package:lsl_plugin/src/utils/unit.dart';
 class DoubleOutletAdapter implements OutletAdapter<double> {
   lsl_outlet? _outletPointer;
 
-  /// {@macro bindings}
-  static LslInterface _lsl = Lsl();
-  static MulticastLock _multicastLock = MulticastLock();
-
-  /// {@macro set_bindings}
-  static void setBindings(LslInterface lsl) {
-    _lsl = lsl;
-  }
-
-  static void setMulticastLock(MulticastLock multicastLock) {
-    _multicastLock = multicastLock;
-  }
-
   DoubleOutletAdapter();
 
   @override
   Result<Unit> create(Outlet<double> outlet) {
-    switch (
-        createOutlet(_lsl, _multicastLock, outlet, Double64ChannelFormat())) {
+    switch (createOutlet(outlet, Double64ChannelFormat())) {
       case Ok(value: var nativeOutlet):
         _outletPointer = nativeOutlet;
         return Result.ok(unit);
@@ -42,7 +27,9 @@ class DoubleOutletAdapter implements OutletAdapter<double> {
 
   @override
   Result<Unit> destroy() {
-    return destroyOutlet(_lsl, _outletPointer, _multicastLock);
+    return destroyOutlet(
+      _outletPointer,
+    );
   }
 
   @override
@@ -62,10 +49,10 @@ class DoubleOutletAdapter implements OutletAdapter<double> {
       }
 
       if (timestamp != null) {
-        _lsl.bindings.lsl_push_sample_dtp(
+        lsl.bindings.lsl_push_sample_dtp(
             outletPointer, nativeSamplePointer, timestamp, pushthrough ? 1 : 0);
       } else {
-        _lsl.bindings.lsl_push_sample_d(outletPointer, nativeSamplePointer);
+        lsl.bindings.lsl_push_sample_d(outletPointer, nativeSamplePointer);
       }
       malloc.free(nativeSamplePointer);
 
@@ -99,10 +86,10 @@ class DoubleOutletAdapter implements OutletAdapter<double> {
       }
 
       if (timestamp != null) {
-        _lsl.bindings.lsl_push_chunk_dtp(outletPointer, nativeSamplePointer,
+        lsl.bindings.lsl_push_chunk_dtp(outletPointer, nativeSamplePointer,
             dataElements, timestamp, pushthrough ? 1 : 0);
       } else {
-        _lsl.bindings
+        lsl.bindings
             .lsl_push_chunk_d(outletPointer, nativeSamplePointer, dataElements);
       }
       malloc.free(nativeSamplePointer);
