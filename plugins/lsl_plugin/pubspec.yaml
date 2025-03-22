@@ -15,7 +15,7 @@ dependencies:
   plugin_platform_interface: ^2.0.2
   ffi: ^2.1.3
   # This package is required for using multicast UDP packets on Android, as LSL uses multicast UDP packets.
-  android_multicast_lock: ^1.0.2
+  # android_multicast_lock: ^1.0.2 -- needs a namespace >:(
   mockito: ^5.4.5
 
 dev_dependencies:

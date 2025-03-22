@@ -129,6 +129,6 @@ class StringOutletAdapter implements OutletAdapter<String> {
 
   @override
   Result<StreamInfo> getStreamInfo() {
-    return getStreamInfo();
+    return getOutletStreamInfo(_outletPointer);
   }
 }
