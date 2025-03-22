@@ -17,14 +17,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.3.0"
-  android_multicast_lock:
-    dependency: transitive
-    description:
-      name: android_multicast_lock
-      sha256: df2502090cd4348bb45c1142c3ba1c57fe8b1e3b5d8272725bbedcb9e30a6a81
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.2"
   args:
     dependency: transitive
     description:
@@ -274,6 +266,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.4.5"
+  nested:
+    dependency: transitive
+    description:
+      name: nested
+      sha256: "03bac4c528c64c95c722ec99280375a6f2fc708eec17c7b3f07253b626cd2a20"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   package_config:
     dependency: transitive
     description:
@@ -298,6 +298,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
+  provider:
+    dependency: "direct main"
+    description:
+      name: provider
+      sha256: c8a055ee5ce3fd98d6fc872478b03823ffdb448699c6ebdbbc71d59b596fd48c
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.1.2"
   pub_semver:
     dependency: transitive
     description:

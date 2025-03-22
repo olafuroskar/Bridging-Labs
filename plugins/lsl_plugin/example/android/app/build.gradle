@@ -24,7 +24,9 @@ android {
         applicationId = "dk.dtu.lsl_plugin_example"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        //minSdk = flutter.minSdkVersion
+        // TODO: Mention in documentation that this needs to be 26 for loguru in LSL to work
+        minSdk = 26
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
