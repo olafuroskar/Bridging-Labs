@@ -12,3 +12,4 @@ environment:
 # to the pubspec.yaml file of the package
 workspace:
   - plugins/lsl_plugin
+  - plugins/multicast_lock

@@ -13,7 +13,7 @@ Result<lsl_outlet> createOutlet<S>(
     Outlet<S> outlet, ChannelFormat<S> channelFormat) {
   try {
     // Required on Android, TODO: Explain more...
-    // TODO:  lsl.multicastLock.acquire();
+    lsl.multicastLock.acquireMulticastLock();
 
     final streamInfo = lsl.bindings.lsl_create_streaminfo(
         outlet.streamInfo.name.toNativeUtf8().cast<Char>(),
@@ -38,7 +38,7 @@ Result<Unit> destroyOutlet(lsl_outlet? outlet) {
     final nativeInfo = lsl.bindings.lsl_get_info(outlet);
     lsl.bindings.lsl_destroy_outlet(outlet);
     lsl.bindings.lsl_destroy_streaminfo(nativeInfo);
-    // TODO: lsl.multicastLock.release();
+    lsl.multicastLock.releaseMulticastLock();
     return Result.ok(unit);
   } catch (e) {
     return unexpectedError("$e");

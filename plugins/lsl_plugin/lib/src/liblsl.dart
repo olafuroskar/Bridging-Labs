@@ -2,6 +2,7 @@ import 'dart:ffi';
 import 'dart:io';
 
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
+import 'package:multicast_lock/multicast_lock.dart';
 
 const String _libName = 'lsl_plugin';
 
@@ -27,7 +28,7 @@ class Lsl {
   static final Lsl _singleton = Lsl._internal();
 
   static LslPluginBindings _bindings = LslPluginBindings(_dylib);
-  // static MulticastLock _multicastLock = MulticastLock();
+  static MulticastLock _multicastLock = MulticastLock();
 
   factory Lsl() {
     return _singleton;
@@ -38,13 +39,13 @@ class Lsl {
     _bindings = bindings;
   }
 
-  // static void setMulticastLock(MulticastLock multicastLock) {
-  //   _multicastLock = multicastLock;
-  // }
+  static void setMulticastLock(MulticastLock multicastLock) {
+    _multicastLock = multicastLock;
+  }
 
   LslPluginBindings get bindings => _bindings;
 
-  // MulticastLock get multicastLock => _multicastLock;
+  MulticastLock get multicastLock => _multicastLock;
 
   Lsl._internal();
 }

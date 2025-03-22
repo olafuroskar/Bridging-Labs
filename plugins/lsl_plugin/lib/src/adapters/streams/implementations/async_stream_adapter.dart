@@ -19,6 +19,9 @@ class AsyncStreamAdapter implements StreamAdapter {
 
   @override
   Future<List<ResolvedStreamHandle>> resolveStreams(double waitTime) async {
+    /// Clear the resolved streams before re-resolving
+    _resolvedStreams.clear();
+
     /// The resolve function can take up to several seconds so we delegate it to a helper isolate
     /// Otherwise, an app using this function will feel janky
     final List<ResolvedStream> streams = await Isolate.run(() {
