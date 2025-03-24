@@ -1,8 +1,8 @@
 import 'dart:ffi';
 import 'dart:io';
 
-import 'package:android_multicast_lock/android_multicast_lock.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
+import 'package:multicast_lock/multicast_lock.dart';
 
 const String _libName = 'lsl_plugin';
 

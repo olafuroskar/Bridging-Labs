@@ -6,10 +6,10 @@
 import 'dart:async' as _i6;
 import 'dart:ffi' as _i3;
 
-import 'package:android_multicast_lock/android_multicast_lock.dart' as _i5;
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i4;
+import 'package:multicast_lock/multicast_lock.dart' as _i5;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -2853,29 +2853,29 @@ class MockLslPluginBindings extends _i1.Mock implements _i2.LslPluginBindings {
 /// See the documentation for Mockito's code generation for more information.
 class MockMulticastLock extends _i1.Mock implements _i5.MulticastLock {
   @override
-  _i6.Future<void> acquire() =>
+  _i6.Future<String?> getPlatformVersion() =>
       (super.noSuchMethod(
-            Invocation.method(#acquire, []),
+            Invocation.method(#getPlatformVersion, []),
+            returnValue: _i6.Future<String?>.value(),
+            returnValueForMissingStub: _i6.Future<String?>.value(),
+          )
+          as _i6.Future<String?>);
+
+  @override
+  _i6.Future<void> acquireMulticastLock() =>
+      (super.noSuchMethod(
+            Invocation.method(#acquireMulticastLock, []),
             returnValue: _i6.Future<void>.value(),
             returnValueForMissingStub: _i6.Future<void>.value(),
           )
           as _i6.Future<void>);
 
   @override
-  _i6.Future<void> release() =>
+  _i6.Future<void> releaseMulticastLock() =>
       (super.noSuchMethod(
-            Invocation.method(#release, []),
+            Invocation.method(#releaseMulticastLock, []),
             returnValue: _i6.Future<void>.value(),
             returnValueForMissingStub: _i6.Future<void>.value(),
           )
           as _i6.Future<void>);
-
-  @override
-  _i6.Future<bool?> isHeld() =>
-      (super.noSuchMethod(
-            Invocation.method(#isHeld, []),
-            returnValue: _i6.Future<bool?>.value(),
-            returnValueForMissingStub: _i6.Future<bool?>.value(),
-          )
-          as _i6.Future<bool?>);
 }

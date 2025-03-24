@@ -1,4 +1,4 @@
-part of '../../lsl_plugin.dart';
+part of 'managers.dart';
 
 /// A service for interacting with a single outlet
 ///
@@ -20,33 +20,31 @@ class OutletManager<S> {
     OutletAdapter<S>? outletAdapter;
 
     if (S == int) {
-      /// Get the appropriate outlet repository for the given integer channel format
+      /// Get the appropriate outlet adapter for the given integer channel format
       ///
       /// Here we have already established that S is in fact int
       /// Furthermore, from the `T extends ChannelFormat<T>` type constraint we know that streamInfo.channelFormat
       /// must be of type ChannelFormat<int>. The factory returns a narrower type but we must cast it back to a wider one.
-      outletAdapter = OutletAdapterFactory.createIntRepositoryFromChannelFormat(
+      outletAdapter = OutletAdapterFactory.createIntAdapterFromChannelFormat(
           _streamInfo.channelFormat as ChannelFormat<int>) as OutletAdapter<S>;
     } else if (S == double) {
-      /// Get the appropriate outlet repository for the given double channel format
+      /// Get the appropriate outlet adapter for the given double channel format
       ///
       /// Here we have already established that S is in fact double
       /// Furthermore, from the `T extends ChannelFormat<T>` type constraint we know that streamInfo.channelFormat
       /// must be of type ChannelFormat<double>. The factory returns a narrower type but we must cast it back to a wider one.
-      outletAdapter =
-          OutletAdapterFactory.createDoubleRepositoryFromChannelFormat(
-                  _streamInfo.channelFormat as ChannelFormat<double>)
-              as OutletAdapter<S>;
+      outletAdapter = OutletAdapterFactory.createDoubleAdapterFromChannelFormat(
+              _streamInfo.channelFormat as ChannelFormat<double>)
+          as OutletAdapter<S>;
     } else if (S == String) {
-      /// Get the appropriate outlet repository for the given String channel format
+      /// Get the appropriate outlet adapter for the given String channel format
       ///
       /// Here we have already established that S is in fact String
       /// Furthermore, from the `T extends ChannelFormat<T>` type constraint we know that streamInfo.channelFormat
       /// must be of type ChannelFormat<String>. The factory returns a narrower type but we must cast it back to a wider one.
-      outletAdapter =
-          OutletAdapterFactory.createStringRepositoryFromChannelFormat(
-                  _streamInfo.channelFormat as ChannelFormat<String>)
-              as OutletAdapter<S>;
+      outletAdapter = OutletAdapterFactory.createStringAdapterFromChannelFormat(
+              _streamInfo.channelFormat as ChannelFormat<String>)
+          as OutletAdapter<S>;
     } else {
       return Result.error(Exception("Unsupported type $S"));
     }
@@ -60,7 +58,7 @@ class OutletManager<S> {
   /// {@macro push_sample}
   Result<Unit> pushSample(List<S> sample,
       [double? timestamp, bool pushthrough = false]) {
-    return switch (getAdapter(_outletAdapter)) {
+    return switch (getOutletAdapter(_outletAdapter)) {
       Ok(value: var outletAdapter) =>
         outletAdapter.pushSample(sample, timestamp, pushthrough),
       Error(error: var e) => Result.error(e)
@@ -70,7 +68,7 @@ class OutletManager<S> {
   /// {@macro push_chunk}
   Result<Unit> pushChunk(List<List<S>> chunk,
       [double? timestamp, bool pushthrough = false]) {
-    return switch (getAdapter(_outletAdapter)) {
+    return switch (getOutletAdapter(_outletAdapter)) {
       Ok(value: var outletAdapter) =>
         outletAdapter.pushChunk(chunk, timestamp, pushthrough),
       Error(error: var e) => Result.error(e)
@@ -79,7 +77,7 @@ class OutletManager<S> {
 
   /// {@macro destroy}
   Result<Unit> destroy() {
-    return switch (getAdapter(_outletAdapter)) {
+    return switch (getOutletAdapter(_outletAdapter)) {
       Ok(value: var outletAdapter) => outletAdapter.destroy(),
       Error(error: var e) => Result.error(e)
     };
@@ -87,7 +85,7 @@ class OutletManager<S> {
 
   /// {@macro get_stream_info}
   Result<StreamInfo> getStreamInfo() {
-    return switch (getAdapter(_outletAdapter)) {
+    return switch (getOutletAdapter(_outletAdapter)) {
       Ok(value: var outletAdapter) => outletAdapter.getStreamInfo(),
       Error(error: var e) => Result.error(e)
     };

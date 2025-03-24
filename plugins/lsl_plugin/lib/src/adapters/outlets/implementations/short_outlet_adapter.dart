@@ -103,6 +103,6 @@ class ShortOutletAdapter implements OutletAdapter<int> {
 
   @override
   Result<StreamInfo> getStreamInfo() {
-    return getStreamInfo();
+    return getOutletStreamInfo(_outletPointer);
   }
 }

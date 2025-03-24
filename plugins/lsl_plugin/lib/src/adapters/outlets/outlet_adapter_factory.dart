@@ -9,7 +9,7 @@ import 'package:lsl_plugin/src/adapters/outlets/implementations/short_outlet_ada
 import 'package:lsl_plugin/src/adapters/outlets/implementations/string_outlet_adapter.dart';
 
 class OutletAdapterFactory {
-  static OutletAdapter<int> createIntRepositoryFromChannelFormat(
+  static OutletAdapter<int> createIntAdapterFromChannelFormat(
       ChannelFormat<int> channelFormat) {
     switch (channelFormat) {
       case Int8ChannelFormat():
@@ -24,7 +24,7 @@ class OutletAdapterFactory {
     }
   }
 
-  static OutletAdapter<double> createDoubleRepositoryFromChannelFormat(
+  static OutletAdapter<double> createDoubleAdapterFromChannelFormat(
       ChannelFormat<double> channelFormat) {
     switch (channelFormat) {
       case Float32ChannelFormat():
@@ -36,7 +36,7 @@ class OutletAdapterFactory {
     }
   }
 
-  static OutletAdapter<String> createStringRepositoryFromChannelFormat(
+  static OutletAdapter<String> createStringAdapterFromChannelFormat(
       ChannelFormat<String> channelFormat) {
     switch (channelFormat) {
       case CftStringChannelFormat():

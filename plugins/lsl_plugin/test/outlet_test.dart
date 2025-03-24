@@ -1,12 +1,12 @@
 import 'dart:ffi';
 
-import 'package:android_multicast_lock/android_multicast_lock.dart';
 import 'package:ffi/ffi.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:multicast_lock/multicast_lock.dart';
 import 'package:test/test.dart';
 
 import 'outlet_test.mocks.dart';

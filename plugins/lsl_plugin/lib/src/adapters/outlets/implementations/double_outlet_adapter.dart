@@ -104,6 +104,6 @@ class DoubleOutletAdapter implements OutletAdapter<double> {
 
   @override
   Result<StreamInfo> getStreamInfo() {
-    return getStreamInfo();
+    return getOutletStreamInfo(_outletPointer);
   }
 }
