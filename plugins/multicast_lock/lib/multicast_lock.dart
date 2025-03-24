@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'multicast_lock_platform_interface.dart';
 
 class MulticastLock {
@@ -5,11 +8,15 @@ class MulticastLock {
     return MulticastLockPlatform.instance.getPlatformVersion();
   }
 
-  Future<void> acquireMulticastLock() {
-    return MulticastLockPlatform.instance.acquireMulticastLock();
+  FutureOr<void> acquireMulticastLock() {
+    if (Platform.isAndroid) {
+      return MulticastLockPlatform.instance.acquireMulticastLock();
+    }
   }
 
-  Future<void> releaseMulticastLock() {
-    return MulticastLockPlatform.instance.releaseMulticastLock();
+  FutureOr<void> releaseMulticastLock() {
+    if (Platform.isAndroid) {
+      return MulticastLockPlatform.instance.releaseMulticastLock();
+    }
   }
 }
