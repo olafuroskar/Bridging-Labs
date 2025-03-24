@@ -1,6 +1,22 @@
 # lsl_plugin
 
-A new Flutter FFI plugin project.
+A Flutter plugin for interacting with the Lab Streaming Layer.
+
+## Android
+
+The minimum SDK version must be set to 26 in `app/build.gradle`. This is due to the logging library used by LSL, Loguru.
+
+```java
+// app/build.gradle
+minSdk = 26
+```
+
+Although not due to this plugin, users may encounter the problem mentioned [here](https://github.com/flutter/flutter-intellij/issues/7152#issuecomment-2132853632) when creating a new project for Android. To avoid, make the following change in you `settings.gradle` file:
+
+```diff
+- includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
++ includeBuild(file("$flutterSdkPath/packages/flutter_tools/gradle").toPath().toRealPath().toAbsolutePath().toString())
+```
 
 ## Getting Started
 
@@ -12,13 +28,13 @@ a specialized package that includes native code directly invoked with Dart FFI.
 
 This template uses the following structure:
 
-* `src`: Contains the native source code, and a CmakeFile.txt file for building
+- `src`: Contains the native source code, and a CmakeFile.txt file for building
   that source code into a dynamic library.
 
-* `lib`: Contains the Dart code that defines the API of the plugin, and which
+- `lib`: Contains the Dart code that defines the API of the plugin, and which
   calls into the native code using `dart:ffi`.
 
-* platform folders (`android`, `ios`, `windows`, etc.): Contains the build files
+- platform folders (`android`, `ios`, `windows`, etc.): Contains the build files
   for building and bundling the native code library with the platform application.
 
 ## Building and bundling native code
@@ -26,10 +42,10 @@ This template uses the following structure:
 The `pubspec.yaml` specifies FFI plugins as follows:
 
 ```yaml
-  plugin:
-    platforms:
-      some_platform:
-        ffiPlugin: true
+plugin:
+  platforms:
+    some_platform:
+      ffiPlugin: true
 ```
 
 This configuration invokes the native build for the various target platforms
@@ -39,34 +55,34 @@ This can be combined with dartPluginClass, such as when FFI is used for the
 implementation of one platform in a federated plugin:
 
 ```yaml
-  plugin:
-    implements: some_other_plugin
-    platforms:
-      some_platform:
-        dartPluginClass: SomeClass
-        ffiPlugin: true
+plugin:
+  implements: some_other_plugin
+  platforms:
+    some_platform:
+      dartPluginClass: SomeClass
+      ffiPlugin: true
 ```
 
 A plugin can have both FFI and method channels:
 
 ```yaml
-  plugin:
-    platforms:
-      some_platform:
-        pluginClass: SomeName
-        ffiPlugin: true
+plugin:
+  platforms:
+    some_platform:
+      pluginClass: SomeName
+      ffiPlugin: true
 ```
 
 The native build systems that are invoked by FFI (and method channel) plugins are:
 
-* For Android: Gradle, which invokes the Android NDK for native builds.
-  * See the documentation in android/build.gradle.
-* For iOS and MacOS: Xcode, via CocoaPods.
-  * See the documentation in ios/lsl_plugin.podspec.
-  * See the documentation in macos/lsl_plugin.podspec.
-* For Linux and Windows: CMake.
-  * See the documentation in linux/CMakeLists.txt.
-  * See the documentation in windows/CMakeLists.txt.
+- For Android: Gradle, which invokes the Android NDK for native builds.
+  - See the documentation in android/build.gradle.
+- For iOS and MacOS: Xcode, via CocoaPods.
+  - See the documentation in ios/lsl_plugin.podspec.
+  - See the documentation in macos/lsl_plugin.podspec.
+- For Linux and Windows: CMake.
+  - See the documentation in linux/CMakeLists.txt.
+  - See the documentation in windows/CMakeLists.txt.
 
 ## Binding to native code
 
@@ -89,4 +105,3 @@ For example, see `sumAsync` in `lib/lsl_plugin.dart`.
 For help getting started with Flutter, view our
 [online documentation](https://docs.flutter.dev), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
-
