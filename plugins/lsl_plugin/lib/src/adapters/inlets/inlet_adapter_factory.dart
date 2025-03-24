@@ -6,9 +6,11 @@ class InletAdapterFactory {
     switch (stream.info.channelFormat) {
       case Int8ChannelFormat():
       case Int16ChannelFormat():
+        return ShortInletAdapter._(inlet, stream);
       case Int32ChannelFormat():
-      case Int64ChannelFormat():
         return IntInletAdapter._(inlet, stream);
+      case Int64ChannelFormat():
+        return LongInletAdapter._(inlet, stream);
       default:
         throw Exception("Unsupported channel format for integers");
     }
@@ -18,8 +20,9 @@ class InletAdapterFactory {
       Inlet<double> inlet, ResolvedStream<double> stream) {
     switch (stream.info.channelFormat) {
       case Float32ChannelFormat():
+        return FloatInletAdapter._(inlet, stream);
       case Double64ChannelFormat():
-        throw UnimplementedError("Double unimplemented");
+        return DoubleInletAdapter._(inlet, stream);
       default:
         throw Exception("Unsupported channel format for integers");
     }
@@ -29,7 +32,7 @@ class InletAdapterFactory {
       Inlet<String> inlet, ResolvedStream<String> stream) {
     switch (stream.info.channelFormat) {
       case CftStringChannelFormat():
-        throw UnimplementedError("String unimplemented");
+        return StringInletAdapter._(inlet, stream);
       default:
         throw Exception("Unsupported channel format for integers");
     }
