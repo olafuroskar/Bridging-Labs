@@ -22,8 +22,6 @@ class AsyncStreamAdapter implements StreamAdapter {
 
   @override
   Future<void> resolveStreams(double waitTime) async {
-    print("Hallo ");
-
     /// Clear the resolved streams before re-resolving
     _resolvedIntStreams.clear();
     _resolvedDoubleStreams.clear();
@@ -53,8 +51,6 @@ class AsyncStreamAdapter implements StreamAdapter {
       final List<ResolvedStream<double>> doubleList = [];
       final List<ResolvedStream<String>> stringList = [];
 
-      print("length");
-      print(numStreams);
       for (var i = 0; i < numStreams; i++) {
         switch (getStreamInfo(buffer[i])) {
           case Ok(value: var info):
@@ -77,22 +73,17 @@ class AsyncStreamAdapter implements StreamAdapter {
             }
             break;
           case Error(error: var e):
-            print("$e");
             log("$e");
         }
       }
       return (intList, doubleList, stringList);
     });
 
-    print(streams);
-
     /// We can not modify _resolvedStreams inside the body of the isolate helper
     /// Therefore, we must perform a loop again outside it.
     for (var stream in streams.$1) {
       final uid = stream.info.uid;
 
-      print("UID ");
-      print(uid);
       // If it exists, use the uid as the key
       if (uid != null && uid != "") {
         _resolvedIntStreams[uid] = stream;
