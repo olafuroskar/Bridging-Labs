@@ -40,6 +40,11 @@ class _InletPageState extends State<InletPage> {
                 });
               },
               child: Text("Get available streams")),
+          leading: TextButton(
+              onPressed: () {
+                inletModel.removeAll();
+              },
+              child: Text("Destroy inlets")),
         ),
         body: loading
             ? CircularProgressIndicator()
@@ -48,7 +53,20 @@ class _InletPageState extends State<InletPage> {
                 itemBuilder: (context, index) {
                   final info = streams[index].info;
                   return ListTile(
-                      title: Text(info.name), subtitle: Text(info.type));
+                    title: Text(info.name),
+                    subtitle: Text(inletModel.exampleSamples.join("+")),
+                    leading: !inletModel.hasInlet(info.name)
+                        ? IconButton(
+                            onPressed: () {
+                              inletModel.createInlet(streams[index]);
+                            },
+                            icon: Icon(Icons.create))
+                        : IconButton(
+                            onPressed: () {
+                              inletModel.pullSample(info.name);
+                            },
+                            icon: Icon(Icons.delete)),
+                  );
                 }),
       ));
     });

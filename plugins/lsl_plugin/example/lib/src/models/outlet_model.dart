@@ -4,24 +4,40 @@ import 'package:flutter/foundation.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
 
 class OutletModel extends ChangeNotifier {
-  final List<OutletManager> _outlets = [];
+  final Map<String, OutletManager> _outlets = {};
 
   /// An unmodifiable view of the int outlets
-  UnmodifiableListView<OutletManager> get outlets =>
-      UnmodifiableListView(_outlets);
+  UnmodifiableListView<String> get outlets =>
+      UnmodifiableListView(_outlets.keys);
 
-  // /// The current total price of all items (assuming all items cost $42).
-  // int get totalPrice => _items.length * 42;
+  void add(String name) {
+    final streamInfo = StreamInfoFactory.createIntStreamInfo(
+        name, "EEG", Int32ChannelFormat());
 
-  void add(OutletManager outlet) {
-    _outlets.add(outlet);
+    final manager = OutletManager(streamInfo);
+    final result = manager.create();
+
+    switch (result) {
+      case Error(error: var e):
+        throw e;
+      case Ok():
+        _outlets[name] = manager;
+    }
     // This call tells the widgets that are listening to this model to rebuild.
     notifyListeners();
   }
 
+  void pushSample(String name, List<int> sample) {
+    final outlet = _outlets[name];
+
+    if (outlet == null) throw Exception("Outlet not found");
+
+    outlet.pushSample(sample);
+  }
+
   /// Removes all outlets
   void removeAll() {
-    for (var outlet in _outlets) {
+    for (var outlet in _outlets.values) {
       outlet.destroy();
     }
     _outlets.clear();

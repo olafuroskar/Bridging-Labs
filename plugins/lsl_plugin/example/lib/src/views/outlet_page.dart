@@ -46,38 +46,24 @@ class _OutletPageState extends State<OutletPage> {
                   TextField(controller: textController),
                   TextButton(
                       onPressed: () {
-                        final streamInfo =
-                            StreamInfoFactory.createDoubleStreamInfo(
-                                textController.text,
-                                "EEG",
-                                Double64ChannelFormat());
-
-                        final manager = OutletManager(streamInfo);
-                        final result = manager.create();
-                        dev.log("creating outlet");
-                        switch (result) {
-                          case Error(error: var e):
-                            error = e.toString();
-                            break;
-                          default:
-                            outletModel.add(manager);
+                        try {
+                          outletModel.add(textController.text);
+                        } catch (e) {
+                          error = e.toString();
                         }
                       },
                       child: Text("Create outlet")),
-                  // TextButton(
-                  //     onPressed: () {
-                  //       final result = outletManager
-                  //           ?.pushSample([Random().nextDouble() * 100]);
-                  //
-                  //       switch (result) {
-                  //         case Error(error: var e):
-                  //           error = e.toString();
-                  //           break;
-                  //         default:
-                  //       }
-                  //     },
-                  //     child: Text("Push sample")),
-                  // spacerSmall,
+                  TextButton(
+                      onPressed: () {
+                        try {
+                          outletModel.pushSample(
+                              textController.text, [Random().nextInt(10)]);
+                        } catch (e) {
+                          error = e.toString();
+                        }
+                      },
+                      child: Text("Push sample")),
+                  spacerSmall,
                   TextButton(
                       onPressed: () {
                         outletModel.removeAll();
