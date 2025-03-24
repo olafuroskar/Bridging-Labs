@@ -115,18 +115,6 @@ class StringOutletAdapter implements OutletAdapter<String> {
     }
   }
 
-  Result<int> testResolveStream() {
-    const bufferSize = 1024;
-
-    Pointer<lsl_streaminfo> buffer =
-        malloc.allocate<lsl_streaminfo>(bufferSize * sizeOf<lsl_streaminfo>());
-
-    var numStreams = lsl.bindings.lsl_resolve_all(buffer, bufferSize, 2);
-
-    // log("NumStreams: $numStreams");
-    return Result.ok(numStreams);
-  }
-
   @override
   Result<StreamInfo> getStreamInfo() {
     return getOutletStreamInfo(_outletPointer);
