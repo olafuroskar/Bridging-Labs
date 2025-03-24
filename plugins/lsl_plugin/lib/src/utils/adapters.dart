@@ -1,7 +1,7 @@
 import 'package:lsl_plugin/lsl_plugin.dart';
+import 'package:lsl_plugin/src/adapters/outlets/outlets.dart';
 import 'package:lsl_plugin/src/adapters/streams/stream_adapter.dart';
 import 'package:lsl_plugin/src/channel_formats/channel_format.dart';
-import 'package:lsl_plugin/src/adapters/outlets/outlet_adapter.dart';
 
 /// "Unwraps" the nullable outlet adapter
 ///

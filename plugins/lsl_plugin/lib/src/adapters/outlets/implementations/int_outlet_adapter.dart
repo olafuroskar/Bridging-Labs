@@ -1,35 +1,17 @@
-import 'dart:ffi';
+part of '../outlets.dart';
 
-import 'package:ffi/ffi.dart';
-import 'package:lsl_plugin/lsl_plugin.dart';
-import 'package:lsl_plugin/src/liblsl.dart';
-import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
-import 'package:lsl_plugin/src/adapters/outlets/outlet_adapter.dart';
-import 'package:lsl_plugin/src/adapters/outlets/utils.dart';
-import 'package:lsl_plugin/src/utils/errors.dart';
-import 'package:lsl_plugin/src/utils/unit.dart';
+class IntOutletAdapter extends OutletAdapter<int> {
+  late OutletContainer _outletContainer;
 
-class IntOutletAdapter implements OutletAdapter<int> {
-  lsl_outlet? _outletPointer;
-
-  IntOutletAdapter();
-
-  @override
-  Result<Unit> create(Outlet<int> outlet) {
-    switch (createOutlet(outlet, Int32ChannelFormat())) {
-      case Ok(value: var nativeOutlet):
-        _outletPointer = nativeOutlet;
-        return Result.ok(unit);
-      case Error(error: var e):
-        return unexpectedError("$e");
-    }
+  /// {@macro create}
+  IntOutletAdapter._(Outlet<int> outlet) {
+    final nativeOutlet = utils.createOutlet(outlet, Int32ChannelFormat());
+    _outletContainer = OutletContainer._(outlet, nativeOutlet);
   }
 
   @override
-  Result<Unit> destroy() {
-    return destroyOutlet(
-      _outletPointer,
-    );
+  OutletContainer getOutletContainer() {
+    return _outletContainer;
   }
 
   @override
@@ -40,7 +22,7 @@ class IntOutletAdapter implements OutletAdapter<int> {
     }
 
     try {
-      final outletPointer = getOutlet(_outletPointer);
+      final outletPointer = getOutletContainer()._nativeOutlet;
       final nativeSamplePointer =
           malloc.allocate<Int32>(sample.length * sizeOf<Int32>());
       for (var i = 0; i < sample.length; i++) {
@@ -70,7 +52,7 @@ class IntOutletAdapter implements OutletAdapter<int> {
     }
 
     try {
-      final outletPointer = getOutlet(_outletPointer);
+      final outletPointer = getOutletContainer()._nativeOutlet;
 
       final dataElements = chunk.length;
       final channelCount = chunk[0].length;
@@ -98,10 +80,5 @@ class IntOutletAdapter implements OutletAdapter<int> {
     } catch (e) {
       return unexpectedError("$e");
     }
-  }
-
-  @override
-  Result<StreamInfo> getStreamInfo() {
-    return getOutletStreamInfo(_outletPointer);
   }
 }

@@ -1,17 +1,14 @@
-import 'package:lsl_plugin/lsl_plugin.dart';
-import 'package:lsl_plugin/src/utils/unit.dart';
+part of 'outlets.dart';
 
 /// An interface for outlet repositories
 abstract class OutletAdapter<S> {
-  /// {@template create}
-  /// Creates an outlet stream from the given [outlet] object
-  /// {@endtemplate}
-  Result<Unit> create(Outlet<S> outlet);
-
-  /// {@template destroy}
-  /// Destroys the given outlet
-  /// {@endtemplate}
-  Result<Unit> destroy();
+  /// Gets the outlet container for the adapter instance
+  ///
+  /// The reference to the outlet is abstracted into this object to avoid it leaking to the manager layer.
+  /// The [OutletContainer._nativeOutlet] reference is private to the outlet library.
+  /// This furthermore allows us to specify common methods in this abstract class, but delegate the
+  /// implementation of type specific methods like [pushSample] and [pushChunk] to inherited classes.
+  OutletContainer getOutletContainer();
 
   /// {@template push_sample}
   /// Pushes a sample to the outlet
@@ -36,14 +33,39 @@ abstract class OutletAdapter<S> {
   Result<Unit> pushChunk(List<List<S>> chunk,
       [double? timestamp, bool pushthrough = false]);
 
+  /// {@template destroy}
+  /// Destroys the given outlet
+  /// {@endtemplate}
+  Result<Unit> destroy() {
+    return utils.destroy(
+      getOutletContainer()._nativeOutlet,
+    );
+  }
+
   /// {@template get_stream_info}
   /// Retrieve the stream info provided by this outlet.
   ///
   /// This is what was used to create the stream (and also has the Additional Network Information fields assigned).
   /// {@endtemplate}
-  Result<StreamInfo> getStreamInfo();
+  Result<StreamInfo> getStreamInfo() {
+    return utils.getOutletStreamInfo(getOutletContainer()._nativeOutlet);
+  }
 
-  // TODO:
-  // haveConsumers
-  // waitForConsumers - might need isolate
+  /// {@template have_consumers}
+  /// Check whether consumers are currently registered.
+  ///
+  /// While it does not hurt, there is technically no reason to push samples if there is no consumer.
+  /// {@endtemplate}
+  Result<bool> haveConsumers() {
+    return utils.haveConsumers(getOutletContainer()._nativeOutlet);
+  }
+
+  /// {@template wait_for_consumers}
+  /// Wait until some consumer shows up (without wasting resources).
+  ///
+  /// returns true if the wait was successful, false if the [timeout] expired.
+  /// {@endtemplate}
+  Future<bool> waitForConsumers(double timeout) {
+    return utils.waitForConsumers(getOutletContainer()._nativeOutlet, timeout);
+  }
 }

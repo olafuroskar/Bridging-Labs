@@ -15,14 +15,9 @@ class OutletModel extends ChangeNotifier {
         name, "EEG", Int32ChannelFormat());
 
     final manager = OutletManager(streamInfo);
-    final result = manager.create();
 
-    switch (result) {
-      case Error(error: var e):
-        throw e;
-      case Ok():
-        _outlets[name] = manager;
-    }
+    _outlets[name] = manager;
+
     // This call tells the widgets that are listening to this model to rebuild.
     notifyListeners();
   }

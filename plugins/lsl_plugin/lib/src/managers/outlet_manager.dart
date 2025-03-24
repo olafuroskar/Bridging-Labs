@@ -5,16 +5,18 @@ part of 'managers.dart';
 /// An instance can be re-used for multiple outlets (after being destroyed of course), but
 /// creaing new instances instead is incouraged for clarity.
 class OutletManager<S> {
-  int chunkSize;
-  int maxBuffered;
-  final StreamInfo<S> _streamInfo;
+  late int chunkSize;
+  late int maxBuffered;
+  late StreamInfo<S> _streamInfo;
 
-  OutletAdapter<S>? _outletAdapter;
-
-  OutletManager(this._streamInfo, [this.chunkSize = 0, this.maxBuffered = 360]);
+  late OutletAdapter<S> _outletAdapter;
 
   /// {@macro create}
-  Result<Unit> create() {
+  OutletManager(StreamInfo<S> streamInfo,
+      [int outletChunkSize = 0, int outletMaxBuffered = 360]) {
+    _streamInfo = streamInfo;
+    chunkSize = outletChunkSize;
+    maxBuffered = outletMaxBuffered;
     final outlet = Outlet<S>(_streamInfo, chunkSize, maxBuffered);
 
     OutletAdapter<S>? outletAdapter;
@@ -26,7 +28,7 @@ class OutletManager<S> {
       /// Furthermore, from the `T extends ChannelFormat<T>` type constraint we know that streamInfo.channelFormat
       /// must be of type ChannelFormat<int>. The factory returns a narrower type but we must cast it back to a wider one.
       outletAdapter = OutletAdapterFactory.createIntAdapterFromChannelFormat(
-          _streamInfo.channelFormat as ChannelFormat<int>) as OutletAdapter<S>;
+          outlet as Outlet<int>) as OutletAdapter<S>;
     } else if (S == double) {
       /// Get the appropriate outlet adapter for the given double channel format
       ///
@@ -34,8 +36,7 @@ class OutletManager<S> {
       /// Furthermore, from the `T extends ChannelFormat<T>` type constraint we know that streamInfo.channelFormat
       /// must be of type ChannelFormat<double>. The factory returns a narrower type but we must cast it back to a wider one.
       outletAdapter = OutletAdapterFactory.createDoubleAdapterFromChannelFormat(
-              _streamInfo.channelFormat as ChannelFormat<double>)
-          as OutletAdapter<S>;
+          outlet as Outlet<double>) as OutletAdapter<S>;
     } else if (S == String) {
       /// Get the appropriate outlet adapter for the given String channel format
       ///
@@ -43,61 +44,43 @@ class OutletManager<S> {
       /// Furthermore, from the `T extends ChannelFormat<T>` type constraint we know that streamInfo.channelFormat
       /// must be of type ChannelFormat<String>. The factory returns a narrower type but we must cast it back to a wider one.
       outletAdapter = OutletAdapterFactory.createStringAdapterFromChannelFormat(
-              _streamInfo.channelFormat as ChannelFormat<String>)
-          as OutletAdapter<S>;
+          outlet as Outlet<String>) as OutletAdapter<S>;
     } else {
-      return Result.error(Exception("Unsupported type $S"));
+      throw Exception("Unsupported type $S");
     }
 
-    final result = outletAdapter.create(outlet);
     _outletAdapter = outletAdapter;
-
-    return result;
   }
 
   /// {@macro push_sample}
   Result<Unit> pushSample(List<S> sample,
       [double? timestamp, bool pushthrough = false]) {
-    return switch (getOutletAdapter(_outletAdapter)) {
-      Ok(value: var outletAdapter) =>
-        outletAdapter.pushSample(sample, timestamp, pushthrough),
-      Error(error: var e) => Result.error(e)
-    };
+    return _outletAdapter.pushSample(sample, timestamp, pushthrough);
   }
 
   /// {@macro push_chunk}
   Result<Unit> pushChunk(List<List<S>> chunk,
       [double? timestamp, bool pushthrough = false]) {
-    return switch (getOutletAdapter(_outletAdapter)) {
-      Ok(value: var outletAdapter) =>
-        outletAdapter.pushChunk(chunk, timestamp, pushthrough),
-      Error(error: var e) => Result.error(e)
-    };
+    return _outletAdapter.pushChunk(chunk, timestamp, pushthrough);
   }
 
   /// {@macro destroy}
   Result<Unit> destroy() {
-    return switch (getOutletAdapter(_outletAdapter)) {
-      Ok(value: var outletAdapter) => outletAdapter.destroy(),
-      Error(error: var e) => Result.error(e)
-    };
+    return _outletAdapter.destroy();
   }
 
   /// {@macro get_stream_info}
   Result<StreamInfo> getStreamInfo() {
-    return switch (getOutletAdapter(_outletAdapter)) {
-      Ok(value: var outletAdapter) => outletAdapter.getStreamInfo(),
-      Error(error: var e) => Result.error(e)
-    };
+    return _outletAdapter.getStreamInfo();
   }
 
+  /// {@macro have_consumers}
   Result<bool> haveConsumers() {
-    // TODO: Implement
-    throw Exception("Not implemented");
+    return _outletAdapter.haveConsumers();
   }
 
-  Result<bool> waitForConsumers() {
-    // TODO: Implement
-    throw Exception("Not implemented");
+  /// {@macro wait_for_consumers}
+  Future<bool> waitForConsumers(double timeout) {
+    return _outletAdapter.waitForConsumers(timeout);
   }
 }
