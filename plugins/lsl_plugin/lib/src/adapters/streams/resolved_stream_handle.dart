@@ -4,8 +4,8 @@ part of '../../../lsl_plugin.dart';
 ///
 /// Does not contain any reference to native pointers. A user can pass an instance of
 /// this class to the stream manager to create an inlet (if the stream still exists).
-class ResolvedStreamHandle {
+class ResolvedStreamHandle<S> {
   final String id;
-  final StreamInfo info;
+  final StreamInfo<S> info;
   const ResolvedStreamHandle(this.id, this.info);
 }

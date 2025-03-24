@@ -4,6 +4,7 @@ import 'dart:isolate';
 
 import 'package:ffi/ffi.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
+import 'package:lsl_plugin/src/adapters/inlets/inlets.dart';
 import 'package:lsl_plugin/src/adapters/streams/resolved_stream.dart';
 import 'package:lsl_plugin/src/adapters/streams/stream_adapter.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
@@ -13,24 +14,34 @@ import 'package:lsl_plugin/src/utils/stream_info.dart';
 import 'package:lsl_plugin/src/utils/unit.dart';
 
 class AsyncStreamAdapter implements StreamAdapter {
-  final Map<String, ResolvedStream> _resolvedStreams = {};
+  final Map<String, ResolvedStream<int>> _resolvedIntStreams = {};
+  final Map<String, ResolvedStream<double>> _resolvedDoubleStreams = {};
+  final Map<String, ResolvedStream<String>> _resolvedStringStreams = {};
 
   AsyncStreamAdapter();
 
   @override
-  Future<List<ResolvedStreamHandle>> resolveStreams(double waitTime) async {
+  Future<void> resolveStreams(double waitTime) async {
+    print("Hallo ");
+
     /// Clear the resolved streams before re-resolving
-    _resolvedStreams.clear();
+    _resolvedIntStreams.clear();
+    _resolvedDoubleStreams.clear();
+    _resolvedStringStreams.clear();
 
     /// The resolve function can take up to several seconds so we delegate it to a helper isolate
     /// Otherwise, an app using this function will feel janky
-    final List<ResolvedStream> streams = await Isolate.run(() {
+    final (
+      List<ResolvedStream<int>>,
+      List<ResolvedStream<double>>,
+      List<ResolvedStream<String>>
+    ) streams = await Isolate.run(() {
       // Arbitrary buffer size
       const bufferSize = 1024;
 
       // Allocate the memory needed on the heap
-      Pointer<lsl_streaminfo> buffer = malloc.allocate<lsl_streaminfo>(
-          bufferSize * sizeOf<Pointer<lsl_streaminfo_struct_>>());
+      Pointer<lsl_streaminfo> buffer = malloc
+          .allocate<lsl_streaminfo>(bufferSize * sizeOf<lsl_streaminfo>());
 
       // Resolve all streams on the network and write them to the buffer.
       // Return the number of streams found
@@ -38,26 +49,53 @@ class AsyncStreamAdapter implements StreamAdapter {
           lsl.bindings.lsl_resolve_all(buffer, bufferSize, waitTime);
 
       // Create ResolvedStream objects for each stream
-      final List<ResolvedStream> list = [];
+      final List<ResolvedStream<int>> intList = [];
+      final List<ResolvedStream<double>> doubleList = [];
+      final List<ResolvedStream<String>> stringList = [];
+
+      print("length");
+      print(numStreams);
       for (var i = 0; i < numStreams; i++) {
         switch (getStreamInfo(buffer[i])) {
           case Ok(value: var info):
-            list.add(ResolvedStream(buffer[i], info));
+            switch (info.channelFormat) {
+              case Int8ChannelFormat():
+              case Int16ChannelFormat():
+              case Int32ChannelFormat():
+              case Int64ChannelFormat():
+                intList.add(
+                    ResolvedStream<int>(buffer[i], info as StreamInfo<int>));
+                break;
+              case Double64ChannelFormat():
+              case Float32ChannelFormat():
+                doubleList.add(ResolvedStream<double>(
+                    buffer[i], info as StreamInfo<double>));
+                break;
+              case CftStringChannelFormat():
+                stringList.add(ResolvedStream<String>(
+                    buffer[i], info as StreamInfo<String>));
+            }
             break;
           case Error(error: var e):
+            print("$e");
             log("$e");
         }
       }
-      return list;
+      return (intList, doubleList, stringList);
     });
+
+    print(streams);
 
     /// We can not modify _resolvedStreams inside the body of the isolate helper
     /// Therefore, we must perform a loop again outside it.
-    for (var stream in streams) {
+    for (var stream in streams.$1) {
       final uid = stream.info.uid;
+
+      print("UID ");
+      print(uid);
       // If it exists, use the uid as the key
       if (uid != null && uid != "") {
-        _resolvedStreams[uid] = stream;
+        _resolvedIntStreams[uid] = stream;
       } else {
         // TODO: Should I handle this differently perhaps?
         // Otherwise don't register the stream and free the allocated memory
@@ -66,29 +104,99 @@ class AsyncStreamAdapter implements StreamAdapter {
       }
     }
 
-    return _getStreamHandles();
+    for (var stream in streams.$2) {
+      final uid = stream.info.uid;
+      if (uid != null && uid != "") {
+        _resolvedDoubleStreams[uid] = stream;
+      } else {
+        lsl.bindings.lsl_destroy_streaminfo(stream.streamInfoPointer);
+        malloc.free(stream.streamInfoPointer);
+      }
+    }
+
+    for (var stream in streams.$3) {
+      final uid = stream.info.uid;
+      if (uid != null && uid != "") {
+        _resolvedStringStreams[uid] = stream;
+      } else {
+        lsl.bindings.lsl_destroy_streaminfo(stream.streamInfoPointer);
+        malloc.free(stream.streamInfoPointer);
+      }
+    }
+  }
+
+  @override
+  InletAdapter<S> createInlet<S>(ResolvedStreamHandle<S> handle) {
+    InletAdapter<S> inletAdapter;
+
+    if (S == int) {
+      final stream = _resolvedIntStreams[handle.id];
+      if (stream == null) throw Exception("Stream not found");
+
+      inletAdapter = InletAdapterFactory.createIntAdapterFromStream(
+          Inlet(stream.info), stream) as InletAdapter<S>;
+    } else if (S == double) {
+      final stream = _resolvedDoubleStreams[handle.id];
+      if (stream == null) throw Exception("Stream not found");
+
+      inletAdapter = InletAdapterFactory.createDoubleAdapterFromStream(
+          Inlet(stream.info), stream) as InletAdapter<S>;
+    } else if (S == String) {
+      final stream = _resolvedStringStreams[handle.id];
+      if (stream == null) throw Exception("Stream not found");
+
+      inletAdapter = InletAdapterFactory.createStringAdapterFromStream(
+          Inlet(stream.info), stream) as InletAdapter<S>;
+    } else {
+      throw Exception("Unsupported type");
+    }
+
+    return inletAdapter;
   }
 
   Result<Unit> destroyStreams() {
     try {
-      _resolvedStreams.forEach((_, stream) {
+      _resolvedIntStreams.forEach((_, stream) {
         lsl.bindings.lsl_destroy_streaminfo(stream.streamInfoPointer);
       });
-      _resolvedStreams.clear();
+      _resolvedIntStreams.clear();
 
+      _resolvedDoubleStreams.forEach((_, stream) {
+        lsl.bindings.lsl_destroy_streaminfo(stream.streamInfoPointer);
+      });
+      _resolvedDoubleStreams.clear();
+
+      _resolvedStringStreams.forEach((_, stream) {
+        lsl.bindings.lsl_destroy_streaminfo(stream.streamInfoPointer);
+      });
+      _resolvedStringStreams.clear();
       return Result.ok(unit);
     } catch (e) {
       return unexpectedError("$e");
     }
   }
 
-  /// Gets the handles for the currently saved streams
-  List<ResolvedStreamHandle> _getStreamHandles() {
-    return _resolvedStreams.entries.map((entry) {
+  /// Gets the handles for the currently saved int streams
+  @override
+  List<ResolvedStreamHandle<int>> getIntStreamHandles() {
+    return _resolvedIntStreams.entries.map((entry) {
       return ResolvedStreamHandle(entry.key, entry.value.info);
     }).toList();
   }
 
-  // TODO: createInlet
-  // Consider removing from the stored handles as refreshing may destroy the stream infos
+  /// Gets the handles for the currently saved double streams
+  @override
+  List<ResolvedStreamHandle<double>> getDoubleStreamHandles() {
+    return _resolvedDoubleStreams.entries.map((entry) {
+      return ResolvedStreamHandle(entry.key, entry.value.info);
+    }).toList();
+  }
+
+  /// Gets the handles for the currently saved String streams
+  @override
+  List<ResolvedStreamHandle<String>> getStringStreamHandles() {
+    return _resolvedStringStreams.entries.map((entry) {
+      return ResolvedStreamHandle(entry.key, entry.value.info);
+    }).toList();
+  }
 }

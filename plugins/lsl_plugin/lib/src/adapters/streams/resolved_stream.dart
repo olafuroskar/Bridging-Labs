@@ -5,8 +5,8 @@ import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
 ///
 /// We use a constant class for passing back the id, instead of simply returning an int
 /// to emphasize the immutability of the id.
-class ResolvedStream {
+class ResolvedStream<S> {
   final lsl_streaminfo streamInfoPointer;
-  final StreamInfo info;
+  final StreamInfo<S> info;
   ResolvedStream(this.streamInfoPointer, this.info);
 }
