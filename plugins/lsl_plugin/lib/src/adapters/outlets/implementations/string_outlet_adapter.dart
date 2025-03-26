@@ -89,4 +89,46 @@ class StringOutletAdapter extends OutletAdapter<String> {
       return unexpectedError("$e");
     }
   }
+
+  @override
+  Result<Unit> pushChunkWithTimestamps(
+      List<List<String>> chunk, List<double> timestamps,
+      [bool pushthrough = false]) {
+    if (chunk.isEmpty) {
+      return Result.ok(unit);
+    }
+
+    try {
+      final outletPointer = _outletContainer._nativeOutlet;
+
+      final dataElements = chunk.length;
+      final channelCount = chunk[0].length;
+
+      Pointer<Char> toString(String text) => text.toNativeUtf8().cast<Char>();
+
+      final nativeSamplePointer = malloc.allocate<Pointer<Char>>(
+          dataElements * channelCount * sizeOf<Pointer<Char>>());
+
+      for (var i = 0; i < dataElements; i++) {
+        final encodedStrings = chunk[i].map(toString).toList();
+        for (var j = 0; j < channelCount; j++) {
+          nativeSamplePointer[i * dataElements + j] = encodedStrings[j];
+        }
+      }
+
+      final nativeTimestamps = utils.allocatTimestamps(timestamps);
+
+      lsl.bindings.lsl_push_chunk_strtnp(outletPointer, nativeSamplePointer,
+          dataElements, nativeTimestamps, pushthrough ? 1 : 0);
+
+      malloc.free(nativeSamplePointer);
+      malloc.free(nativeTimestamps);
+
+      return Result.ok(unit);
+    } on Exception catch (e) {
+      return Result.error(e);
+    } catch (e) {
+      return unexpectedError("$e");
+    }
+  }
 }

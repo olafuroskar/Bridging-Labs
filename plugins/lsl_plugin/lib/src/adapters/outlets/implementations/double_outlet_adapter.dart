@@ -78,4 +78,42 @@ class DoubleOutletAdapter extends OutletAdapter<double> {
       return unexpectedError("$e");
     }
   }
+
+  @override
+  Result<Unit> pushChunkWithTimestamps(
+      List<List<double>> chunk, List<double> timestamps,
+      [bool pushthrough = false]) {
+    if (chunk.isEmpty) {
+      return Result.ok(unit);
+    }
+
+    try {
+      final outletPointer = _outletContainer._nativeOutlet;
+
+      final dataElements = chunk.length;
+      final channelCount = chunk[0].length;
+
+      final nativeSamplePointer = malloc
+          .allocate<Double>(dataElements * channelCount * sizeOf<Double>());
+      for (var i = 0; i < dataElements; i++) {
+        for (var j = 0; j < channelCount; j++) {
+          nativeSamplePointer[i * dataElements + j] = chunk[i][j];
+        }
+      }
+
+      final nativeTimestampsPointer = utils.allocatTimestamps(timestamps);
+
+      lsl.bindings.lsl_push_chunk_dtnp(outletPointer, nativeSamplePointer,
+          dataElements, nativeTimestampsPointer, pushthrough ? 1 : 0);
+
+      malloc.free(nativeSamplePointer);
+      malloc.free(nativeTimestampsPointer);
+
+      return Result.ok(unit);
+    } on Exception catch (e) {
+      return Result.error(e);
+    } catch (e) {
+      return unexpectedError("$e");
+    }
+  }
 }

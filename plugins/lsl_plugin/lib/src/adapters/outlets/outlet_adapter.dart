@@ -33,6 +33,18 @@ abstract class OutletAdapter<S> {
   Result<Unit> pushChunk(List<List<S>> chunk,
       [double? timestamp, bool pushthrough = false]);
 
+  /// {@template push_chunk_with_timestamps}
+  /// Push a chunk of multiplexed samples into the outlet. One timestamp per sample is provided.
+  ///
+  /// [chunk] A rectangular array of values for multiple samples.
+  /// [timestamp] An array of timestamp values holding time stamps for each sample in the data buffer.
+  /// [pushthrough] Optionally whether to push the chunk through to the receivers instead of buffering it with subsequent samples.
+  /// Note that the chunk_size, if specified at outlet construction, takes precedence over the pushthrough flag.
+  /// {@endtemplate}
+  Result<Unit> pushChunkWithTimestamps(
+      List<List<S>> chunk, List<double> timestamps,
+      [bool pushthrough = false]);
+
   /// {@template destroy}
   /// Destroys the given outlet
   /// {@endtemplate}

@@ -69,3 +69,13 @@ Future<bool> waitForConsumers(lsl_outlet outlet, double timeout) async {
     return false;
   }
 }
+
+Pointer<Double> allocatTimestamps(List<double> timestamps) {
+  final dataElements = timestamps.length;
+  final nativeTimestampsPointer =
+      malloc.allocate<Double>(dataElements * sizeOf<Double>());
+  for (var i = 0; i < dataElements; i++) {
+    nativeTimestampsPointer[i] = timestamps[i];
+  }
+  return nativeTimestampsPointer;
+}
