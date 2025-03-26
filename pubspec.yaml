@@ -13,3 +13,4 @@ environment:
 workspace:
   - plugins/lsl_plugin
   - plugins/multicast_lock
+  - apps/sensors
