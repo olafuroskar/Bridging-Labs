@@ -7,7 +7,7 @@ abstract class InletAdapter<S> {
   /// The [InletContainer._nativeInlet] reference is private to the inlet library.
   /// This furthermore allows us to specify common methods in this abstract class, but delegate the
   /// implementation of type specific methods like [pullSample] and [pullChunk] to inherited classes.
-  InletContainer getInletContainer();
+  InletContainer _getInletContainer();
 
   /// {@template pull_sample}
   /// Pull a sample from the inlet and read it into an array of values.
@@ -46,7 +46,7 @@ abstract class InletAdapter<S> {
   /// [timeout] Optional timeout of the operation (default: no timeout).
   /// {@endtemplate}
   Future<void> openStream([double timeout = double.infinity]) async {
-    return utils.openStream(getInletContainer()._nativeInlet, timeout);
+    return utils.openStream(_getInletContainer()._nativeInlet, timeout);
   }
 
   /// {@template close_stream}
@@ -59,7 +59,7 @@ abstract class InletAdapter<S> {
   /// resources.
   /// {@endtemplate}
   Result<Unit> closeStream() {
-    return utils.closeStream(getInletContainer()._nativeInlet);
+    return utils.closeStream(_getInletContainer()._nativeInlet);
   }
 
   /// {@template get_inlet_stream_info}
@@ -70,7 +70,7 @@ abstract class InletAdapter<S> {
   /// [timeout] Timeout of the operation (default: no timeout).
   /// {@endtemplate}
   Result<StreamInfo> getStreamInfo([double timeout = double.infinity]) {
-    return utils.getInletStreamInfo(getInletContainer()._nativeInlet, timeout);
+    return utils.getInletStreamInfo(_getInletContainer()._nativeInlet, timeout);
   }
 
   /// {@template time_correction}
@@ -85,7 +85,7 @@ abstract class InletAdapter<S> {
   /// [timeout] Timeout to acquire the first time-correction estimate (default: no timeout).
   /// {@endtemplate}
   Future<double> timeCorrection([double timeout = double.infinity]) {
-    return utils.timeCorrection(getInletContainer()._nativeInlet, timeout);
+    return utils.timeCorrection(_getInletContainer()._nativeInlet, timeout);
   }
 
   /// {@template samples_available}
@@ -97,7 +97,7 @@ abstract class InletAdapter<S> {
   ///  samples available (otherwise it will be 1 or 0).
   /// {@endtemplate}
   Result<int> samplesAvailable() {
-    return utils.samplesAvailable(getInletContainer()._nativeInlet);
+    return utils.samplesAvailable(_getInletContainer()._nativeInlet);
   }
 
   /// {@template was_clock_reset}
@@ -108,6 +108,6 @@ abstract class InletAdapter<S> {
   /// hot-swapped or restarted in between two measurements.
   /// {@endtemplate}
   Result<bool> wasClockReset() {
-    return utils.wasClockReset(getInletContainer()._nativeInlet);
+    return utils.wasClockReset(_getInletContainer()._nativeInlet);
   }
 }

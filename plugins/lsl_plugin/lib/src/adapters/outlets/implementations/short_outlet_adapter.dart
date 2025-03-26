@@ -10,7 +10,7 @@ class ShortOutletAdapter extends OutletAdapter<int> {
   }
 
   @override
-  OutletContainer getOutletContainer() {
+  OutletContainer _getOutletContainer() {
     return _outletContainer;
   }
 
@@ -22,7 +22,7 @@ class ShortOutletAdapter extends OutletAdapter<int> {
     }
 
     try {
-      final outletPointer = getOutletContainer()._nativeOutlet;
+      final outletPointer = _getOutletContainer()._nativeOutlet;
 
       final nativeSamplePointer =
           malloc.allocate<Int16>(sample.length * sizeOf<Int16>());
@@ -53,7 +53,7 @@ class ShortOutletAdapter extends OutletAdapter<int> {
     }
 
     try {
-      final outletPointer = getOutletContainer()._nativeOutlet;
+      final outletPointer = _getOutletContainer()._nativeOutlet;
 
       final dataElements = chunk.length;
       final channelCount = chunk[0].length;

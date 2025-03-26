@@ -10,7 +10,7 @@ class IntOutletAdapter extends OutletAdapter<int> {
   }
 
   @override
-  OutletContainer getOutletContainer() {
+  OutletContainer _getOutletContainer() {
     return _outletContainer;
   }
 
@@ -22,7 +22,7 @@ class IntOutletAdapter extends OutletAdapter<int> {
     }
 
     try {
-      final outletPointer = getOutletContainer()._nativeOutlet;
+      final outletPointer = _getOutletContainer()._nativeOutlet;
       final nativeSamplePointer =
           malloc.allocate<Int32>(sample.length * sizeOf<Int32>());
       for (var i = 0; i < sample.length; i++) {
@@ -52,7 +52,7 @@ class IntOutletAdapter extends OutletAdapter<int> {
     }
 
     try {
-      final outletPointer = getOutletContainer()._nativeOutlet;
+      final outletPointer = _getOutletContainer()._nativeOutlet;
 
       final dataElements = chunk.length;
       final channelCount = chunk[0].length;

@@ -16,8 +16,8 @@ class DoubleInletAdapter extends InletAdapter<double> {
 
   @override
   Future<List<(List<double>, double)>?> pullChunk([double timeout = 0]) async {
-    final nativeInlet = getInletContainer()._nativeInlet;
-    final inlet = getInletContainer().inlet;
+    final nativeInlet = _getInletContainer()._nativeInlet;
+    final inlet = _getInletContainer().inlet;
 
     return await Isolate.run(() {
       final ec = malloc.allocate<Int32>(sizeOf<Int32>());
@@ -68,7 +68,7 @@ class DoubleInletAdapter extends InletAdapter<double> {
 
   @override
   Future<(List<double>, double)?> pullSample([double timeout = 0]) async {
-    final inlet = getInletContainer()._nativeInlet;
+    final inlet = _getInletContainer()._nativeInlet;
 
     return await Isolate.run(() {
       final ec = malloc.allocate<Int32>(sizeOf<Int32>());
@@ -93,7 +93,7 @@ class DoubleInletAdapter extends InletAdapter<double> {
   }
 
   @override
-  InletContainer getInletContainer() {
+  InletContainer _getInletContainer() {
     return _inletContainer;
   }
 }

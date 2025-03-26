@@ -10,7 +10,7 @@ class FloatOutletAdapter extends OutletAdapter<double> {
   }
 
   @override
-  OutletContainer getOutletContainer() {
+  OutletContainer _getOutletContainer() {
     return _outletContainer;
   }
 
@@ -22,7 +22,7 @@ class FloatOutletAdapter extends OutletAdapter<double> {
     }
 
     try {
-      final outletPointer = getOutletContainer()._nativeOutlet;
+      final outletPointer = _getOutletContainer()._nativeOutlet;
 
       final nativeSamplePointer =
           malloc.allocate<Float>(sample.length * sizeOf<Float>());
@@ -52,7 +52,7 @@ class FloatOutletAdapter extends OutletAdapter<double> {
     }
 
     try {
-      final outletPointer = getOutletContainer()._nativeOutlet;
+      final outletPointer = _getOutletContainer()._nativeOutlet;
 
       final dataElements = chunk.length;
       final channelCount = chunk[0].length;

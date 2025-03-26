@@ -10,7 +10,7 @@ class StringOutletAdapter extends OutletAdapter<String> {
   }
 
   @override
-  OutletContainer getOutletContainer() {
+  OutletContainer _getOutletContainer() {
     return _outletContainer;
   }
 
@@ -22,7 +22,7 @@ class StringOutletAdapter extends OutletAdapter<String> {
     }
 
     try {
-      final outletPointer = getOutletContainer()._nativeOutlet;
+      final outletPointer = _getOutletContainer()._nativeOutlet;
 
       Pointer<Char> toString(String text) => text.toNativeUtf8().cast<Char>();
       final encodedStrings = sample.map(toString).toList();
@@ -62,7 +62,7 @@ class StringOutletAdapter extends OutletAdapter<String> {
     }
 
     try {
-      final outletPointer = getOutletContainer()._nativeOutlet;
+      final outletPointer = _getOutletContainer()._nativeOutlet;
 
       final dataElements = chunk.length;
       final channelCount = chunk[0].length;
