@@ -1,7 +1,6 @@
 part of '../inlets.dart';
 
 class ShortInletAdapter extends InletAdapter<int> {
-  late InletContainer _inletContainer;
   late StreamInfo<int> _streamInfo;
 
   /// {@macro create_inlet}
@@ -16,8 +15,8 @@ class ShortInletAdapter extends InletAdapter<int> {
 
   @override
   Future<List<(List<int>, double)>?> pullChunk([double timeout = 0]) async {
-    final nativeInlet = _getInletContainer()._nativeInlet;
-    final inlet = _getInletContainer().inlet;
+    final nativeInlet = _inletContainer._nativeInlet;
+    final inlet = _inletContainer.inlet;
 
     return await Isolate.run(() {
       final ec = malloc.allocate<Int32>(sizeOf<Int32>());
@@ -68,7 +67,7 @@ class ShortInletAdapter extends InletAdapter<int> {
 
   @override
   Future<(List<int>, double)?> pullSample([double timeout = 0]) async {
-    final inlet = _getInletContainer()._nativeInlet;
+    final inlet = _inletContainer._nativeInlet;
 
     return await Isolate.run(() {
       final ec = malloc.allocate<Int32>(sizeOf<Int32>());
@@ -90,10 +89,5 @@ class ShortInletAdapter extends InletAdapter<int> {
 
       return (sample, timestamp);
     });
-  }
-
-  @override
-  InletContainer _getInletContainer() {
-    return _inletContainer;
   }
 }

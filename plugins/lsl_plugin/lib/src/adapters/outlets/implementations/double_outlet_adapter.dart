@@ -1,19 +1,12 @@
 part of '../outlets.dart';
 
 class DoubleOutletAdapter extends OutletAdapter<double> {
-  late OutletContainer _outletContainer;
-
   /// {@template create}
   /// Creates an outlet stream from the given [outlet] object
   /// {@endtemplate}
   DoubleOutletAdapter._(Outlet<double> outlet) {
     final nativeOutlet = utils.createOutlet(outlet, Double64ChannelFormat());
     _outletContainer = OutletContainer._(outlet, nativeOutlet);
-  }
-
-  @override
-  OutletContainer _getOutletContainer() {
-    return _outletContainer;
   }
 
   @override
@@ -24,7 +17,7 @@ class DoubleOutletAdapter extends OutletAdapter<double> {
     }
 
     try {
-      final outletPointer = _getOutletContainer()._nativeOutlet;
+      final outletPointer = _outletContainer._nativeOutlet;
 
       final nativeSamplePointer =
           malloc.allocate<Double>(sample.length * sizeOf<Double>());
@@ -56,7 +49,7 @@ class DoubleOutletAdapter extends OutletAdapter<double> {
     }
 
     try {
-      final outletPointer = _getOutletContainer()._nativeOutlet;
+      final outletPointer = _outletContainer._nativeOutlet;
 
       final dataElements = chunk.length;
       final channelCount = chunk[0].length;

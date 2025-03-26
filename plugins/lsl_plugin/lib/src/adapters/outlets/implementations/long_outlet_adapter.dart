@@ -1,17 +1,10 @@
 part of '../outlets.dart';
 
 class LongOutletAdapter extends OutletAdapter<int> {
-  late OutletContainer _outletContainer;
-
   /// {@macro create}
   LongOutletAdapter._(Outlet<int> outlet) {
     final nativeOutlet = utils.createOutlet(outlet, Int64ChannelFormat());
     _outletContainer = OutletContainer._(outlet, nativeOutlet);
-  }
-
-  @override
-  OutletContainer _getOutletContainer() {
-    return _outletContainer;
   }
 
   @override
@@ -22,7 +15,7 @@ class LongOutletAdapter extends OutletAdapter<int> {
     }
 
     try {
-      final outletPointer = _getOutletContainer()._nativeOutlet;
+      final outletPointer = _outletContainer._nativeOutlet;
 
       final nativeSamplePointer =
           malloc.allocate<Int64>(sample.length * sizeOf<Int64>());
@@ -53,7 +46,7 @@ class LongOutletAdapter extends OutletAdapter<int> {
     }
 
     try {
-      final outletPointer = _getOutletContainer()._nativeOutlet;
+      final outletPointer = _outletContainer._nativeOutlet;
 
       final dataElements = chunk.length;
       final channelCount = chunk[0].length;

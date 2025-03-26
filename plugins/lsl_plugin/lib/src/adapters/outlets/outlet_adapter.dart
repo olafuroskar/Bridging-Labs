@@ -2,13 +2,13 @@ part of 'outlets.dart';
 
 /// An interface for outlet repositories
 abstract class OutletAdapter<S> {
-  /// Gets the outlet container for the adapter instance
+  /// The outlet container for the adapter instance
   ///
-  /// The reference to the outlet is abstracted into this object to avoid it leaking to the manager layer.
-  /// The [OutletContainer._nativeOutlet] reference is private to the outlet library.
-  /// This furthermore allows us to specify common methods in this abstract class, but delegate the
-  /// implementation of type specific methods like [pushSample] and [pushChunk] to inherited classes.
-  OutletContainer _getOutletContainer();
+  /// Must be initialized in subclasses.
+  /// Kept private to avoid it leaking to the manager layer.
+  /// Defining the outlet here allows us to specify common methods in this abstract class, but delegate the
+  /// implementation of type specific methods like [pullSample] and [pullChunk] to inherited classes.
+  late OutletContainer _outletContainer;
 
   /// {@template push_sample}
   /// Pushes a sample to the outlet
@@ -38,7 +38,7 @@ abstract class OutletAdapter<S> {
   /// {@endtemplate}
   Result<Unit> destroy() {
     return utils.destroy(
-      _getOutletContainer()._nativeOutlet,
+      _outletContainer._nativeOutlet,
     );
   }
 
@@ -48,7 +48,7 @@ abstract class OutletAdapter<S> {
   /// This is what was used to create the stream (and also has the Additional Network Information fields assigned).
   /// {@endtemplate}
   Result<StreamInfo> getStreamInfo() {
-    return utils.getOutletStreamInfo(_getOutletContainer()._nativeOutlet);
+    return utils.getOutletStreamInfo(_outletContainer._nativeOutlet);
   }
 
   /// {@template have_consumers}
@@ -57,7 +57,7 @@ abstract class OutletAdapter<S> {
   /// While it does not hurt, there is technically no reason to push samples if there is no consumer.
   /// {@endtemplate}
   Result<bool> haveConsumers() {
-    return utils.haveConsumers(_getOutletContainer()._nativeOutlet);
+    return utils.haveConsumers(_outletContainer._nativeOutlet);
   }
 
   /// {@template wait_for_consumers}
@@ -66,6 +66,6 @@ abstract class OutletAdapter<S> {
   /// returns true if the wait was successful, false if the [timeout] expired.
   /// {@endtemplate}
   Future<bool> waitForConsumers(double timeout) {
-    return utils.waitForConsumers(_getOutletContainer()._nativeOutlet, timeout);
+    return utils.waitForConsumers(_outletContainer._nativeOutlet, timeout);
   }
 }

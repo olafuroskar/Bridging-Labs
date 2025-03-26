@@ -1,17 +1,10 @@
 part of '../outlets.dart';
 
 class StringOutletAdapter extends OutletAdapter<String> {
-  late OutletContainer _outletContainer;
-
   /// {@macro create}
   StringOutletAdapter._(Outlet<String> outlet) {
     final nativeOutlet = utils.createOutlet(outlet, CftStringChannelFormat());
     _outletContainer = OutletContainer._(outlet, nativeOutlet);
-  }
-
-  @override
-  OutletContainer _getOutletContainer() {
-    return _outletContainer;
   }
 
   @override
@@ -22,7 +15,7 @@ class StringOutletAdapter extends OutletAdapter<String> {
     }
 
     try {
-      final outletPointer = _getOutletContainer()._nativeOutlet;
+      final outletPointer = _outletContainer._nativeOutlet;
 
       Pointer<Char> toString(String text) => text.toNativeUtf8().cast<Char>();
       final encodedStrings = sample.map(toString).toList();
@@ -62,7 +55,7 @@ class StringOutletAdapter extends OutletAdapter<String> {
     }
 
     try {
-      final outletPointer = _getOutletContainer()._nativeOutlet;
+      final outletPointer = _outletContainer._nativeOutlet;
 
       final dataElements = chunk.length;
       final channelCount = chunk[0].length;
