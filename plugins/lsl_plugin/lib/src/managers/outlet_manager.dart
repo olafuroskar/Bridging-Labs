@@ -64,6 +64,14 @@ class OutletManager<S> {
     return _outletAdapter.pushChunk(chunk, timestamp, pushthrough);
   }
 
+  /// {@macro push_chunk_with_timestamps}
+  Result<Unit> pushChunkWithTimastamps(
+      List<List<S>> chunk, List<double> timestamps,
+      [bool pushthrough = false]) {
+    return _outletAdapter.pushChunkWithTimestamps(
+        chunk, timestamps, pushthrough);
+  }
+
   /// {@macro destroy}
   Result<Unit> destroy() {
     return _outletAdapter.destroy();
