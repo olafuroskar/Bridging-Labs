@@ -1,16 +1,16 @@
 part of '../main.dart';
 
-class _CreateOutletScreenState extends State<CreateOutletScreen> {
+final polar = Polar();
+
+class _AddDeviceScreenState extends State<AddDeviceScreen> {
   final TextEditingController _controller = TextEditingController();
-  String _selectedOption = 'Option 1';
-  final List<String> options = ['Option 1', 'Option 2', 'Option 3'];
+  String _selectedOption = 'Polar';
+  final List<String> options = ['Polar'];
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Create Outlet')),
+      appBar: AppBar(title: const Text('Find device')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -28,15 +28,22 @@ class _CreateOutletScreenState extends State<CreateOutletScreen> {
             ),
             TextField(
               controller: _controller,
-              decoration: const InputDecoration(labelText: 'Enter outlet name'),
+              decoration: const InputDecoration(labelText: 'Enter device id'),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                for (var deviceId in appState.selectedDevices) {
-                  appState.addPolarStream(deviceId);
+              onPressed: () async {
+                final deviceId = _controller.text;
+                try {
+                  await polar.connectToDevice(deviceId);
+                  if (context.mounted) {
+                    Provider.of<AppState>(context, listen: false)
+                        .addDevice(deviceId);
+                    Navigator.pop(context);
+                  }
+                } catch (e) {
+                  print("$e");
                 }
-                Navigator.pop(context);
               },
               child: const Text('Create'),
             )
@@ -47,9 +54,9 @@ class _CreateOutletScreenState extends State<CreateOutletScreen> {
   }
 }
 
-class CreateOutletScreen extends StatefulWidget {
-  const CreateOutletScreen({super.key});
+class AddDeviceScreen extends StatefulWidget {
+  const AddDeviceScreen({super.key});
 
   @override
-  State<CreateOutletScreen> createState() => _CreateOutletScreenState();
+  State<AddDeviceScreen> createState() => _AddDeviceScreenState();
 }

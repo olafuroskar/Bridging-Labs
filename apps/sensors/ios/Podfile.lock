@@ -1,22 +1,70 @@
 PODS:
+  - Alamofire (5.8.1)
+  - device_info_plus (0.0.1):
+    - Flutter
   - Flutter (1.0.0)
+  - flutter_blue_plus_darwin (0.0.2):
+    - Flutter
+    - FlutterMacOS
   - lsl_plugin (0.0.1):
     - Flutter
+  - permission_handler_apple (9.3.0):
+    - Flutter
+  - polar (0.0.1):
+    - Flutter
+    - PolarBleSdk (~> 5.7.0)
+  - PolarBleSdk (5.7.0):
+    - Alamofire (~> 5.8.1)
+    - RxSwift (~> 6.5.0)
+    - SwiftProtobuf (~> 1.0)
+    - Zip (~> 2.1.2)
+  - RxSwift (6.5.0)
+  - SwiftProtobuf (1.29.0)
+  - Zip (2.1.2)
 
 DEPENDENCIES:
+  - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - Flutter (from `Flutter`)
+  - flutter_blue_plus_darwin (from `.symlinks/plugins/flutter_blue_plus_darwin/darwin`)
   - lsl_plugin (from `.symlinks/plugins/lsl_plugin/ios`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
+  - polar (from `.symlinks/plugins/polar/ios`)
+
+SPEC REPOS:
+  trunk:
+    - Alamofire
+    - PolarBleSdk
+    - RxSwift
+    - SwiftProtobuf
+    - Zip
 
 EXTERNAL SOURCES:
+  device_info_plus:
+    :path: ".symlinks/plugins/device_info_plus/ios"
   Flutter:
     :path: Flutter
+  flutter_blue_plus_darwin:
+    :path: ".symlinks/plugins/flutter_blue_plus_darwin/darwin"
   lsl_plugin:
     :path: ".symlinks/plugins/lsl_plugin/ios"
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
+  polar:
+    :path: ".symlinks/plugins/polar/ios"
 
 SPEC CHECKSUMS:
+  Alamofire: 3ca42e259043ee0dc5c0cdd76c4bc568b8e42af7
+  device_info_plus: bf2e3232933866d73fe290f2942f2156cdd10342
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  flutter_blue_plus_darwin: 3ea4ec9133b377febcc8a70b28cd2d2dc9242bd9
   lsl_plugin: cb3154979978d7e39df08b72439f1b89039f21d7
+  permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
+  polar: 72c115bddd9aef3e3cc3eaba1196ecd99c59b8b6
+  PolarBleSdk: e3df6f62b6ed34701d2e1d74ebe24fd8245062ca
+  RxSwift: 5710a9e6b17f3c3d6e40d6e559b9fa1e813b2ef8
+  SwiftProtobuf: b7aa08087e2ab6d162862d143020091254095f69
+  Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
 
-PODFILE CHECKSUM: 819463e6a0290f5a72f145ba7cde16e8b6ef0796
+PODFILE CHECKSUM: 1959d098c91d8a792531a723c4a9d7e9f6a01e38
 
 COCOAPODS: 1.15.2

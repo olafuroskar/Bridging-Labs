@@ -1,33 +1,45 @@
 part of '../main.dart';
 
-class OutletScreen extends StatelessWidget {
+class OutletScreen extends StatefulWidget {
   const OutletScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
-
-    return Scaffold(
-      appBar: AppBar(title: const Text('Outlets')),
-      body: ListView(
-        children: appState.outlets
-            .map((outlet) => ListTile(title: Text(outlet)))
-            .toList(),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const CreateOutletScreen()),
-        ),
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
+  State<OutletScreen> createState() => _OutletScreenState();
 }
 
-class CreateOutletScreen extends StatefulWidget {
-  const CreateOutletScreen({super.key});
+class _OutletScreenState extends State<OutletScreen>
+    with SingleTickerProviderStateMixin {
+  static const List<Tab> tabs = <Tab>[
+    Tab(text: 'Available Devices'),
+    Tab(text: 'Active Outlets'),
+  ];
+
+  late TabController _tabController;
 
   @override
-  State<CreateOutletScreen> createState() => _CreateOutletScreenState();
+  void initState() {
+    super.initState();
+    _tabController = TabController(vsync: this, length: tabs.length);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text('Outlets'),
+          bottom: TabBar(
+            tabs: tabs,
+            controller: _tabController,
+          ),
+        ),
+        body: TabBarView(
+            controller: _tabController,
+            children: [AvailableDevices(), ActiveOutlets()]));
+  }
 }
