@@ -35,18 +35,14 @@ Result<Unit> closeStream(lsl_inlet inlet) {
 }
 
 /// {@macro close_stream}
-Result<StreamInfo> getInletStreamInfo(lsl_inlet inlet, double timeout) {
-  try {
-    final ec = malloc.allocate<Int32>(sizeOf<Int32>());
-    final nativeInfo = lsl.bindings.lsl_get_fullinfo(inlet, timeout, ec);
+StreamInfo getInletStreamInfo(lsl_inlet inlet, double timeout) {
+  final ec = malloc.allocate<Int32>(sizeOf<Int32>());
+  final nativeInfo = lsl.bindings.lsl_get_fullinfo(inlet, timeout, ec);
 
-    checkError(ec);
-    malloc.free(ec);
+  checkError(ec);
+  malloc.free(ec);
 
-    return getStreamInfo(nativeInfo);
-  } catch (e) {
-    return unexpectedError("$e");
-  }
+  return getStreamInfo(nativeInfo);
 }
 
 /// {@macro samples_available}

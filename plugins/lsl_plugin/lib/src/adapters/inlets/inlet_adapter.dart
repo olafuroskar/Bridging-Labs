@@ -69,7 +69,7 @@ abstract class InletAdapter<S> {
   ///
   /// [timeout] Timeout of the operation (default: no timeout).
   /// {@endtemplate}
-  Result<StreamInfo> getStreamInfo([double timeout = double.infinity]) {
+  StreamInfo getStreamInfo([double timeout = double.infinity]) {
     return utils.getInletStreamInfo(_inletContainer._nativeInlet, timeout);
   }
 

@@ -59,7 +59,7 @@ abstract class OutletAdapter<S> {
   ///
   /// This is what was used to create the stream (and also has the Additional Network Information fields assigned).
   /// {@endtemplate}
-  Result<StreamInfo> getStreamInfo() {
+  StreamInfo getStreamInfo() {
     return utils.getOutletStreamInfo(_outletContainer._nativeOutlet);
   }
 

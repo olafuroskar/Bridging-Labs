@@ -78,7 +78,7 @@ class OutletManager<S> {
   }
 
   /// {@macro get_stream_info}
-  Result<StreamInfo> getStreamInfo() {
+  StreamInfo getStreamInfo() {
     return _outletAdapter.getStreamInfo();
   }
 

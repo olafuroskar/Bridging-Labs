@@ -41,14 +41,10 @@ Result<Unit> destroy(lsl_outlet? outlet) {
   }
 }
 
-Result<StreamInfo> getOutletStreamInfo(lsl_outlet outlet) {
-  try {
-    final nativeInfo = lsl.bindings.lsl_get_info(outlet);
+StreamInfo getOutletStreamInfo(lsl_outlet outlet) {
+  final nativeInfo = lsl.bindings.lsl_get_info(outlet);
 
-    return getStreamInfo(nativeInfo);
-  } catch (e) {
-    return unexpectedError("$e");
-  }
+  return getStreamInfo(nativeInfo);
 }
 
 Result<bool> haveConsumers(lsl_outlet outlet) {

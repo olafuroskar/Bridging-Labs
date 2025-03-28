@@ -52,28 +52,23 @@ class AsyncStreamAdapter implements StreamAdapter {
       final List<ResolvedStream<String>> stringList = [];
 
       for (var i = 0; i < numStreams; i++) {
-        switch (getStreamInfo(buffer[i])) {
-          case Ok(value: var info):
-            switch (info.channelFormat) {
-              case Int8ChannelFormat():
-              case Int16ChannelFormat():
-              case Int32ChannelFormat():
-              case Int64ChannelFormat():
-                intList.add(
-                    ResolvedStream<int>(buffer[i], info as StreamInfo<int>));
-                break;
-              case Double64ChannelFormat():
-              case Float32ChannelFormat():
-                doubleList.add(ResolvedStream<double>(
-                    buffer[i], info as StreamInfo<double>));
-                break;
-              case CftStringChannelFormat():
-                stringList.add(ResolvedStream<String>(
-                    buffer[i], info as StreamInfo<String>));
-            }
+        final info = getStreamInfo(buffer[i]);
+        switch (info.channelFormat) {
+          case Int8ChannelFormat():
+          case Int16ChannelFormat():
+          case Int32ChannelFormat():
+          case Int64ChannelFormat():
+            intList
+                .add(ResolvedStream<int>(buffer[i], info as StreamInfo<int>));
             break;
-          case Error(error: var e):
-            log("$e");
+          case Double64ChannelFormat():
+          case Float32ChannelFormat():
+            doubleList.add(
+                ResolvedStream<double>(buffer[i], info as StreamInfo<double>));
+            break;
+          case CftStringChannelFormat():
+            stringList.add(
+                ResolvedStream<String>(buffer[i], info as StreamInfo<String>));
         }
       }
       return (intList, doubleList, stringList);
