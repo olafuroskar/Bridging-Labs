@@ -3,6 +3,7 @@ import 'dart:isolate';
 
 import 'package:ffi/ffi.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
+import 'package:lsl_plugin/src/adapters/inlets/inlets.dart';
 import 'package:lsl_plugin/src/adapters/utils.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
@@ -80,4 +81,17 @@ Result<bool> wasClockReset(lsl_inlet inlet) {
   } catch (e) {
     return unexpectedError("$e");
   }
+}
+
+(int, int) getBufferLengths(InletContainer inletContainer) {
+  /// The default value of maxChunkLen is zero which allows the sender to determine granularity.
+  /// However due to the fact that we need to allocate memory beforehand we set the value to 10.
+  final maxChunkLen = inletContainer.inlet.maxChunkLen == 0
+      ? 10
+      : inletContainer.inlet.maxChunkLen;
+  final dataBufferLength =
+      inletContainer.inlet.streamInfo.channelCount * maxChunkLen;
+  final timeStampBufferLength = inletContainer.inlet.maxChunkLen;
+
+  return (dataBufferLength, timeStampBufferLength);
 }

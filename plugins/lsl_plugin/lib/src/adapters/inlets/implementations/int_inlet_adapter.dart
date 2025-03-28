@@ -1,8 +1,6 @@
 part of '../inlets.dart';
 
 class IntInletAdapter extends InletAdapter<int> {
-  late StreamInfo<int> _streamInfo;
-
   /// {@template create_inlet}
   /// Construct a new stream inlet from a resolved stream info.
   ///
@@ -25,8 +23,6 @@ class IntInletAdapter extends InletAdapter<int> {
   /// LostException if the stream's source is lost (e.g., due to an app or computer crash).
   /// {@endtemplate}
   IntInletAdapter._(Inlet<int> inlet, ResolvedStream stream) {
-    _streamInfo = inlet.streamInfo;
-
     final nativeInlet = lsl.bindings.lsl_create_inlet(stream.streamInfoPointer,
         inlet.maxBufLen, inlet.maxChunkLen, inlet.recover ? 1 : 0);
 
@@ -36,12 +32,12 @@ class IntInletAdapter extends InletAdapter<int> {
   @override
   Future<List<(List<int>, double)>?> pullChunk([double timeout = 0]) async {
     final nativeInlet = _inletContainer._nativeInlet;
-    final inlet = _inletContainer.inlet;
 
     return await Isolate.run(() {
       final ec = malloc.allocate<Int32>(sizeOf<Int32>());
-      final dataBufferLength = _streamInfo.channelCount * inlet.maxChunkLen;
-      final timeStampBufferLength = inlet.maxChunkLen;
+
+      final (dataBufferLength, timeStampBufferLength) =
+          utils.getBufferLengths(_inletContainer);
 
       /// Allocate an array of length channelCount * maxChunkLen
       ///
@@ -70,8 +66,11 @@ class IntInletAdapter extends InletAdapter<int> {
 
       for (var i = 0; i < numSamples; i++) {
         final List<int> sample = [];
-        for (var j = 0; j < _streamInfo.channelCount; j++) {
-          sample.add(nativeSample[i * _streamInfo.channelCount + j]);
+        for (var j = 0;
+            j < _inletContainer.inlet.streamInfo.channelCount;
+            j++) {
+          sample.add(nativeSample[
+              i * _inletContainer.inlet.streamInfo.channelCount + j]);
         }
         samples.add((sample, nativeTimestamps[i]));
       }
@@ -91,15 +90,15 @@ class IntInletAdapter extends InletAdapter<int> {
 
     return await Isolate.run(() {
       final ec = malloc.allocate<Int32>(sizeOf<Int32>());
-      final nativeSample =
-          malloc.allocate<Int32>(_streamInfo.channelCount * sizeOf<Int32>());
+      final nativeSample = malloc.allocate<Int32>(
+          _inletContainer.inlet.streamInfo.channelCount * sizeOf<Int32>());
 
-      final timestamp = lsl.bindings.lsl_pull_sample_i(
-          inlet, nativeSample, _streamInfo.channelCount, timeout, ec);
+      final timestamp = lsl.bindings.lsl_pull_sample_i(inlet, nativeSample,
+          _inletContainer.inlet.streamInfo.channelCount, timeout, ec);
 
       final List<int> sample = [];
 
-      for (var i = 0; i < _streamInfo.channelCount; i++) {
+      for (var i = 0; i < _inletContainer.inlet.streamInfo.channelCount; i++) {
         sample.add(nativeSample[i]);
       }
 

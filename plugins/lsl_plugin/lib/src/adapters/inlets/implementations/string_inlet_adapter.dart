@@ -1,12 +1,8 @@
 part of '../inlets.dart';
 
 class StringInletAdapter extends InletAdapter<String> {
-  late StreamInfo<String> _streamInfo;
-
   /// {@macro create_inlet}
   StringInletAdapter._(Inlet<String> inlet, ResolvedStream stream) {
-    _streamInfo = inlet.streamInfo;
-
     final nativeInlet = lsl.bindings.lsl_create_inlet(stream.streamInfoPointer,
         inlet.maxBufLen, inlet.maxChunkLen, inlet.recover ? 1 : 0);
 
@@ -16,12 +12,12 @@ class StringInletAdapter extends InletAdapter<String> {
   @override
   Future<List<(List<String>, double)>?> pullChunk([double timeout = 0]) async {
     final nativeInlet = _inletContainer._nativeInlet;
-    final inlet = _inletContainer.inlet;
 
     return await Isolate.run(() {
       final ec = malloc.allocate<Int32>(sizeOf<Int32>());
-      final dataBufferLength = _streamInfo.channelCount * inlet.maxChunkLen;
-      final timeStampBufferLength = inlet.maxChunkLen;
+
+      final (dataBufferLength, timeStampBufferLength) =
+          utils.getBufferLengths(_inletContainer);
 
       /// Allocate an array of length channelCount * maxChunkLen
       ///
@@ -50,8 +46,11 @@ class StringInletAdapter extends InletAdapter<String> {
 
       for (var i = 0; i < numSamples; i++) {
         final List<String> sample = [];
-        for (var j = 0; j < _streamInfo.channelCount; j++) {
-          sample.add(nativeSample[i * _streamInfo.channelCount + j]
+        for (var j = 0;
+            j < _inletContainer.inlet.streamInfo.channelCount;
+            j++) {
+          sample.add(nativeSample[
+                  i * _inletContainer.inlet.streamInfo.channelCount + j]
               .cast<Utf8>()
               .toDartString());
         }
@@ -74,14 +73,15 @@ class StringInletAdapter extends InletAdapter<String> {
     return await Isolate.run(() {
       final ec = malloc.allocate<Int32>(sizeOf<Int32>());
       final nativeSample = malloc.allocate<Pointer<Char>>(
-          _streamInfo.channelCount * sizeOf<Pointer<Char>>());
+          _inletContainer.inlet.streamInfo.channelCount *
+              sizeOf<Pointer<Char>>());
 
-      final timestamp = lsl.bindings.lsl_pull_sample_str(
-          inlet, nativeSample, _streamInfo.channelCount, timeout, ec);
+      final timestamp = lsl.bindings.lsl_pull_sample_str(inlet, nativeSample,
+          _inletContainer.inlet.streamInfo.channelCount, timeout, ec);
 
       final List<String> sample = [];
 
-      for (var i = 0; i < _streamInfo.channelCount; i++) {
+      for (var i = 0; i < _inletContainer.inlet.streamInfo.channelCount; i++) {
         sample.add(nativeSample[i].cast<Utf8>().toDartString());
       }
 
