@@ -20,6 +20,10 @@ class _OutletScreenState extends State<OutletScreen>
   void initState() {
     super.initState();
     _tabController = TabController(vsync: this, length: tabs.length);
+    polar.batteryLevel.listen((e) => log('Battery: ${e.level}'));
+    polar.deviceConnecting.listen((_) => log('Device connecting'));
+    polar.deviceConnected.listen((_) => log('Device connected'));
+    polar.deviceDisconnected.listen((_) => log('Device disconnected'));
   }
 
   @override

@@ -28,7 +28,7 @@ class AvailableDevices extends StatelessWidget {
       ),
       body: ListView(
         children: appState.devices.map((device) {
-          final selected = appState.selectedDevices.contains(device);
+          final selected = appState.selectedDevice == device;
           return CheckboxListTile(
             value: selected,
             title: Text(device),

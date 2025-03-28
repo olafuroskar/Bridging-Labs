@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
@@ -25,36 +26,53 @@ void main() {
 
 class AppState extends ChangeNotifier {
   List<String> devices = [];
-  List<String> inlets = ['Inlet A', 'Inlet B', 'Inlet C'];
+  String? selectedDevice;
+  List<(List<int>, double)> currentChunk = [];
+
   List<String> selectedInlets = [];
-  List<String> selectedDevices = [];
+  StreamManager streamManager = StreamManager();
+  List<ResolvedStreamHandle<int>> streams = [];
+  final Map<String, InletManager<int>> _inlets = {};
 
   List<PolarStreamingData<Object?>> subs = [];
   List<(StreamSubscription<Object?>, OutletManager<Object?>, String)>
       polarStreams = [];
 
-  void addPolarStream(String deviceId) {
+  Future<void> findDevices() async {
+    await polar.searchForDevice().take(1).fold([], (previous, element) {
+      return previous + [element.deviceId];
+    });
+    notifyListeners();
+  }
+
+  Future<void> addPolarStream(String deviceId) async {
     final streamInfo = StreamInfoFactory.createIntStreamInfo(
         "Polar $deviceId", "ECG", Int64ChannelFormat());
     final outletManager = OutletManager(streamInfo);
 
-    final subscription = polar.startEcgStreaming(deviceId).listen((data) {
-      final List<List<int>> chunk = [];
-      final List<double> timestamps = [];
+    await polar.sdkFeatureReady.firstWhere((e) => e.identifier == deviceId);
+    try {
+      final subscription = polar.startHrStreaming(deviceId).listen((data) {
+        final List<List<int>> chunk = [];
+        // final List<double> timestamps = [];
 
-      for (var sample in data.samples) {
-        chunk.add([sample.voltage]);
-        timestamps.add(sample.timeStamp.millisecondsSinceEpoch / 1000);
-      }
+        for (var sample in data.samples) {
+          chunk.add([sample.hr]);
+        }
 
-      print(chunk);
-      outletManager.pushChunkWithTimastamps(chunk, timestamps);
-    });
+        outletManager.pushChunk(chunk);
+      });
 
-    polarStreams.add((subscription, outletManager, deviceId));
+      polarStreams.add((subscription, outletManager, deviceId));
+    } catch (e) {
+      outletManager.destroy();
+    }
+    notifyListeners();
   }
 
-  void addDevice(String device) {
+  void addDevice() {
+    final device = selectedDevice;
+    if (device == null) return;
     devices.add(device);
     notifyListeners();
   }
@@ -81,18 +99,60 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleDeviceSelection(String device) {
-    if (selectedDevices.contains(device)) {
-      selectedDevices.remove(device);
-    } else {
-      selectedDevices.add(device);
+  void toggleDeviceSelection(String? device) {
+    selectedDevice = device;
+    notifyListeners();
+  }
+
+  void clearInlets() {
+    for (var inlet in _inlets.values) {
+      inlet.closeStream();
+    }
+    _inlets.clear();
+  }
+
+  void clearDeviceSelection() {
+    selectedDevice = null;
+    notifyListeners();
+  }
+
+  Future<void> resolveStreams(double waitTime) async {
+    await streamManager.resolveStreams(waitTime);
+    streams = streamManager.getIntStreamHandles();
+
+    // This call tells the widgets that are listening to this model to rebuild.
+    notifyListeners();
+  }
+
+  void createInlet() {
+    // This should perhaps be an id instead
+    final handle = streams[0];
+    final key = handle.info.name;
+
+    // Inlet has already been created for this stream
+    if (_inlets.containsKey(key)) return;
+    final inletManager = streamManager.createInlet<int>(handle);
+    switch (inletManager) {
+      case Ok(value: var inlet):
+        _inlets[key] = inlet;
+      case Error():
     }
     notifyListeners();
   }
 
-  void clearDeviceSelection() {
-    selectedDevices.clear();
-    notifyListeners();
+  void listenToInlet() async {
+    final handle = streams[0];
+    final name = handle.info.name;
+
+    final inlet = _inlets[name];
+
+    if (inlet == null) return;
+
+    await inlet.openStream();
+    inlet.startChunkStream().listen((chunk) {
+      currentChunk = chunk;
+      notifyListeners();
+    });
   }
 }
 

@@ -21,16 +21,28 @@ class InletScreen extends StatelessWidget {
                 );
               }
             },
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              appState.resolveStreams(2);
+            },
+          ),
+          IconButton(
+            onPressed: () async {
+              appState.clearInlets();
+            },
+            icon: const Icon(Icons.delete),
           )
         ],
       ),
       body: ListView(
-        children: appState.inlets.map((inlet) {
-          final selected = appState.selectedInlets.contains(inlet);
+        children: appState.streams.map((inlet) {
+          final selected = appState.selectedInlets.contains(inlet.info.name);
           return CheckboxListTile(
             value: selected,
-            title: Text(inlet),
-            onChanged: (_) => appState.toggleInletSelection(inlet),
+            title: Text(inlet.info.name),
+            onChanged: (_) => appState.toggleInletSelection(inlet.info.name),
           );
         }).toList(),
       ),

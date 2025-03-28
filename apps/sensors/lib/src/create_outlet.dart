@@ -1,49 +1,58 @@
 part of '../main.dart';
 
 class _CreateOutletScreenState extends State<CreateOutletScreen> {
-  final TextEditingController _controller = TextEditingController();
-  String _selectedOption = 'Option 1';
-  final List<String> options = ['Option 1', 'Option 2', 'Option 3'];
-
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    return Consumer<AppState>(builder: (_, appState, __) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Create Outlet')),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              DropdownButton<String>(
+                value: appState.selectedDevice,
+                onChanged: (value) {
+                  appState.toggleDeviceSelection(value);
+                },
+                items: appState.devices.map((option) {
+                  return DropdownMenuItem(value: option, child: Text(option));
+                }).toList(),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () async {
+                  await appState.findDevices();
+                },
+                child: const Text('Discover devices'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  final selectedDevice = appState.selectedDevice;
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Create Outlet')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            DropdownButton<String>(
-              value: _selectedOption,
-              onChanged: (value) {
-                setState(() {
-                  _selectedOption = value!;
-                });
-              },
-              items: options.map((option) {
-                return DropdownMenuItem(value: option, child: Text(option));
-              }).toList(),
-            ),
-            TextField(
-              controller: _controller,
-              decoration: const InputDecoration(labelText: 'Enter outlet name'),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                for (var deviceId in appState.selectedDevices) {
-                  appState.addPolarStream(deviceId);
-                }
-                Navigator.pop(context);
-              },
-              child: const Text('Create'),
-            )
-          ],
+                  if (selectedDevice == null) return;
+                  await polar.connectToDevice(selectedDevice);
+                  await appState.addPolarStream(selectedDevice);
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
+                },
+                child: const Text('Create'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  final selectedDevice = appState.selectedDevice;
+                  if (selectedDevice == null) return;
+                  await polar.disconnectFromDevice(selectedDevice);
+                  appState.stopPolarStreams();
+                },
+                child: const Text('disconnect'),
+              )
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
 
