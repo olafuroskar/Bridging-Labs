@@ -5,6 +5,7 @@ import 'package:lsl_plugin/src/adapters/inlets/inlets.dart';
 import 'package:lsl_plugin/src/adapters/outlets/outlets.dart';
 import 'package:lsl_plugin/src/adapters/streams/implementations/async_stream_adapter.dart';
 import 'package:lsl_plugin/src/adapters/streams/stream_adapter.dart';
+import 'package:lsl_plugin/src/types.dart';
 
 part 'outlet_manager.dart';
 part 'inlet_manager.dart';

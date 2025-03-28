@@ -10,7 +10,7 @@ class FloatInletAdapter extends InletAdapter<double> {
   }
 
   @override
-  Future<List<(List<double>, double)>?> pullChunk([double timeout = 0]) async {
+  Future<Chunk<double>?> pullChunk([double timeout = 0]) async {
     final nativeInlet = _inletContainer._nativeInlet;
 
     return await Isolate.run(() {
@@ -42,7 +42,7 @@ class FloatInletAdapter extends InletAdapter<double> {
           timeout,
           ec);
 
-      final List<(List<double>, double)> samples = [];
+      final Chunk<double> samples = [];
 
       for (var i = 0; i < numSamples; i++) {
         final List<double> sample = [];
@@ -65,7 +65,7 @@ class FloatInletAdapter extends InletAdapter<double> {
   }
 
   @override
-  Future<(List<double>, double)?> pullSample([double timeout = 0]) async {
+  Future<Sample<double>?> pullSample([double timeout = 0]) async {
     final inlet = _inletContainer._nativeInlet;
 
     return await Isolate.run(() {

@@ -19,14 +19,12 @@ class InletManager<S> {
   }
 
   /// {@macro pull_sample}
-  Future<(List<S> sample, double timestamp)?> pullSample(
-      [double timeout = 0]) async {
+  Future<Sample<S>?> pullSample([double timeout = 0]) async {
     return await _inletAdapter.pullSample();
   }
 
   /// {@macro pull_chunk}
-  Future<List<(List<S> sample, double timestamp)>?> pullChunk(
-      [double timeout = 0]) {
+  Future<Chunk<S>?> pullChunk([double timeout = 0]) {
     return _inletAdapter.pullChunk(timeout);
   }
 
@@ -50,7 +48,7 @@ class InletManager<S> {
     return _inletAdapter.wasClockReset();
   }
 
-  Stream<(List<S>, double)> startSampleStream() async* {
+  Stream<Sample<S>> startSampleStream() async* {
     if (isClosed) return;
     final nominalSRate = getStreamInfo().nominalSRate.toInt();
 
@@ -65,7 +63,7 @@ class InletManager<S> {
     }
   }
 
-  Stream<List<(List<S>, double)>> startChunkStream() async* {
+  Stream<Chunk<S>> startChunkStream() async* {
     if (isClosed) return;
     final nominalSRate = getStreamInfo().nominalSRate.toInt();
 

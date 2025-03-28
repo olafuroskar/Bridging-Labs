@@ -18,7 +18,7 @@ abstract class InletAdapter<S> {
   ///
   /// [timeout] The timeout for this operation, if any. Use 0.0 to make the function non-blocking.
   /// {@endtemplate}
-  Future<(List<S> sample, double timestamp)?> pullSample([double timeout = 0]);
+  Future<Sample<S>?> pullSample([double timeout = 0]);
 
   /// {@template pull_chunk}
   /// Pull a chunk of data from the inlet.
@@ -29,8 +29,7 @@ abstract class InletAdapter<S> {
   ///
   /// [timeout] Optionally the timeout for this operation, if any. When the timeout expires, the function
   /// {@endtemplate}
-  Future<List<(List<S> sample, double timestamp)>?> pullChunk(
-      [double timeout = 0]);
+  Future<Chunk<S>?> pullChunk([double timeout = 0]);
 
   /// The following methods should not change on a type basis
   ///
