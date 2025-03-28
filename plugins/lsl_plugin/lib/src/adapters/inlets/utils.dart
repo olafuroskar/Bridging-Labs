@@ -7,9 +7,7 @@ import 'package:lsl_plugin/src/adapters/inlets/inlets.dart';
 import 'package:lsl_plugin/src/adapters/utils.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
-import 'package:lsl_plugin/src/utils/errors.dart';
 import 'package:lsl_plugin/src/utils/stream_info.dart';
-import 'package:lsl_plugin/src/utils/unit.dart';
 
 /// {@macro open_stream}
 Future<void> openStream(lsl_inlet inlet, double timeout) async {
@@ -25,13 +23,8 @@ Future<void> openStream(lsl_inlet inlet, double timeout) async {
 }
 
 /// {@macro close_stream}
-Result<Unit> closeStream(lsl_inlet inlet) {
-  try {
-    lsl.bindings.lsl_close_stream(inlet);
-    return Result.ok(unit);
-  } catch (e) {
-    return unexpectedError("$e");
-  }
+void closeStream(lsl_inlet inlet) {
+  lsl.bindings.lsl_close_stream(inlet);
 }
 
 /// {@macro close_stream}
@@ -46,13 +39,8 @@ StreamInfo getInletStreamInfo(lsl_inlet inlet, double timeout) {
 }
 
 /// {@macro samples_available}
-Result<int> samplesAvailable(lsl_inlet inlet) {
-  try {
-    final numAvailable = lsl.bindings.lsl_samples_available(inlet);
-    return Result.ok(numAvailable);
-  } catch (e) {
-    return unexpectedError("$e");
-  }
+int samplesAvailable(lsl_inlet inlet) {
+  return lsl.bindings.lsl_samples_available(inlet);
 }
 
 /// {@macro time_correction}
@@ -70,13 +58,9 @@ Future<double> timeCorrection(lsl_inlet inlet, double timeout) async {
 }
 
 /// {@macro was_clock_reset}
-Result<bool> wasClockReset(lsl_inlet inlet) {
-  try {
-    final clockWasReset = lsl.bindings.lsl_was_clock_reset(inlet);
-    return Result.ok(clockWasReset == 1);
-  } catch (e) {
-    return unexpectedError("$e");
-  }
+bool wasClockReset(lsl_inlet inlet) {
+  final clockWasReset = lsl.bindings.lsl_was_clock_reset(inlet);
+  return clockWasReset == 1;
 }
 
 (int, int) getBufferLengths(InletContainer inletContainer) {
@@ -87,7 +71,7 @@ Result<bool> wasClockReset(lsl_inlet inlet) {
       : inletContainer.inlet.maxChunkLen;
   final dataBufferLength =
       inletContainer.inlet.streamInfo.channelCount * maxChunkLen;
-  final timeStampBufferLength = inletContainer.inlet.maxChunkLen;
+  final timeStampBufferLength = maxChunkLen;
 
   return (dataBufferLength, timeStampBufferLength);
 }

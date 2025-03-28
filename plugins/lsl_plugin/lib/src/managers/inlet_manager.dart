@@ -13,14 +13,9 @@ class InletManager<S> {
   }
 
   /// {@macro close_stream}
-  Result<Unit> closeStream() {
-    final result = _inletAdapter.closeStream();
-    switch (result) {
-      case Ok():
-        isClosed = true;
-      default:
-    }
-    return result;
+  void closeStream() {
+    isClosed = true;
+    _inletAdapter.closeStream();
   }
 
   /// {@macro pull_sample}
@@ -46,12 +41,12 @@ class InletManager<S> {
   }
 
   /// {@macro samples_available}
-  Result<int> samplesAvailable() {
+  int samplesAvailable() {
     return _inletAdapter.samplesAvailable();
   }
 
   /// {@macro was_clock_reset}
-  Result<bool> wasClockReset() {
+  bool wasClockReset() {
     return _inletAdapter.wasClockReset();
   }
 

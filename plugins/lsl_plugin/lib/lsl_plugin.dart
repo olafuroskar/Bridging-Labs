@@ -8,7 +8,6 @@ import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
 export 'src/managers/managers.dart';
 
 // Utils
-part 'src/utils/result.dart';
 part 'src/adapters/streams/resolved_stream_handle.dart';
 
 // Domain

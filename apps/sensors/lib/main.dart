@@ -39,19 +39,23 @@ class AppState extends ChangeNotifier {
       polarStreams = [];
 
   Future<void> findDevices() async {
-    await polar.searchForDevice().take(1).fold([], (previous, element) {
-      return previous + [element.deviceId];
-    });
+    devices = ['B69BC32A'];
+    // polar.searchForDevice().take(1).fold([], (previous, element) {
+    //   return previous + [element.deviceId];
+    // });
     notifyListeners();
   }
 
   Future<void> addPolarStream(String deviceId) async {
-    final streamInfo = StreamInfoFactory.createIntStreamInfo(
-        "Polar $deviceId", "ECG", Int64ChannelFormat());
-    final outletManager = OutletManager(streamInfo);
-
-    await polar.sdkFeatureReady.firstWhere((e) => e.identifier == deviceId);
+    OutletManager<int>? outletManager;
     try {
+      await polar.sdkFeatureReady.firstWhere((e) => e.identifier == deviceId);
+
+      final streamInfo = StreamInfoFactory.createIntStreamInfo(
+          "Polar $deviceId", "ECG", Int64ChannelFormat(), 1, 1);
+      outletManager = OutletManager(streamInfo, 1);
+      print("${outletManager.getStreamInfo().name}");
+
       final subscription = polar.startHrStreaming(deviceId).listen((data) {
         final List<List<int>> chunk = [];
         // final List<double> timestamps = [];
@@ -59,13 +63,13 @@ class AppState extends ChangeNotifier {
         for (var sample in data.samples) {
           chunk.add([sample.hr]);
         }
-
-        outletManager.pushChunk(chunk);
+        print("out: $chunk");
+        outletManager?.pushChunk(chunk);
       });
 
       polarStreams.add((subscription, outletManager, deviceId));
     } catch (e) {
-      outletManager.destroy();
+      outletManager?.destroy();
     }
     notifyListeners();
   }
@@ -132,11 +136,8 @@ class AppState extends ChangeNotifier {
     // Inlet has already been created for this stream
     if (_inlets.containsKey(key)) return;
     final inletManager = streamManager.createInlet<int>(handle);
-    switch (inletManager) {
-      case Ok(value: var inlet):
-        _inlets[key] = inlet;
-      case Error():
-    }
+    _inlets[key] = inletManager;
+
     notifyListeners();
   }
 

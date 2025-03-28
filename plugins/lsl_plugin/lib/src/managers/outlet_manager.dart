@@ -53,27 +53,26 @@ class OutletManager<S> {
   }
 
   /// {@macro push_sample}
-  Result<Unit> pushSample(List<S> sample,
+  void pushSample(List<S> sample,
       [double? timestamp, bool pushthrough = false]) {
     return _outletAdapter.pushSample(sample, timestamp, pushthrough);
   }
 
   /// {@macro push_chunk}
-  Result<Unit> pushChunk(List<List<S>> chunk,
+  void pushChunk(List<List<S>> chunk,
       [double? timestamp, bool pushthrough = false]) {
     return _outletAdapter.pushChunk(chunk, timestamp, pushthrough);
   }
 
   /// {@macro push_chunk_with_timestamps}
-  Result<Unit> pushChunkWithTimastamps(
-      List<List<S>> chunk, List<double> timestamps,
+  void pushChunkWithTimastamps(List<List<S>> chunk, List<double> timestamps,
       [bool pushthrough = false]) {
     return _outletAdapter.pushChunkWithTimestamps(
         chunk, timestamps, pushthrough);
   }
 
   /// {@macro destroy}
-  Result<Unit> destroy() {
+  void destroy() {
     return _outletAdapter.destroy();
   }
 
@@ -83,7 +82,7 @@ class OutletManager<S> {
   }
 
   /// {@macro have_consumers}
-  Result<bool> haveConsumers() {
+  bool haveConsumers() {
     return _outletAdapter.haveConsumers();
   }
 

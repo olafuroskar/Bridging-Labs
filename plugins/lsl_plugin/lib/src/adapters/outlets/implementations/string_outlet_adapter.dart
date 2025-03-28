@@ -8,127 +8,103 @@ class StringOutletAdapter extends OutletAdapter<String> {
   }
 
   @override
-  Result<Unit> pushSample(List<String> sample,
+  void pushSample(List<String> sample,
       [double? timestamp, bool pushthrough = false]) {
     if (sample.isEmpty) {
-      return Result.ok(unit);
+      return;
     }
 
-    try {
-      final outletPointer = _outletContainer._nativeOutlet;
+    final outletPointer = _outletContainer._nativeOutlet;
 
-      Pointer<Char> toString(String text) => text.toNativeUtf8().cast<Char>();
-      final encodedStrings = sample.map(toString).toList();
+    Pointer<Char> toString(String text) => text.toNativeUtf8().cast<Char>();
+    final encodedStrings = sample.map(toString).toList();
 
-      final nativeSamplePointer = malloc
-          .allocate<Pointer<Char>>(sample.length * sizeOf<Pointer<Char>>());
+    final nativeSamplePointer =
+        malloc.allocate<Pointer<Char>>(sample.length * sizeOf<Pointer<Char>>());
 
-      for (var i = 0; i < sample.length; i++) {
-        nativeSamplePointer[i] = encodedStrings[i];
-      }
-
-      if (timestamp != null) {
-        lsl.bindings.lsl_push_sample_strtp(
-            outletPointer, nativeSamplePointer, timestamp, pushthrough ? 1 : 0);
-      } else {
-        lsl.bindings.lsl_push_sample_str(outletPointer, nativeSamplePointer);
-      }
-
-      for (var ptr in encodedStrings) {
-        malloc.free(ptr);
-      }
-      malloc.free(nativeSamplePointer);
-
-      return Result.ok(unit);
-    } on Exception catch (e) {
-      return Result.error(e);
-    } catch (e) {
-      return unexpectedError("$e");
+    for (var i = 0; i < sample.length; i++) {
+      nativeSamplePointer[i] = encodedStrings[i];
     }
+
+    if (timestamp != null) {
+      lsl.bindings.lsl_push_sample_strtp(
+          outletPointer, nativeSamplePointer, timestamp, pushthrough ? 1 : 0);
+    } else {
+      lsl.bindings.lsl_push_sample_str(outletPointer, nativeSamplePointer);
+    }
+
+    for (var ptr in encodedStrings) {
+      malloc.free(ptr);
+    }
+    malloc.free(nativeSamplePointer);
   }
 
   @override
-  Result<Unit> pushChunk(List<List<String>> chunk,
+  void pushChunk(List<List<String>> chunk,
       [double? timestamp, bool pushthrough = false]) {
     if (chunk.isEmpty) {
-      return Result.ok(unit);
+      return;
     }
 
-    try {
-      final outletPointer = _outletContainer._nativeOutlet;
+    final outletPointer = _outletContainer._nativeOutlet;
 
-      final dataElements = chunk.length;
-      final channelCount = chunk[0].length;
+    final dataElements = chunk.length;
+    final channelCount = chunk[0].length;
 
-      Pointer<Char> toString(String text) => text.toNativeUtf8().cast<Char>();
+    Pointer<Char> toString(String text) => text.toNativeUtf8().cast<Char>();
 
-      final nativeSamplePointer = malloc.allocate<Pointer<Char>>(
-          dataElements * channelCount * sizeOf<Pointer<Char>>());
+    final nativeSamplePointer = malloc.allocate<Pointer<Char>>(
+        dataElements * channelCount * sizeOf<Pointer<Char>>());
 
-      for (var i = 0; i < dataElements; i++) {
-        final encodedStrings = chunk[i].map(toString).toList();
-        for (var j = 0; j < channelCount; j++) {
-          nativeSamplePointer[i * dataElements + j] = encodedStrings[j];
-        }
+    for (var i = 0; i < dataElements; i++) {
+      final encodedStrings = chunk[i].map(toString).toList();
+      for (var j = 0; j < channelCount; j++) {
+        nativeSamplePointer[i * dataElements + j] = encodedStrings[j];
       }
-
-      if (timestamp != null) {
-        lsl.bindings.lsl_push_chunk_strtp(outletPointer, nativeSamplePointer,
-            dataElements, timestamp, pushthrough ? 1 : 0);
-      } else {
-        lsl.bindings.lsl_push_chunk_str(
-            outletPointer, nativeSamplePointer, dataElements);
-      }
-
-      malloc.free(nativeSamplePointer);
-
-      return Result.ok(unit);
-    } on Exception catch (e) {
-      return Result.error(e);
-    } catch (e) {
-      return unexpectedError("$e");
     }
+
+    if (timestamp != null) {
+      lsl.bindings.lsl_push_chunk_strtp(outletPointer, nativeSamplePointer,
+          dataElements, timestamp, pushthrough ? 1 : 0);
+    } else {
+      lsl.bindings
+          .lsl_push_chunk_str(outletPointer, nativeSamplePointer, dataElements);
+    }
+
+    malloc.free(nativeSamplePointer);
   }
 
   @override
-  Result<Unit> pushChunkWithTimestamps(
+  void pushChunkWithTimestamps(
       List<List<String>> chunk, List<double> timestamps,
       [bool pushthrough = false]) {
     if (chunk.isEmpty) {
-      return Result.ok(unit);
+      return;
     }
 
-    try {
-      final outletPointer = _outletContainer._nativeOutlet;
+    final outletPointer = _outletContainer._nativeOutlet;
 
-      final dataElements = chunk.length;
-      final channelCount = chunk[0].length;
+    final dataElements = chunk.length;
+    final channelCount = chunk[0].length;
 
-      Pointer<Char> toString(String text) => text.toNativeUtf8().cast<Char>();
+    Pointer<Char> toString(String text) => text.toNativeUtf8().cast<Char>();
 
-      final nativeSamplePointer = malloc.allocate<Pointer<Char>>(
-          dataElements * channelCount * sizeOf<Pointer<Char>>());
+    final nativeSamplePointer = malloc.allocate<Pointer<Char>>(
+        dataElements * channelCount * sizeOf<Pointer<Char>>());
 
-      for (var i = 0; i < dataElements; i++) {
-        final encodedStrings = chunk[i].map(toString).toList();
-        for (var j = 0; j < channelCount; j++) {
-          nativeSamplePointer[i * dataElements + j] = encodedStrings[j];
-        }
+    for (var i = 0; i < dataElements; i++) {
+      final encodedStrings = chunk[i].map(toString).toList();
+      for (var j = 0; j < channelCount; j++) {
+        nativeSamplePointer[i * dataElements + j] = encodedStrings[j];
       }
-
-      final nativeTimestamps = utils.allocatTimestamps(timestamps);
-
-      lsl.bindings.lsl_push_chunk_strtnp(outletPointer, nativeSamplePointer,
-          dataElements, nativeTimestamps, pushthrough ? 1 : 0);
-
-      malloc.free(nativeSamplePointer);
-      malloc.free(nativeTimestamps);
-
-      return Result.ok(unit);
-    } on Exception catch (e) {
-      return Result.error(e);
-    } catch (e) {
-      return unexpectedError("$e");
     }
+
+    final nativeTimestamps = utils.allocatTimestamps(timestamps);
+
+    lsl.bindings.lsl_push_chunk_strtnp(outletPointer, nativeSamplePointer,
+        dataElements, nativeTimestamps, pushthrough ? 1 : 0);
+
+    malloc.free(nativeSamplePointer);
+    malloc.free(nativeTimestamps);
   }
 }

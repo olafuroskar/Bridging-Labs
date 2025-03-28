@@ -58,7 +58,7 @@ abstract class InletAdapter<S> {
   /// it should call [closeStream] to not waste unnecessary system and network
   /// resources.
   /// {@endtemplate}
-  Result<Unit> closeStream() {
+  void closeStream() {
     return utils.closeStream(_inletContainer._nativeInlet);
   }
 
@@ -96,7 +96,7 @@ abstract class InletAdapter<S> {
   ///  low value. If the underlying implementation supports it, the value will be the number of
   ///  samples available (otherwise it will be 1 or 0).
   /// {@endtemplate}
-  Result<int> samplesAvailable() {
+  int samplesAvailable() {
     return utils.samplesAvailable(_inletContainer._nativeInlet);
   }
 
@@ -107,7 +107,7 @@ abstract class InletAdapter<S> {
   /// values to estimate precise clock drift; it allows to tolerate cases where the source machine was
   /// hot-swapped or restarted in between two measurements.
   /// {@endtemplate}
-  Result<bool> wasClockReset() {
+  bool wasClockReset() {
     return utils.wasClockReset(_inletContainer._nativeInlet);
   }
 }

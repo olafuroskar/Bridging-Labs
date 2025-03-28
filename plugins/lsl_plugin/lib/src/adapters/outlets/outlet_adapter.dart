@@ -18,7 +18,7 @@ abstract class OutletAdapter<S> {
   /// with subsequent samples. Note that the chunk_size, if specified at outlet construction, takes
   /// precedence over the pushthrough flag
   /// {@endtemplate}
-  Result<Unit> pushSample(List<S> sample,
+  void pushSample(List<S> sample,
       [double? timestamp, bool pushthrough = false]);
 
   /// {@template push_chunk}
@@ -30,7 +30,7 @@ abstract class OutletAdapter<S> {
   /// [pushthrough] Optionally whether to push the chunk through to the receivers instead of buffering it with subsequent samples.
   /// Note that the chunk_size, if specified at outlet construction, takes precedence over the pushthrough flag.
   /// {@endtemplate}
-  Result<Unit> pushChunk(List<List<S>> chunk,
+  void pushChunk(List<List<S>> chunk,
       [double? timestamp, bool pushthrough = false]);
 
   /// {@template push_chunk_with_timestamps}
@@ -41,14 +41,13 @@ abstract class OutletAdapter<S> {
   /// [pushthrough] Optionally whether to push the chunk through to the receivers instead of buffering it with subsequent samples.
   /// Note that the chunk_size, if specified at outlet construction, takes precedence over the pushthrough flag.
   /// {@endtemplate}
-  Result<Unit> pushChunkWithTimestamps(
-      List<List<S>> chunk, List<double> timestamps,
+  void pushChunkWithTimestamps(List<List<S>> chunk, List<double> timestamps,
       [bool pushthrough = false]);
 
   /// {@template destroy}
   /// Destroys the given outlet
   /// {@endtemplate}
-  Result<Unit> destroy() {
+  void destroy() {
     return utils.destroy(
       _outletContainer._nativeOutlet,
     );
@@ -68,7 +67,7 @@ abstract class OutletAdapter<S> {
   ///
   /// While it does not hurt, there is technically no reason to push samples if there is no consumer.
   /// {@endtemplate}
-  Result<bool> haveConsumers() {
+  bool haveConsumers() {
     return utils.haveConsumers(_outletContainer._nativeOutlet);
   }
 

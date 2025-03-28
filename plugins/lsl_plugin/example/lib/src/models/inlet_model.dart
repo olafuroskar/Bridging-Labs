@@ -34,13 +34,9 @@ class InletModel extends ChangeNotifier {
     if (_inlets.containsKey(key)) return false;
 
     final inletManager = streamManager.createInlet<int>(handle);
-    switch (inletManager) {
-      case Ok(value: var inlet):
-        _inlets[key] = inlet;
-        return true;
-      case Error():
-        return false;
-    }
+    _inlets[key] = inletManager;
+
+    return true;
   }
 
   bool hasInlet(String name) {

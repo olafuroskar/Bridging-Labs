@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:ffi';
 import 'dart:isolate';
 
@@ -9,9 +8,7 @@ import 'package:lsl_plugin/src/adapters/streams/resolved_stream.dart';
 import 'package:lsl_plugin/src/adapters/streams/stream_adapter.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
-import 'package:lsl_plugin/src/utils/errors.dart';
 import 'package:lsl_plugin/src/utils/stream_info.dart';
-import 'package:lsl_plugin/src/utils/unit.dart';
 
 class AsyncStreamAdapter implements StreamAdapter {
   final Map<String, ResolvedStream<int>> _resolvedIntStreams = {};
@@ -51,6 +48,8 @@ class AsyncStreamAdapter implements StreamAdapter {
       final List<ResolvedStream<double>> doubleList = [];
       final List<ResolvedStream<String>> stringList = [];
 
+      print("resolved: $numStreams");
+
       for (var i = 0; i < numStreams; i++) {
         final info = getStreamInfo(buffer[i]);
         switch (info.channelFormat) {
@@ -71,8 +70,11 @@ class AsyncStreamAdapter implements StreamAdapter {
                 ResolvedStream<String>(buffer[i], info as StreamInfo<String>));
         }
       }
+      malloc.free(buffer);
       return (intList, doubleList, stringList);
     });
+
+    print(streams);
 
     /// We can not modify _resolvedStreams inside the body of the isolate helper
     /// Therefore, we must perform a loop again outside it.
@@ -140,26 +142,21 @@ class AsyncStreamAdapter implements StreamAdapter {
     return inletAdapter;
   }
 
-  Result<Unit> destroyStreams() {
-    try {
-      _resolvedIntStreams.forEach((_, stream) {
-        lsl.bindings.lsl_destroy_streaminfo(stream.streamInfoPointer);
-      });
-      _resolvedIntStreams.clear();
+  void destroyStreams() {
+    _resolvedIntStreams.forEach((_, stream) {
+      lsl.bindings.lsl_destroy_streaminfo(stream.streamInfoPointer);
+    });
+    _resolvedIntStreams.clear();
 
-      _resolvedDoubleStreams.forEach((_, stream) {
-        lsl.bindings.lsl_destroy_streaminfo(stream.streamInfoPointer);
-      });
-      _resolvedDoubleStreams.clear();
+    _resolvedDoubleStreams.forEach((_, stream) {
+      lsl.bindings.lsl_destroy_streaminfo(stream.streamInfoPointer);
+    });
+    _resolvedDoubleStreams.clear();
 
-      _resolvedStringStreams.forEach((_, stream) {
-        lsl.bindings.lsl_destroy_streaminfo(stream.streamInfoPointer);
-      });
-      _resolvedStringStreams.clear();
-      return Result.ok(unit);
-    } catch (e) {
-      return unexpectedError("$e");
-    }
+    _resolvedStringStreams.forEach((_, stream) {
+      lsl.bindings.lsl_destroy_streaminfo(stream.streamInfoPointer);
+    });
+    _resolvedStringStreams.clear();
   }
 
   /// Gets the handles for the currently saved int streams

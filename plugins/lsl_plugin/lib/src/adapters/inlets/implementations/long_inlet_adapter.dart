@@ -55,6 +55,8 @@ class LongInletAdapter extends InletAdapter<int> {
         samples.add((sample, nativeTimestamps[i]));
       }
 
+      print("long: $samples");
+
       checkError(ec);
       malloc.free(ec);
       malloc.free(nativeSample);

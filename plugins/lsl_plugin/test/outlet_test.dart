@@ -47,14 +47,12 @@ void main() {
           "Test", "EEG", Float32ChannelFormat());
       final outletManager = OutletManager(streamInfo);
 
-      var result = outletManager.pushSample([1.0, 3.2, 4.3, 5.3]);
-      expect(result is Ok, true);
+      outletManager.pushSample([1.0, 3.2, 4.3, 5.3]);
 
-      result = outletManager.pushChunk([
+      outletManager.pushChunk([
         [1.0, 3.2, 4.3, 5.3],
         [1.0, 3.2, 4.3, 5.3]
       ]);
-      expect(result is Ok, true);
     });
 
     test(
@@ -64,14 +62,12 @@ void main() {
           "Test", "EEG", Double64ChannelFormat());
       final outletManager = OutletManager(streamInfo);
 
-      var result = outletManager.pushSample([1.0, 3.2, 4.3, 5.3]);
-      expect(result is Ok, true);
+      outletManager.pushSample([1.0, 3.2, 4.3, 5.3]);
 
-      result = outletManager.pushChunk([
+      outletManager.pushChunk([
         [1.0, 3.2, 4.3, 5.3],
         [1.0, 3.2, 4.3, 5.3]
       ]);
-      expect(result is Ok, true);
     });
   });
 
@@ -83,14 +79,12 @@ void main() {
           "Test", "EEG", Int64ChannelFormat());
       final outletManager = OutletManager(streamInfo);
 
-      var result = outletManager.pushSample([1, 3, 4, 5]);
-      expect(result is Ok, true);
+      outletManager.pushSample([1, 3, 4, 5]);
 
-      result = outletManager.pushChunk([
+      outletManager.pushChunk([
         [1, 3, 4, 5],
         [1, 3, 4, 5]
       ]);
-      expect(result is Ok, true);
     });
 
     test(
@@ -100,14 +94,12 @@ void main() {
           "Test", "EEG", Int32ChannelFormat());
       final outletManager = OutletManager(streamInfo);
 
-      var result = outletManager.pushSample([1, 3, 4, 5]);
-      expect(result is Ok, true);
+      outletManager.pushSample([1, 3, 4, 5]);
 
-      result = outletManager.pushChunk([
+      outletManager.pushChunk([
         [1, 3, 4, 5],
         [1, 3, 4, 5]
       ]);
-      expect(result is Ok, true);
     });
 
     test(
@@ -117,14 +109,12 @@ void main() {
           "Test", "EEG", Int16ChannelFormat());
       final outletManager = OutletManager(streamInfo);
 
-      var result = outletManager.pushSample([1, 3, 4, 5]);
-      expect(result is Ok, true);
+      outletManager.pushSample([1, 3, 4, 5]);
 
-      result = outletManager.pushChunk([
+      outletManager.pushChunk([
         [1, 3, 4, 5],
         [1, 3, 4, 5]
       ]);
-      expect(result is Ok, true);
     });
 
     test(
@@ -134,14 +124,12 @@ void main() {
           "Test", "EEG", Int8ChannelFormat());
       final outletManager = OutletManager(streamInfo);
 
-      var result = outletManager.pushSample([1, 3, 4, 5]);
-      expect(result is Ok, true);
+      outletManager.pushSample([1, 3, 4, 5]);
 
-      result = outletManager.pushChunk([
+      outletManager.pushChunk([
         [1, 3, 4, 5],
         [1, 3, 4, 5]
       ]);
-      expect(result is Ok, true);
     });
   });
 }
