@@ -5,7 +5,7 @@ class InletScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<InletProvider>(context);
 
     return Scaffold(
       appBar: AppBar(

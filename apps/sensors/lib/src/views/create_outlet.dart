@@ -3,7 +3,7 @@ part of '../../main.dart';
 class _CreateOutletScreenState extends State<CreateOutletScreen> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppState>(builder: (_, appState, __) {
+    return Consumer<OutletProvider>(builder: (_, appState, __) {
       return Scaffold(
         appBar: AppBar(title: const Text('Create Outlet')),
         body: Padding(

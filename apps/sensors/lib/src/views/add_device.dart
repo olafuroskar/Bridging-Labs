@@ -5,7 +5,7 @@ final polar = Polar();
 class _AddDeviceScreenState extends State<AddDeviceScreen> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppState>(builder: (_, appState, __) {
+    return Consumer<OutletProvider>(builder: (_, appState, __) {
       return Scaffold(
         appBar: AppBar(title: const Text('Find device')),
         body: Padding(

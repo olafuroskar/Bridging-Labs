@@ -5,13 +5,12 @@ class InletResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppState>(builder: (context, appState, child) {
+    return Consumer<InletProvider>(builder: (context, appState, child) {
       return Scaffold(
         appBar: AppBar(title: const Text('Selected Inlets'), actions: [
           IconButton(
               onPressed: () {
                 appState.createInlet();
-                appState.listenToInlet();
               },
               icon: Icon(Icons.play_arrow))
         ]),

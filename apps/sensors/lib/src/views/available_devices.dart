@@ -5,7 +5,7 @@ class AvailableDevices extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<OutletProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
