@@ -54,7 +54,6 @@ class AppState extends ChangeNotifier {
       final streamInfo = StreamInfoFactory.createIntStreamInfo(
           "Polar $deviceId", "ECG", Int64ChannelFormat(), 1, 1);
       outletManager = OutletManager(streamInfo, 1);
-      print("${outletManager.getStreamInfo().name}");
 
       final subscription = polar.startHrStreaming(deviceId).listen((data) {
         final List<List<int>> chunk = [];
@@ -63,7 +62,6 @@ class AppState extends ChangeNotifier {
         for (var sample in data.samples) {
           chunk.add([sample.hr]);
         }
-        print("out: $chunk");
         outletManager?.pushChunk(chunk);
       });
 
