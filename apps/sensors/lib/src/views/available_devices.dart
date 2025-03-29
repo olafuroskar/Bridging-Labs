@@ -1,4 +1,4 @@
-part of '../main.dart';
+part of '../../main.dart';
 
 class AvailableDevices extends StatelessWidget {
   const AvailableDevices({super.key});

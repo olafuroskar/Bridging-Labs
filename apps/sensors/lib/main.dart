@@ -6,14 +6,14 @@ import 'package:lsl_plugin/lsl_plugin.dart';
 import 'package:polar/polar.dart';
 import 'package:provider/provider.dart';
 
-part 'src/home.dart';
-part 'src/outlets.dart';
-part 'src/inlets.dart';
-part 'src/create_outlet.dart';
-part 'src/inlet_results.dart';
-part 'src/add_device.dart';
-part 'src/available_devices.dart';
-part 'src/active_outlets.dart';
+part 'src/views/home.dart';
+part 'src/views/outlets.dart';
+part 'src/views/inlets.dart';
+part 'src/views/create_outlet.dart';
+part 'src/views/inlet_results.dart';
+part 'src/views/add_device.dart';
+part 'src/views/available_devices.dart';
+part 'src/views/active_outlets.dart';
 
 void main() {
   runApp(
