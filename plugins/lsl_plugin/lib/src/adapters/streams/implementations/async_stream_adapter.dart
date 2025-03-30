@@ -48,8 +48,6 @@ class AsyncStreamAdapter implements StreamAdapter {
       final List<ResolvedStream<double>> doubleList = [];
       final List<ResolvedStream<String>> stringList = [];
 
-      print("resolved: $numStreams");
-
       for (var i = 0; i < numStreams; i++) {
         final info = getStreamInfo(buffer[i]);
         switch (info.channelFormat) {
@@ -73,8 +71,6 @@ class AsyncStreamAdapter implements StreamAdapter {
       malloc.free(buffer);
       return (intList, doubleList, stringList);
     });
-
-    print(streams);
 
     /// We can not modify _resolvedStreams inside the body of the isolate helper
     /// Therefore, we must perform a loop again outside it.

@@ -10,6 +10,9 @@ export 'src/managers/managers.dart';
 // Utils
 part 'src/adapters/streams/resolved_stream_handle.dart';
 
+// Types
+part 'src/types.dart';
+
 // Domain
 part 'package:lsl_plugin/src/domain/outlet.dart';
 part 'package:lsl_plugin/src/domain/inlet.dart';

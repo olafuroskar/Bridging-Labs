@@ -10,7 +10,6 @@ import 'package:lsl_plugin/src/adapters/streams/resolved_stream.dart';
 import 'package:lsl_plugin/src/adapters/utils.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
-import 'package:lsl_plugin/src/types.dart';
 
 part 'implementations/int_inlet_adapter.dart';
 part 'implementations/short_inlet_adapter.dart';

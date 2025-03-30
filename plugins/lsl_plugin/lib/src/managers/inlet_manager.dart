@@ -56,7 +56,7 @@ class InletManager<S> {
       await Future.delayed(Duration(seconds: nominalSRate));
 
       final sample = await pullSample();
-      if (sample != null) {
+      if (sample != null && sample.$1.isNotEmpty) {
         yield sample;
       }
       if (isClosed) break;
@@ -71,7 +71,7 @@ class InletManager<S> {
       await Future.delayed(Duration(seconds: nominalSRate));
 
       final chunk = await pullChunk();
-      if (chunk != null) {
+      if (chunk != null && chunk.isNotEmpty) {
         yield chunk;
       }
       if (isClosed) break;
