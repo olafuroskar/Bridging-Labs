@@ -31,8 +31,8 @@ class _CreateOutletScreenState extends State<CreateOutletScreen> {
                   final selectedDevice = appState.selectedDevice;
 
                   if (selectedDevice == null) return;
-                  await polar.connectToDevice(selectedDevice);
-                  await appState.addPolarStream(selectedDevice);
+                  await appState.addStream(selectedDevice);
+
                   if (context.mounted) {
                     Navigator.pop(context);
                   }
@@ -43,8 +43,7 @@ class _CreateOutletScreenState extends State<CreateOutletScreen> {
                 onPressed: () async {
                   final selectedDevice = appState.selectedDevice;
                   if (selectedDevice == null) return;
-                  await polar.disconnectFromDevice(selectedDevice);
-                  appState.stopPolarStreams();
+                  appState.stopStreams();
                 },
                 child: const Text('disconnect'),
               )

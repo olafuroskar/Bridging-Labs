@@ -37,12 +37,12 @@ class InletScreen extends StatelessWidget {
         ],
       ),
       body: ListView(
-        children: appState.streams.map((inlet) {
-          final selected = appState.selectedInlets.contains(inlet.info.name);
+        children: appState.streams.map((name) {
+          final selected = appState.selectedInlets.contains(name);
           return CheckboxListTile(
             value: selected,
-            title: Text(inlet.info.name),
-            onChanged: (_) => appState.toggleInletSelection(inlet.info.name),
+            title: Text(name),
+            onChanged: (_) => appState.toggleInletSelection(name),
           );
         }).toList(),
       ),

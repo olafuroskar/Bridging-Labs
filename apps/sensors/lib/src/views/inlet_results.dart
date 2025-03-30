@@ -18,13 +18,42 @@ class InletResultScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: appState.currentChunk
-                  .map((item) => Row(
-                      children: [Text(item.$2.toString())] +
-                          item.$1
-                              .map((elem) => Text(elem.toString()))
-                              .toList()))
-                  .toList()),
+              children: [
+                    const Row(
+                      children: [Text("Int")],
+                    )
+                  ] +
+                  appState.currentIntChunk
+                      .map((item) => Row(
+                          children: [Text(item.$2.toString())] +
+                              item.$1
+                                  .map((elem) => Text(elem.toString()))
+                                  .toList()))
+                      .toList() +
+                  [
+                    const Row(
+                      children: [Text("Double")],
+                    )
+                  ] +
+                  appState.currentDoubleChunk
+                      .map((item) => Row(
+                          children: [Text(item.$2.toString())] +
+                              item.$1
+                                  .map((elem) => Text(elem.toString()))
+                                  .toList()))
+                      .toList() +
+                  [
+                    const Row(
+                      children: [Text("String")],
+                    )
+                  ] +
+                  appState.currentStringChunk
+                      .map((item) => Row(
+                          children: [Text(item.$2.toString())] +
+                              item.$1
+                                  .map((elem) => Text(elem.toString()))
+                                  .toList()))
+                      .toList()),
         ),
       );
     });

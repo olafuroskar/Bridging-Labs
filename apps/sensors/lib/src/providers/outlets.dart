@@ -1,40 +1,122 @@
 part of '../../main.dart';
 
+enum StreamType {
+  device,
+  polar;
+}
+
 class OutletProvider extends ChangeNotifier {
   List<String> devices = [];
   String? selectedDevice;
-  List<(StreamSubscription<Object?>, OutletManager<Object?>, String)>
-      polarStreams = [];
+  Map<String, (StreamSubscription<Object?>, OutletManager<Object?>, StreamType)>
+      streams = {};
 
   Future<void> findDevices() async {
-    // devices = ['B69BC32A'];
-    polar.searchForDevice().take(5).fold([], (previous, element) {
-      return previous + [element.deviceId];
-    });
+    if (Platform.isIOS || Platform.isAndroid) {
+      devices = ['Gyroscope', "Accelerometer"];
+    }
+
+    final polarDevices = await polar
+        .searchForDevice()
+        .take(1)
+        .timeout(Duration(seconds: 5), onTimeout: (_) => [])
+        .map((element) => element.deviceId)
+        .toList();
+
+    devices += polarDevices;
+
     notifyListeners();
+  }
+
+  Future<void> addGyroscopeStream() async {
+    OutletManager<double>? outletManager;
+
+    try {
+      final streamInfo = StreamInfoFactory.createDoubleStreamInfo(
+          "Gyroscope mobile",
+          "Gyroscope",
+          Double64ChannelFormat(),
+          3,
+          SensorInterval.normalInterval.inSeconds.toDouble());
+      outletManager = OutletManager(streamInfo);
+
+      final subscription =
+          gyroscopeEventStream(samplingPeriod: SensorInterval.normalInterval)
+              .listen(
+        (event) {
+          outletManager?.pushSample([event.x, event.y, event.z]);
+        },
+      );
+
+      streams["Gyroscope"] = (subscription, outletManager, StreamType.device);
+    } catch (e) {
+      print("Stream creation failed: $e");
+    }
+  }
+
+  Future<void> addUserAccelerometer() async {
+    OutletManager<double>? outletManager;
+
+    try {
+      final streamInfo = StreamInfoFactory.createDoubleStreamInfo(
+          "Accelerometer mobile",
+          "Accelerometer",
+          Double64ChannelFormat(),
+          3,
+          SensorInterval.normalInterval.inSeconds.toDouble());
+      outletManager = OutletManager(streamInfo);
+
+      final subscription = userAccelerometerEventStream(
+              samplingPeriod: SensorInterval.normalInterval)
+          .listen(
+        (event) {
+          outletManager?.pushSample([event.x, event.y, event.z]);
+        },
+      );
+
+      streams["Accelerometer"] =
+          (subscription, outletManager, StreamType.device);
+    } catch (e) {
+      print("Stream creation failed: $e");
+    }
+  }
+
+  Future<void> addStream(String deviceId) async {
+    if (deviceId == "Gyroscope") {
+      return addGyroscopeStream();
+    } else if (deviceId == "Accelerometer") {
+      return addUserAccelerometer();
+    } else {
+      return addPolarStream(deviceId);
+    }
   }
 
   Future<void> addPolarStream(String deviceId) async {
     OutletManager<int>? outletManager;
     try {
-      await polar.sdkFeatureReady.firstWhere((e) => e.identifier == deviceId);
+      polar.connectToDevice(deviceId);
+      await polar.sdkFeatureReady.firstWhere((e) =>
+          e.identifier == deviceId &&
+          e.feature == PolarSdkFeature.onlineStreaming);
 
       final streamInfo = StreamInfoFactory.createIntStreamInfo(
-          "Polar $deviceId", "ECG", Int64ChannelFormat(), 1, 1);
+          "Polar $deviceId", "PPG", Int64ChannelFormat(), 50);
       outletManager = OutletManager(streamInfo, 1);
 
-      final subscription = polar.startHrStreaming(deviceId).listen((data) {
+      final subscription = polar.startPpgStreaming(deviceId).listen((data) {
         final List<List<int>> chunk = [];
         // final List<double> timestamps = [];
 
         for (var sample in data.samples) {
-          chunk.add([sample.hr]);
+          chunk.add(sample.channelSamples);
         }
+        print(chunk.length);
         outletManager?.pushChunk(chunk);
       });
 
-      polarStreams.add((subscription, outletManager, deviceId));
+      streams[deviceId] = (subscription, outletManager, StreamType.polar);
     } catch (e) {
+      print("$e");
       outletManager?.destroy();
     }
     notifyListeners();
@@ -47,12 +129,35 @@ class OutletProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void stopPolarStreams() {
-    for (var (sub, outletManager, _) in polarStreams) {
-      sub.cancel();
-      outletManager.destroy();
+  void stopStreams() {
+    stopGyroscope();
+    stopAccelerometer();
+    stopPolarStreams();
+  }
+
+  void stopGyroscope() {
+    final gyroStream = streams.remove("Gyroscope");
+    if (gyroStream != null) {
+      gyroStream.$1.cancel();
+      gyroStream.$2.destroy();
     }
-    polarStreams.clear();
+  }
+
+  void stopAccelerometer() {
+    final gyroStream = streams.remove("Accelerometer");
+    if (gyroStream != null) {
+      gyroStream.$1.cancel();
+      gyroStream.$2.destroy();
+    }
+  }
+
+  void stopPolarStreams() async {
+    for (var entry in streams.entries) {
+      await polar.disconnectFromDevice(entry.key);
+      entry.value.$1.cancel();
+      entry.value.$2.destroy();
+    }
+    streams.clear();
   }
 
   void toggleDeviceSelection(String? device) {

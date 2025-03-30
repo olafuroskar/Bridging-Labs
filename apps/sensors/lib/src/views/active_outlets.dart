@@ -12,14 +12,14 @@ class ActiveOutlets extends StatelessWidget {
         title: const Text('Active outlets'),
         actions: [
           IconButton(
-              onPressed: () => appState.stopPolarStreams(),
+              onPressed: () => appState.stopStreams(),
               icon: const Icon(Icons.clear)),
         ],
       ),
       body: ListView(
-        children: appState.polarStreams.map((item) {
+        children: appState.streams.keys.map((item) {
           return ListTile(
-            title: Text(item.$3),
+            title: Text(item),
           );
         }).toList(),
       ),

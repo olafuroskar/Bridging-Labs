@@ -45,6 +45,7 @@ dependencies:
   flutter_blue_plus: ^1.35.3
   polar: ^7.5.1
   fl_chart: ^0.70.2
+  sensors_plus: ^6.1.1
 
 resolution: workspace
 
