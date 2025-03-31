@@ -46,7 +46,7 @@ class FloatOutletAdapter extends OutletAdapter<double> {
         malloc.allocate<Float>(dataElements * sizeOf<Float>());
     for (var i = 0; i < chunkSize; i++) {
       for (var j = 0; j < channelCount; j++) {
-        nativeSamplePointer[i * chunkSize + j] = chunk[i][j];
+        nativeSamplePointer[i * channelCount + j] = chunk[i][j];
       }
     }
 
@@ -77,7 +77,7 @@ class FloatOutletAdapter extends OutletAdapter<double> {
         malloc.allocate<Float>(dataElements * sizeOf<Float>());
     for (var i = 0; i < chunkSize; i++) {
       for (var j = 0; j < channelCount; j++) {
-        nativeSamplePointer[i * chunkSize + j] = chunk[i][j];
+        nativeSamplePointer[i * channelCount + j] = chunk[i][j];
       }
     }
 

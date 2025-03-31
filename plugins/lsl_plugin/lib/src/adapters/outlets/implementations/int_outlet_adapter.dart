@@ -45,7 +45,7 @@ class IntOutletAdapter extends OutletAdapter<int> {
         malloc.allocate<Int32>(dataElements * sizeOf<Int32>());
     for (var i = 0; i < chunkSize; i++) {
       for (var j = 0; j < channelCount; j++) {
-        nativeSamplePointer[i * chunkSize + j] = chunk[i][j];
+        nativeSamplePointer[i * channelCount + j] = chunk[i][j];
       }
     }
 
@@ -75,7 +75,7 @@ class IntOutletAdapter extends OutletAdapter<int> {
         malloc.allocate<Int32>(dataElements * sizeOf<Int32>());
     for (var i = 0; i < chunkSize; i++) {
       for (var j = 0; j < channelCount; j++) {
-        nativeSamplePointer[i * chunkSize + j] = chunk[i][j];
+        nativeSamplePointer[i * channelCount + j] = chunk[i][j];
       }
     }
 

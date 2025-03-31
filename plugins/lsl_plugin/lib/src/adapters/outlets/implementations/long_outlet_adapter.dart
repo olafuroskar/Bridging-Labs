@@ -46,7 +46,7 @@ class LongOutletAdapter extends OutletAdapter<int> {
         malloc.allocate<Int64>(dataElements * sizeOf<Int64>());
     for (var i = 0; i < chunkSize; i++) {
       for (var j = 0; j < channelCount; j++) {
-        nativeSamplePointer[i * chunkSize + j] = chunk[i][j];
+        nativeSamplePointer[i * channelCount + j] = chunk[i][j];
       }
     }
 
@@ -76,7 +76,7 @@ class LongOutletAdapter extends OutletAdapter<int> {
         malloc.allocate<Int64>(dataElements * sizeOf<Int64>());
     for (var i = 0; i < chunkSize; i++) {
       for (var j = 0; j < channelCount; j++) {
-        nativeSamplePointer[i * chunkSize + j] = chunk[i][j];
+        nativeSamplePointer[i * channelCount + j] = chunk[i][j];
       }
     }
 

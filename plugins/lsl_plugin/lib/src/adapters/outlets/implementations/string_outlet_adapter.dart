@@ -59,7 +59,7 @@ class StringOutletAdapter extends OutletAdapter<String> {
     for (var i = 0; i < chunkSize; i++) {
       final encodedStrings = chunk[i].map(toString).toList();
       for (var j = 0; j < channelCount; j++) {
-        nativeSamplePointer[i * chunkSize + j] = encodedStrings[j];
+        nativeSamplePointer[i * channelCount + j] = encodedStrings[j];
       }
     }
 
@@ -95,7 +95,7 @@ class StringOutletAdapter extends OutletAdapter<String> {
     for (var i = 0; i < chunkSize; i++) {
       final encodedStrings = chunk[i].map(toString).toList();
       for (var j = 0; j < channelCount; j++) {
-        nativeSamplePointer[i * chunkSize + j] = encodedStrings[j];
+        nativeSamplePointer[i * channelCount + j] = encodedStrings[j];
       }
     }
 

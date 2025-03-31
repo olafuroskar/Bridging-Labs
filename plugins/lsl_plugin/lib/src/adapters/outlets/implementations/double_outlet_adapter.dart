@@ -50,7 +50,7 @@ class DoubleOutletAdapter extends OutletAdapter<double> {
 
     for (var i = 0; i < chunkSize; i++) {
       for (var j = 0; j < channelCount; j++) {
-        nativeSamplePointer[i * chunkSize + j] = chunk[i][j];
+        nativeSamplePointer[i * channelCount + j] = chunk[i][j];
       }
     }
 
@@ -81,7 +81,7 @@ class DoubleOutletAdapter extends OutletAdapter<double> {
         malloc.allocate<Double>(dataElements * sizeOf<Double>());
     for (var i = 0; i < chunkSize; i++) {
       for (var j = 0; j < channelCount; j++) {
-        nativeSamplePointer[i * chunkSize + j] = chunk[i][j];
+        nativeSamplePointer[i * channelCount + j] = chunk[i][j];
       }
     }
 
