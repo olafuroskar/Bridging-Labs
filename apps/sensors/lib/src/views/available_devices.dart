@@ -28,11 +28,11 @@ class AvailableDevices extends StatelessWidget {
       ),
       body: ListView(
         children: appState.devices.map((device) {
-          final selected = appState.selectedDevice == device;
+          final selected = appState.selectedDevice == device.$1;
           return CheckboxListTile(
             value: selected,
-            title: Text(device),
-            onChanged: (_) => appState.toggleDeviceSelection(device),
+            title: Text(device.$1),
+            onChanged: (_) => appState.toggleDeviceSelection(device.$1),
           );
         }).toList(),
       ),
