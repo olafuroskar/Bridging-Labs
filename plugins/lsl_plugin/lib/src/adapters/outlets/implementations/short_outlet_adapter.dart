@@ -39,14 +39,14 @@ class ShortOutletAdapter extends OutletAdapter<int> {
 
     final outletPointer = _outletContainer._nativeOutlet;
 
-    final dataElements = chunk.length;
-    final channelCount = chunk[0].length;
+    final (dataElements, chunkSize, channelCount) =
+        utils.getDataElements(chunk);
 
     final nativeSamplePointer =
-        malloc.allocate<Int16>(dataElements * channelCount * sizeOf<Int16>());
-    for (var i = 0; i < dataElements; i++) {
+        malloc.allocate<Int16>(dataElements * sizeOf<Int16>());
+    for (var i = 0; i < chunkSize; i++) {
       for (var j = 0; j < channelCount; j++) {
-        nativeSamplePointer[i * dataElements + j] = chunk[i][j];
+        nativeSamplePointer[i * chunkSize + j] = chunk[i][j];
       }
     }
 
@@ -69,14 +69,14 @@ class ShortOutletAdapter extends OutletAdapter<int> {
 
     final outletPointer = _outletContainer._nativeOutlet;
 
-    final dataElements = chunk.length;
-    final channelCount = chunk[0].length;
+    final (dataElements, chunkSize, channelCount) =
+        utils.getDataElements(chunk);
 
     final nativeSamplePointer =
-        malloc.allocate<Int16>(dataElements * channelCount * sizeOf<Int16>());
+        malloc.allocate<Int16>(dataElements * sizeOf<Int16>());
     for (var i = 0; i < dataElements; i++) {
       for (var j = 0; j < channelCount; j++) {
-        nativeSamplePointer[i * dataElements + j] = chunk[i][j];
+        nativeSamplePointer[i * chunkSize + j] = chunk[i][j];
       }
     }
 

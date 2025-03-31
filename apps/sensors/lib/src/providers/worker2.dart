@@ -137,7 +137,7 @@ class Worker2 {
             }
             break;
           case CommandType.push:
-            print("$id, $command, $deviceId, $chunk");
+            // print("$id, $command, $deviceId, $chunk");
 
             if (chunk != null) {
               outlets[deviceId]?.pushChunk(chunk);

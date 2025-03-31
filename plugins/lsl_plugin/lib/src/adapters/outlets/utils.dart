@@ -12,6 +12,8 @@ lsl_outlet createOutlet<S>(Outlet<S> outlet, ChannelFormat<S> channelFormat) {
   // Required on Android, TODO: Explain more...
   lsl.multicastLock.acquireMulticastLock();
 
+  // print("Created outlet: ${outlet.streamInfo.channelCount}");
+
   final streamInfo = lsl.bindings.lsl_create_streaminfo(
       outlet.streamInfo.name.toNativeUtf8().cast<Char>(),
       outlet.streamInfo.type.toNativeUtf8().cast<Char>(),
@@ -60,4 +62,17 @@ Pointer<Double> allocatTimestamps(List<double> timestamps) {
     nativeTimestampsPointer[i] = timestamps[i];
   }
   return nativeTimestampsPointer;
+}
+
+/// Returns the length of the data chunk when flattened
+///
+/// [chunk] The data to be sent
+(int dataElements, int chunkSize, int channelCount) getDataElements(
+    List<List<Object?>> chunk) {
+  final chunkSize = chunk.length;
+  final channelCount = chunk[0].length;
+  // The number of elements LSL expects to be in this chunk
+  final dataElements = chunkSize * channelCount;
+
+  return (dataElements, chunkSize, channelCount);
 }

@@ -39,14 +39,14 @@ class FloatOutletAdapter extends OutletAdapter<double> {
 
     final outletPointer = _outletContainer._nativeOutlet;
 
-    final dataElements = chunk.length;
-    final channelCount = chunk[0].length;
+    final (dataElements, chunkSize, channelCount) =
+        utils.getDataElements(chunk);
 
     final nativeSamplePointer =
-        malloc.allocate<Float>(dataElements * channelCount * sizeOf<Float>());
-    for (var i = 0; i < dataElements; i++) {
+        malloc.allocate<Float>(dataElements * sizeOf<Float>());
+    for (var i = 0; i < chunkSize; i++) {
       for (var j = 0; j < channelCount; j++) {
-        nativeSamplePointer[i * dataElements + j] = chunk[i][j];
+        nativeSamplePointer[i * chunkSize + j] = chunk[i][j];
       }
     }
 
@@ -55,7 +55,7 @@ class FloatOutletAdapter extends OutletAdapter<double> {
           dataElements, timestamp, pushthrough ? 1 : 0);
     } else {
       lsl.bindings
-          .lsl_push_chunk_f(outletPointer, nativeSamplePointer, dataElements);
+          .lsl_push_chunk_f(outletPointer, nativeSamplePointer, chunkSize);
     }
     malloc.free(nativeSamplePointer);
   }
@@ -70,14 +70,14 @@ class FloatOutletAdapter extends OutletAdapter<double> {
 
     final outletPointer = _outletContainer._nativeOutlet;
 
-    final dataElements = chunk.length;
-    final channelCount = chunk[0].length;
+    final (dataElements, chunkSize, channelCount) =
+        utils.getDataElements(chunk);
 
     final nativeSamplePointer =
-        malloc.allocate<Float>(dataElements * channelCount * sizeOf<Float>());
-    for (var i = 0; i < dataElements; i++) {
+        malloc.allocate<Float>(dataElements * sizeOf<Float>());
+    for (var i = 0; i < chunkSize; i++) {
       for (var j = 0; j < channelCount; j++) {
-        nativeSamplePointer[i * dataElements + j] = chunk[i][j];
+        nativeSamplePointer[i * chunkSize + j] = chunk[i][j];
       }
     }
 

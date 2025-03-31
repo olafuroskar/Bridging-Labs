@@ -87,7 +87,7 @@ class OutletProvider extends ChangeNotifier {
         .listen(
       (event) {
         buffer.add([event.x, event.y, event.z]);
-        print(buffer.length);
+        // print(buffer.length);
 
         if (buffer.length >= batchSize) {
           worker?.pushChunk(deviceId, buffer);

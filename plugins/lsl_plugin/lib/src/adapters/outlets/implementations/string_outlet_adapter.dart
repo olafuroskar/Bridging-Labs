@@ -48,18 +48,18 @@ class StringOutletAdapter extends OutletAdapter<String> {
 
     final outletPointer = _outletContainer._nativeOutlet;
 
-    final dataElements = chunk.length;
-    final channelCount = chunk[0].length;
+    final (dataElements, chunkSize, channelCount) =
+        utils.getDataElements(chunk);
 
     Pointer<Char> toString(String text) => text.toNativeUtf8().cast<Char>();
 
-    final nativeSamplePointer = malloc.allocate<Pointer<Char>>(
-        dataElements * channelCount * sizeOf<Pointer<Char>>());
+    final nativeSamplePointer =
+        malloc.allocate<Pointer<Char>>(dataElements * sizeOf<Pointer<Char>>());
 
-    for (var i = 0; i < dataElements; i++) {
+    for (var i = 0; i < chunkSize; i++) {
       final encodedStrings = chunk[i].map(toString).toList();
       for (var j = 0; j < channelCount; j++) {
-        nativeSamplePointer[i * dataElements + j] = encodedStrings[j];
+        nativeSamplePointer[i * chunkSize + j] = encodedStrings[j];
       }
     }
 
@@ -84,18 +84,18 @@ class StringOutletAdapter extends OutletAdapter<String> {
 
     final outletPointer = _outletContainer._nativeOutlet;
 
-    final dataElements = chunk.length;
-    final channelCount = chunk[0].length;
+    final (dataElements, chunkSize, channelCount) =
+        utils.getDataElements(chunk);
 
     Pointer<Char> toString(String text) => text.toNativeUtf8().cast<Char>();
 
-    final nativeSamplePointer = malloc.allocate<Pointer<Char>>(
-        dataElements * channelCount * sizeOf<Pointer<Char>>());
+    final nativeSamplePointer =
+        malloc.allocate<Pointer<Char>>(dataElements * sizeOf<Pointer<Char>>());
 
-    for (var i = 0; i < dataElements; i++) {
+    for (var i = 0; i < chunkSize; i++) {
       final encodedStrings = chunk[i].map(toString).toList();
       for (var j = 0; j < channelCount; j++) {
-        nativeSamplePointer[i * dataElements + j] = encodedStrings[j];
+        nativeSamplePointer[i * chunkSize + j] = encodedStrings[j];
       }
     }
 
