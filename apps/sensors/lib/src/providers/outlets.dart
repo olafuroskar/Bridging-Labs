@@ -10,7 +10,7 @@ const batchSize = 20;
 class OutletProvider extends ChangeNotifier {
   List<(String, StreamType)> devices = [];
   String? selectedDevice;
-  Map<String, StreamSubscription<Object?>> streams = {};
+  Map<String, (StreamSubscription<Object?>, StreamType)> streams = {};
   bool isWorkerListenedTo = false;
 
   // final worker = Worker();
@@ -67,7 +67,7 @@ class OutletProvider extends ChangeNotifier {
       },
     );
 
-    streams[deviceId] = subscription;
+    streams[deviceId] = (subscription, StreamType.device);
   }
 
   void addAccelerometerStream(String deviceId) {
@@ -89,35 +89,45 @@ class OutletProvider extends ChangeNotifier {
       },
     );
 
-    streams[deviceId] = subscription;
+    streams[deviceId] = (subscription, StreamType.device);
   }
 
   void addPolarStream(String deviceId) async {
     List<List<int>> buffer = [];
+    List<double> timestampBuffer = [];
 
     polar.connectToDevice(deviceId);
 
+    print("Feature");
     await polar.sdkFeatureReady.firstWhere((e) =>
         e.identifier == deviceId &&
         e.feature == PolarSdkFeature.onlineStreaming);
+    print("After");
 
     final subscription = polar.startPpgStreaming(deviceId).listen(
       (event) {
         buffer.addAll(event.samples.map((item) => item.channelSamples));
+        timestampBuffer.addAll(event.samples
+            .map((item) => item.timeStamp.millisecondsSinceEpoch / 1000));
 
         if (buffer.length >= batchSize) {
-          worker?.pushChunk(deviceId, buffer);
+          print("length in outlet: ${buffer.length} ${timestampBuffer.length}");
+          worker?.pushChunkWithTimestamp(deviceId, buffer, timestampBuffer);
           buffer.clear();
+          timestampBuffer.clear();
         }
       },
     );
 
-    streams[deviceId] = subscription;
+    streams[deviceId] = (subscription, StreamType.polar);
   }
 
   void stopStreams() {
-    for (var stream in streams.values) {
-      stream.cancel();
+    for (var stream in streams.entries) {
+      stream.value.$1.cancel();
+      if (stream.value.$2 == StreamType.polar) {
+        polar.disconnectFromDevice(stream.key);
+      }
     }
     worker?.close();
     worker = null;
