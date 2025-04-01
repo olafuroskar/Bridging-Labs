@@ -8,6 +8,7 @@ import 'package:sensors_plus/sensors_plus.dart';
 enum CommandType {
   start("START"),
   push("PUSH"),
+  pushWithTimestamp("PUSH_WITH_TIMESTAMP"),
   stop("STOP");
 
   const CommandType(this.value);
@@ -35,7 +36,7 @@ class Worker2 {
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    _commands.send((id, CommandType.start, deviceId, null));
+    _commands.send((id, CommandType.start, deviceId, null, null));
     return await completer.future;
   }
 
@@ -44,7 +45,18 @@ class Worker2 {
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    _commands.send((id, CommandType.push, deviceId, chunk));
+    _commands.send((id, CommandType.push, deviceId, chunk, null));
+    return await completer.future;
+  }
+
+  Future<bool> pushChunkWithTimestamp(String deviceId,
+      List<List<Object?>> chunk, List<double> timestamps) async {
+    if (_closed) throw StateError('Closed');
+    final completer = Completer<bool>.sync();
+    final id = _idCounter++;
+    _activeRequests[id] = completer;
+    _commands
+        .send((id, CommandType.pushWithTimestamp, deviceId, chunk, timestamps));
     return await completer.future;
   }
 
@@ -53,7 +65,7 @@ class Worker2 {
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    _commands.send((id, CommandType.stop, deviceId, null));
+    _commands.send((id, CommandType.stop, deviceId, null, null));
     return await completer.future;
   }
 
@@ -125,8 +137,15 @@ class Worker2 {
         int id,
         CommandType command,
         String deviceId,
-        List<List<Object?>>? chunk
-      ) = message as (int, CommandType, String, List<List<Object?>>?);
+        List<List<Object?>>? chunk,
+        List<double>? timestamps
+      ) = message as (
+        int,
+        CommandType,
+        String,
+        List<List<Object?>>?,
+        List<double>?
+      );
       try {
         switch (command) {
           case CommandType.start:
@@ -141,6 +160,14 @@ class Worker2 {
 
             if (chunk != null) {
               outlets[deviceId]?.pushChunk(chunk);
+              sendPort.send((id, true));
+            } else {
+              sendPort.send((id, false));
+            }
+            break;
+          case CommandType.pushWithTimestamp:
+            if (chunk != null && timestamps != null) {
+              outlets[deviceId]?.pushChunkWithTimastamps(chunk, timestamps);
               sendPort.send((id, true));
             } else {
               sendPort.send((id, false));

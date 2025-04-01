@@ -5,7 +5,7 @@ enum StreamType {
   polar;
 }
 
-const batchSize = 50;
+const batchSize = 20;
 
 class OutletProvider extends ChangeNotifier {
   List<(String, StreamType)> devices = [];
@@ -54,7 +54,6 @@ class OutletProvider extends ChangeNotifier {
 
   void addGyroscopeStream(String deviceId) {
     List<List<double>> buffer = [];
-    Timer? batchTimer;
 
     final subscription =
         gyroscopeEventStream(samplingPeriod: SensorInterval.normalInterval)
@@ -64,15 +63,7 @@ class OutletProvider extends ChangeNotifier {
         if (buffer.length >= batchSize) {
           worker?.pushChunk(deviceId, buffer);
           buffer.clear();
-          batchTimer?.cancel();
         }
-
-        batchTimer ??= Timer(Duration(seconds: 5), () {
-          if (buffer.isNotEmpty) {
-            worker?.pushChunk(deviceId, buffer);
-            buffer.clear();
-          }
-        });
       },
     );
 
@@ -81,17 +72,19 @@ class OutletProvider extends ChangeNotifier {
 
   void addAccelerometerStream(String deviceId) {
     List<List<double>> buffer = [];
+    List<double> timestampBuffer = [];
 
     final subscription = userAccelerometerEventStream(
             samplingPeriod: SensorInterval.normalInterval)
         .listen(
       (event) {
         buffer.add([event.x, event.y, event.z]);
-        // print(buffer.length);
+        timestampBuffer.add(event.timestamp.millisecondsSinceEpoch / 1000);
 
         if (buffer.length >= batchSize) {
-          worker?.pushChunk(deviceId, buffer);
+          worker?.pushChunkWithTimestamp(deviceId, buffer, timestampBuffer);
           buffer.clear();
+          timestampBuffer.clear();
         }
       },
     );
