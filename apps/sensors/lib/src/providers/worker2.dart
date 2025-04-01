@@ -261,7 +261,7 @@ class Worker2 {
     try {
       final streamInfo = StreamInfoFactory.createIntStreamInfo(
           "Polar $deviceId", "PPG", Int64ChannelFormat(),
-          channelCount: 50,
+          channelCount: 4,
           nominalSRate:
               // TODO: Not sure this is right
               SensorInterval.normalInterval.inMilliseconds.toDouble() / 1000,
