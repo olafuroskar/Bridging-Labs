@@ -3,26 +3,13 @@
 A Flutter plugin for interacting with the Lab Streaming Layer. Allows users to create both LSL inlets and outlets on the local network.
 
 Table of Contents
-[Platform Support](pltform-support)
-[Android](android)
-[Requirements](req-android)
-[Permissions](per-android)
 
-[iOS](ios)
-[Requirements](req-ios)
-[Permissions](per-ios)
-
-[macOS](macos)
-[Requirements](req-macos)
-[Permissions](per-macos)
-
-[Windows](windows)
-[Requirements](req-windows)
-[Permissions](per-windows)
-
-[Linux](linux)
-[Requirements](req-linux)
-[Permissions](per-linux)
+1. [Platform Support](#platform-support)
+2. [Android](#android)
+3. [iOS](#ios)
+4. [macOS](#macos)
+5. [Windows](#windows)
+6. [Linux](#linux)
 
 ## Platform Support
 
@@ -34,7 +21,7 @@ Table of Contents
 
 ## Android
 
-### Requirements <a name="req-android"></a>
+### Requirements
 
 The minimum SDK version must be set to 26 in `app/build.gradle`. This is due to the logging library used by LSL, Loguru.
 
@@ -50,7 +37,7 @@ Although not due to this plugin, users may encounter the problem mentioned [here
 + includeBuild(file("$flutterSdkPath/packages/flutter_tools/gradle").toPath().toRealPath().toAbsolutePath().toString())
 ```
 
-### Permissions <a name="per-android"></a>
+### Permissions
 
 The `AndroidManifest.xml` must contain
 
@@ -62,24 +49,24 @@ The `AndroidManifest.xml` must contain
 
 ## iOS
 
-### Requirements <a name="req-ios"></a>
+### Requirements
 
-### Permissions <a name="per-ios"></a>
+### Permissions
 
 ## macOS
 
-### Requirements <a name="req-macos"></a>
+### Requirements
 
-### Permissions <a name="per-macos"></a>
+### Permissions
 
 ## Windows
 
-### Requirements <a name="req-windows"></a>
+### Requirements
 
-### Permissions <a name="per-windows"></a>
+### Permissions
 
 ## Linux
 
-### Requirements <a name="req-linux"></a>
+### Requirements
 
-### Permissions <a name="per-linux"></a>
+### Permissions
