@@ -65,10 +65,11 @@ class InletManager<S> {
 
   Stream<Chunk<S>> startChunkStream() async* {
     if (isClosed) return;
-    final nominalSRate = getStreamInfo().nominalSRate.toInt();
+    final nominalSRate = getStreamInfo().nominalSRate;
 
     while (true) {
-      await Future.delayed(Duration(seconds: nominalSRate));
+      await Future.delayed(
+          Duration(milliseconds: (1000 / nominalSRate).toInt()));
 
       final chunk = await pullChunk();
       if (chunk != null && chunk.isNotEmpty) {
