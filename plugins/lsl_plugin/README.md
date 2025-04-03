@@ -2,7 +2,7 @@
 
 A Flutter plugin for interacting with the Lab Streaming Layer. Allows users to create both LSL inlets and outlets on the local network.
 
-Table of Contents
+## Table of Contents
 
 1. [Platform Support](#platform-support)
 2. [Android](#android)
@@ -10,6 +10,7 @@ Table of Contents
 4. [macOS](#macos)
 5. [Windows](#windows)
 6. [Linux](#linux)
+7. [Examples](#example-usage)
 
 ## Platform Support
 
@@ -70,3 +71,25 @@ The `AndroidManifest.xml` must contain
 ### Requirements
 
 ### Permissions
+
+## Example Usage
+
+### Outlets
+
+### Inlets
+
+The first step in creating inlets is to discover streams that exist on the network, or resolving them. This can be achieved with a `StreamManager`, which resolves existing streams on the network, keeps track of them for you and can instantiate an inlet from a chosen stream.
+
+```dart
+/// Creates a stream manager
+StreamManager streamManager = StreamManager();
+
+/// Resolve streams on the network with a timeout of 2 seconds
+await streamManager.resolveStreams(2);
+
+/// Gets a handle to all resolved stream that have an integer channel format
+final intStreamHandles = streamManager.getIntStreamHandles();
+
+/// Create an inlet manager from the first stream
+final inletManager = streamManager.createInlet(intStreamHandles[0]);
+```
