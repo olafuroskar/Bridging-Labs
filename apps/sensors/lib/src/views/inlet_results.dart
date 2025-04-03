@@ -7,6 +7,20 @@ class InletResultScreen extends StatefulWidget {
   State<InletResultScreen> createState() => _InletResultScreenState();
 }
 
+List<double> normalizeToRange(List<int> data) {
+  if (data.isEmpty) return [];
+
+  int minVal = data.reduce((a, b) => a < b ? a : b);
+  int maxVal = data.reduce((a, b) => a > b ? a : b);
+
+  if (minVal == maxVal) {
+    return List.filled(data.length,
+        50.0); // Assign mid-range value if all elements are the same
+  }
+
+  return data.map((x) => ((x - minVal) / (maxVal - minVal)) * 100).toList();
+}
+
 class _InletResultScreenState extends State<InletResultScreen> {
   var baselineX = 0.0;
   var baselineY = 0.0;
@@ -14,10 +28,21 @@ class _InletResultScreenState extends State<InletResultScreen> {
   @override
   Widget build(BuildContext context) {
     return Consumer<InletProvider>(builder: (context, appState, child) {
-      final data = appState.currentDoubleChunk;
+      final data = appState.currentIntChunk;
+      // final data = appState.currentIntChunk.isNotEmpty
+      //     ? appState.currentIntChunk
+      //     : appState.currentDoubleChunk.isNotEmpty
+      //         ? appState.currentDoubleChunk
+      //         : [];
 
-      final xAccData =
-          data.map((element) => FlSpot(element.$2, element.$1[0])).toList();
+      final normalizedData =
+          normalizeToRange(data.map((elem) => elem.$1[0]).toList());
+
+      final xAccData = data
+          .asMap()
+          .entries
+          .map((entry) => FlSpot(entry.value.$2, normalizedData[entry.key]))
+          .toList();
 
       return Scaffold(
           appBar: AppBar(title: const Text('Selected Inlets'), actions: [
@@ -27,71 +52,62 @@ class _InletResultScreenState extends State<InletResultScreen> {
                 },
                 icon: Icon(Icons.play_arrow))
           ]),
-          body: xAccData.isEmpty
-              ? Container()
-              : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 12),
-                    Text(
-                      'Timestamp',
-                      // 'x: ${xValue.toStringAsFixed(1)}',
-                      style: const TextStyle(
-                        color: Color.fromARGB(1, 10, 10, 10),
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      // 'sin: ${sinPoints.last.y.toStringAsFixed(1)}',
-                      'User acceleration',
-                      style: TextStyle(
-                        color: Color.fromARGB(1, 10, 10, 10),
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    // Text(
-                    //   'cos: ${cosPoints.last.y.toStringAsFixed(1)}',
-                    //   style: TextStyle(
-                    //     color: widget.cosColor,
-                    //     fontSize: 18,
-                    //     fontWeight: FontWeight.bold,
-                    //   ),
-                    // ),
-                    const SizedBox(
-                      height: 12,
-                    ),
-                    AspectRatio(
-                      aspectRatio: 1.5,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 24.0),
-                        child: LineChart(
-                          LineChartData(
-                            minY: -5,
-                            maxY: 5,
-                            minX: xAccData.first.x,
-                            maxX: xAccData.last.x,
-                            lineTouchData: const LineTouchData(enabled: false),
-                            clipData: const FlClipData.all(),
-                            gridData: const FlGridData(
-                              show: true,
-                              drawVerticalLine: false,
-                            ),
-                            borderData: FlBorderData(show: false),
-                            lineBarsData: [
-                              line(xAccData),
-                              // cosLine(cosPoints),
-                            ],
-                            titlesData: const FlTitlesData(
-                              show: false,
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ));
+          body: Column(
+              children: normalizedData
+                  .map((item) => Text(item.toString()))
+                  .toList()));
+      // body: xAccData.isEmpty
+      //     ? Container()
+      //     : Column(
+      //         mainAxisAlignment: MainAxisAlignment.center,
+      //         children: [
+      //           Text(
+      //             'Timestamp',
+      //             style: const TextStyle(
+      //               color: Color.fromARGB(255, 10, 10, 10),
+      //               fontSize: 18,
+      //               fontWeight: FontWeight.bold,
+      //             ),
+      //           ),
+      //           Text(
+      //             'User acceleration',
+      //             style: TextStyle(
+      //               color: Color.fromARGB(255, 10, 10, 10),
+      //               fontSize: 18,
+      //               fontWeight: FontWeight.bold,
+      //             ),
+      //           ),
+      //           AspectRatio(
+      //             aspectRatio: 16 / 9,
+      //             child: Padding(
+      //               padding: const EdgeInsets.only(bottom: 24.0),
+      //               child: LineChart(
+      //                 LineChartData(
+      //                   // minY: -5,
+      //                   // maxY: 5,
+      //                   minY: 0,
+      //                   maxY: 100,
+      //                   minX: xAccData.first.x,
+      //                   maxX: xAccData.last.x,
+      //                   lineTouchData: const LineTouchData(enabled: false),
+      //                   clipData: const FlClipData.all(),
+      //                   gridData: const FlGridData(
+      //                     show: true,
+      //                     drawVerticalLine: false,
+      //                   ),
+      //                   borderData: FlBorderData(show: false),
+      //                   lineBarsData: [
+      //                     line(xAccData),
+      //                   ],
+      //                   titlesData: const FlTitlesData(
+      //                     show: false,
+      //                   ),
+      //                 ),
+      //               ),
+      //             ),
+      //           )
+      //         ],
+      //       ));
     });
   }
 
@@ -100,6 +116,13 @@ class _InletResultScreenState extends State<InletResultScreen> {
       spots: points,
       dotData: const FlDotData(
         show: false,
+      ),
+      gradient: LinearGradient(
+        colors: [
+          Color.fromARGB(255, 50, 168, 82),
+          Color.fromARGB(255, 245, 66, 66)
+        ],
+        stops: const [0.1, 1.0],
       ),
       barWidth: 4,
       isCurved: false,

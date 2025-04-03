@@ -1,6 +1,7 @@
 part of '../../main.dart';
 
 class InletProvider extends ChangeNotifier {
+  int maxCurrentChunkSize = 75;
   List<Sample<int>> currentIntChunk = [];
   List<Sample<double>> currentDoubleChunk = [];
   List<Sample<String>> currentStringChunk = [];
@@ -71,14 +72,24 @@ class InletProvider extends ChangeNotifier {
     for (var stream in intStreams) {
       _openInlet<int>(stream, (chunk) {
         // TODO: Write data to a csv
-        currentIntChunk = chunk;
+        print(chunk);
+        currentIntChunk.addAll(chunk);
+        currentIntChunk.sort((a, b) => a.$2 > b.$2 ? 1 : -1);
+        // FIX: Specific to Polar PPG
+        currentIntChunk.removeWhere((item) => item.$1[0] < 100);
+
+        final overflow = currentIntChunk.length - maxCurrentChunkSize;
+        if (overflow > 0) {
+          currentIntChunk = currentIntChunk
+              .getRange(overflow, currentIntChunk.length)
+              .toList();
+        }
         notifyListeners();
       });
     }
 
     for (var stream in doubleStreams) {
       _openInlet<double>(stream, (chunk) {
-        print(chunk);
         currentDoubleChunk = chunk;
         notifyListeners();
       });
