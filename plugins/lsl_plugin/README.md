@@ -1,8 +1,40 @@
 # lsl_plugin
 
-A Flutter plugin for interacting with the Lab Streaming Layer.
+A Flutter plugin for interacting with the Lab Streaming Layer. Allows users to create both LSL inlets and outlets on the local network.
+
+Table of Contents
+[Platform Support](pltform-support)
+[Android](android)
+[Requirements](req-android)
+[Permissions](per-android)
+
+[iOS](ios)
+[Requirements](req-ios)
+[Permissions](per-ios)
+
+[macOS](macos)
+[Requirements](req-macos)
+[Permissions](per-macos)
+
+[Windows](windows)
+[Requirements](req-windows)
+[Permissions](per-windows)
+
+[Linux](linux)
+[Requirements](req-linux)
+[Permissions](per-linux)
+
+## Platform Support
+
+| Android | iOS | MacOS | Web | Linux | Windows |
+| :-----: | :-: | :---: | :-: | :---: | :-----: |
+|   ✅    | ✅  | ⚠️ \* | ❌  |  ❓   |   ❓    |
+
+\* Requires special permission from Apple that has not been tested. [macOS](macos)
 
 ## Android
+
+### Requirements <a name="req-android"></a>
 
 The minimum SDK version must be set to 26 in `app/build.gradle`. This is due to the logging library used by LSL, Loguru.
 
@@ -11,97 +43,43 @@ The minimum SDK version must be set to 26 in `app/build.gradle`. This is due to 
 minSdk = 26
 ```
 
-Although not due to this plugin, users may encounter the problem mentioned [here](https://github.com/flutter/flutter-intellij/issues/7152#issuecomment-2132853632) when creating a new project for Android. To avoid, make the following change in you `settings.gradle` file:
+Although not due to this plugin, users may encounter the problem mentioned [here](https://github.com/flutter/flutter-intellij/issues/7152#issuecomment-2132853632) when creating a new project for Android. To avoid, make the following change in your `settings.gradle` file:
 
 ```diff
 - includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
 + includeBuild(file("$flutterSdkPath/packages/flutter_tools/gradle").toPath().toRealPath().toAbsolutePath().toString())
 ```
 
-## Getting Started
+### Permissions <a name="per-android"></a>
 
-This project is a starting point for a Flutter
-[FFI plugin](https://flutter.dev/to/ffi-package),
-a specialized package that includes native code directly invoked with Dart FFI.
+The `AndroidManifest.xml` must contain
 
-## Project structure
-
-This template uses the following structure:
-
-- `src`: Contains the native source code, and a CmakeFile.txt file for building
-  that source code into a dynamic library.
-
-- `lib`: Contains the Dart code that defines the API of the plugin, and which
-  calls into the native code using `dart:ffi`.
-
-- platform folders (`android`, `ios`, `windows`, etc.): Contains the build files
-  for building and bundling the native code library with the platform application.
-
-## Building and bundling native code
-
-The `pubspec.yaml` specifies FFI plugins as follows:
-
-```yaml
-plugin:
-  platforms:
-    some_platform:
-      ffiPlugin: true
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
 ```
 
-This configuration invokes the native build for the various target platforms
-and bundles the binaries in Flutter applications using these FFI plugins.
+## iOS
 
-This can be combined with dartPluginClass, such as when FFI is used for the
-implementation of one platform in a federated plugin:
+### Requirements <a name="req-ios"></a>
 
-```yaml
-plugin:
-  implements: some_other_plugin
-  platforms:
-    some_platform:
-      dartPluginClass: SomeClass
-      ffiPlugin: true
-```
+### Permissions <a name="per-ios"></a>
 
-A plugin can have both FFI and method channels:
+## macOS
 
-```yaml
-plugin:
-  platforms:
-    some_platform:
-      pluginClass: SomeName
-      ffiPlugin: true
-```
+### Requirements <a name="req-macos"></a>
 
-The native build systems that are invoked by FFI (and method channel) plugins are:
+### Permissions <a name="per-macos"></a>
 
-- For Android: Gradle, which invokes the Android NDK for native builds.
-  - See the documentation in android/build.gradle.
-- For iOS and MacOS: Xcode, via CocoaPods.
-  - See the documentation in ios/lsl_plugin.podspec.
-  - See the documentation in macos/lsl_plugin.podspec.
-- For Linux and Windows: CMake.
-  - See the documentation in linux/CMakeLists.txt.
-  - See the documentation in windows/CMakeLists.txt.
+## Windows
 
-## Binding to native code
+### Requirements <a name="req-windows"></a>
 
-To use the native code, bindings in Dart are needed.
-To avoid writing these by hand, they are generated from the header file
-(`src/lsl_plugin.h`) by `package:ffigen`.
-Regenerate the bindings by running `dart run ffigen --config ffigen.yaml`.
+### Permissions <a name="per-windows"></a>
 
-## Invoking native code
+## Linux
 
-Very short-running native functions can be directly invoked from any isolate.
-For example, see `sum` in `lib/lsl_plugin.dart`.
+### Requirements <a name="req-linux"></a>
 
-Longer-running functions should be invoked on a helper isolate to avoid
-dropping frames in Flutter applications.
-For example, see `sumAsync` in `lib/lsl_plugin.dart`.
-
-## Flutter help
-
-For help getting started with Flutter, view our
-[online documentation](https://docs.flutter.dev), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Permissions <a name="per-linux"></a>
