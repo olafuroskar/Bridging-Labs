@@ -1,10 +1,9 @@
 part of '../../main.dart';
 
 class InletProvider extends ChangeNotifier {
-  int maxCurrentChunkSize = 75;
-  List<Sample<int>> currentIntChunk = [];
-  List<Sample<double>> currentDoubleChunk = [];
-  List<Sample<String>> currentStringChunk = [];
+  int maxBufferSize = 150;
+
+  Map<String, int> writtenLines = {};
 
   List<ResolvedStreamHandle<int>> intStreams = [];
   List<ResolvedStreamHandle<double>> doubleStreams = [];
@@ -12,7 +11,8 @@ class InletProvider extends ChangeNotifier {
 
   List<String> selectedInlets = [];
   StreamManager streamManager = StreamManager();
-  final Map<String, InletManager<Object?>> inlets = {};
+  final Map<String, (InletManager<Object?>, StreamSubscription<Chunk<Object?>>)>
+      inlets = {};
 
   List<String> get streams =>
       intStreams.map((stream) => stream.info.name).toList() +
@@ -35,7 +35,8 @@ class InletProvider extends ChangeNotifier {
 
   void clearInlets() {
     for (var inlet in inlets.values) {
-      inlet.closeStream();
+      inlet.$2.cancel();
+      inlet.$1.closeStream();
     }
     inlets.clear();
   }
@@ -50,8 +51,20 @@ class InletProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void closeInlet(String key) {
+    inlets[key]?.$2.cancel();
+    inlets[key]?.$1.closeStream();
+    inlets.remove(key);
+  }
+
+  void shareResult(String key) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final filePath = '${directory.path}/$key.csv';
+    await Share.shareXFiles([XFile(filePath)]);
+  }
+
   void _openInlet<S>(ResolvedStreamHandle<S> stream,
-      void Function(Chunk<S> chunk) onData) async {
+      void Function(Chunk<S> chunk) onData, void Function() onDone) async {
     final key = stream.info.name;
 
     // Inlet has already been created for this stream
@@ -63,44 +76,93 @@ class InletProvider extends ChangeNotifier {
     await inletManager.openStream();
 
     // Start streaming chunks from the stream
-    inletManager.startChunkStream().listen(onData);
+    final listener =
+        inletManager.startChunkStream().listen(onData, onDone: onDone);
 
-    inlets[key] = inletManager;
+    inlets[key] = (inletManager, listener);
   }
 
   void createInlet() async {
     for (var stream in intStreams) {
-      _openInlet<int>(stream, (chunk) {
-        // TODO: Write data to a csv
-        print(chunk);
-        currentIntChunk.addAll(chunk);
-        currentIntChunk.sort((a, b) => a.$2 > b.$2 ? 1 : -1);
-        // FIX: Specific to Polar PPG
-        currentIntChunk.removeWhere((item) => item.$1[0] < 100);
+      final sink = await openCsvFile(stream.id);
+      final List<List<dynamic>> buffer = [];
+      writtenLines[stream.id] = 0;
 
-        final overflow = currentIntChunk.length - maxCurrentChunkSize;
-        if (overflow > 0) {
-          currentIntChunk = currentIntChunk
-              .getRange(overflow, currentIntChunk.length)
-              .toList();
+      _openInlet<int>(stream, (chunk) {
+        buffer.addAll(chunk.map((item) =>
+            [item.$2.toString()] + item.$1.map((x) => x.toString()).toList()));
+
+        if (buffer.length > maxBufferSize) {
+          writeRow(sink, buffer);
+          buffer.clear();
+          writtenLines[stream.id] = writtenLines[stream.id]! + maxBufferSize;
+          notifyListeners();
         }
-        notifyListeners();
+      }, () {
+        if (buffer.isNotEmpty) {
+          writeRow(sink, buffer);
+        }
+        sink.close();
       });
     }
 
     for (var stream in doubleStreams) {
+      final sink = await openCsvFile(stream.id);
+      final List<List<dynamic>> buffer = [];
+      writtenLines[stream.id] = 0;
+
       _openInlet<double>(stream, (chunk) {
-        currentDoubleChunk = chunk;
-        notifyListeners();
+        buffer.addAll(chunk.map((item) =>
+            [item.$2.toString()] + item.$1.map((x) => x.toString()).toList()));
+
+        if (buffer.length > maxBufferSize) {
+          writeRow(sink, buffer);
+          buffer.clear();
+          writtenLines[stream.id] = writtenLines[stream.id]! + maxBufferSize;
+          notifyListeners();
+        }
+      }, () {
+        if (buffer.isNotEmpty) {
+          writeRow(sink, buffer);
+        }
+        sink.close();
       });
     }
 
     for (var stream in stringStreams) {
+      final sink = await openCsvFile(stream.id);
+      final List<List<dynamic>> buffer = [];
+      writtenLines[stream.id] = 0;
+
       _openInlet<String>(stream, (chunk) {
-        currentStringChunk = chunk;
-        notifyListeners();
+        buffer.addAll(chunk.map((item) => [item.$2.toString()] + item.$1));
+
+        if (buffer.length > maxBufferSize) {
+          writeRow(sink, buffer);
+          buffer.clear();
+          writtenLines[stream.id] = writtenLines[stream.id]! + maxBufferSize;
+          notifyListeners();
+        }
+      }, () {
+        if (buffer.isNotEmpty) {
+          writeRow(sink, buffer);
+        }
+        sink.close();
       });
     }
     notifyListeners();
+  }
+
+  Future<IOSink> openCsvFile(String fileName) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final filePath = '${directory.path}/$fileName.csv';
+    final file = File(filePath);
+
+    return file.openWrite(mode: FileMode.append);
+  }
+
+  void writeRow(IOSink sink, List<List<dynamic>> rows) {
+    String csvRow = '${const ListToCsvConverter().convert(rows)}\n';
+    sink.write(csvRow);
   }
 }

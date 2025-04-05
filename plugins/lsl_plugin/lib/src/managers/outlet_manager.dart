@@ -65,7 +65,7 @@ class OutletManager<S> {
   }
 
   /// {@macro push_chunk_with_timestamps}
-  void pushChunkWithTimastamps(List<List<S>> chunk, List<double> timestamps,
+  void pushChunkWithTimestamps(List<List<S>> chunk, List<double> timestamps,
       [bool pushthrough = false]) {
     return _outletAdapter.pushChunkWithTimestamps(
         chunk, timestamps, pushthrough);

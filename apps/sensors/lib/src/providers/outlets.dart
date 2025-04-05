@@ -14,7 +14,7 @@ class OutletProvider extends ChangeNotifier {
   bool isWorkerListenedTo = false;
 
   // final worker = Worker();
-  Worker2? worker;
+  OutletWorker? worker;
 
   Future<void> findDevices() async {
     if (Platform.isIOS || Platform.isAndroid) {
@@ -35,13 +35,11 @@ class OutletProvider extends ChangeNotifier {
   }
 
   Future<void> addStream(String deviceId) async {
-    worker ??= await Worker2.spawn();
+    print("trying to add stream");
 
-    final result = await worker?.addDevice(deviceId);
+    worker ??= await OutletWorker.spawn();
 
-    if (result == null || !result) {
-      return;
-    }
+    print("after spawn");
 
     if (deviceId == "Gyroscope") {
       addGyroscopeStream(deviceId);
@@ -52,8 +50,19 @@ class OutletProvider extends ChangeNotifier {
     }
   }
 
-  void addGyroscopeStream(String deviceId) {
+  void addGyroscopeStream(String deviceId) async {
     List<List<double>> buffer = [];
+
+    final streamInfo = StreamInfoFactory.createDoubleStreamInfo(
+        deviceId, "Gyroscope", Double64ChannelFormat(),
+        channelCount: 3,
+        nominalSRate: intervalToFrequency(SensorInterval.normalInterval));
+
+    final result = await worker?.addStream(streamInfo);
+
+    if (result == null || !result) {
+      return;
+    }
 
     final subscription =
         gyroscopeEventStream(samplingPeriod: SensorInterval.normalInterval)
@@ -70,9 +79,21 @@ class OutletProvider extends ChangeNotifier {
     streams[deviceId] = (subscription, StreamType.device);
   }
 
-  void addAccelerometerStream(String deviceId) {
+  void addAccelerometerStream(String deviceId) async {
     List<List<double>> buffer = [];
     List<double> timestampBuffer = [];
+
+    final streamInfo = StreamInfoFactory.createDoubleStreamInfo(
+        deviceId, "Accelerometer", Double64ChannelFormat(),
+        channelCount: 3,
+        nominalSRate: intervalToFrequency(SensorInterval.normalInterval),
+        sourceId: deviceId);
+
+    final result = await worker?.addStream(streamInfo);
+
+    if (result == null || !result) {
+      return;
+    }
 
     final subscription = userAccelerometerEventStream(
             samplingPeriod: SensorInterval.normalInterval)
@@ -98,11 +119,30 @@ class OutletProvider extends ChangeNotifier {
 
     polar.connectToDevice(deviceId);
 
-    print("Feature");
-    await polar.sdkFeatureReady.firstWhere((e) =>
-        e.identifier == deviceId &&
-        e.feature == PolarSdkFeature.onlineStreaming);
-    print("After");
+    print("Connected");
+
+    try {
+      await polar.sdkFeatureReady.firstWhere((e) =>
+          e.identifier == deviceId &&
+          e.feature == PolarSdkFeature.onlineStreaming);
+    } catch (e) {
+      print("$e");
+    }
+    print("features");
+
+    final streamInfo = StreamInfoFactory.createIntStreamInfo(
+        "Polar $deviceId", "PPG", Int64ChannelFormat(),
+        channelCount: 4, nominalSRate: 135, sourceId: deviceId);
+
+    print("Trying to add stream");
+
+    final result = await worker?.addStream(streamInfo);
+
+    print(result);
+
+    if (result == null || !result) {
+      return;
+    }
 
     final subscription = polar.startPpgStreaming(deviceId).listen(
       (event) {
@@ -111,7 +151,6 @@ class OutletProvider extends ChangeNotifier {
             .map((item) => item.timeStamp.millisecondsSinceEpoch / 1000));
 
         if (buffer.length >= batchSize) {
-          print("length in outlet: ${buffer.length} ${timestampBuffer.length}");
           worker?.pushChunkWithTimestamp(deviceId, buffer, timestampBuffer);
           buffer.clear();
           timestampBuffer.clear();

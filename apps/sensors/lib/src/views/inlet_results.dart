@@ -7,18 +7,9 @@ class InletResultScreen extends StatefulWidget {
   State<InletResultScreen> createState() => _InletResultScreenState();
 }
 
-List<double> normalizeToRange(List<int> data) {
-  if (data.isEmpty) return [];
-
-  int minVal = data.reduce((a, b) => a < b ? a : b);
-  int maxVal = data.reduce((a, b) => a > b ? a : b);
-
-  if (minVal == maxVal) {
-    return List.filled(data.length,
-        50.0); // Assign mid-range value if all elements are the same
-  }
-
-  return data.map((x) => ((x - minVal) / (maxVal - minVal)) * 100).toList();
+enum InletAction {
+  stop,
+  share;
 }
 
 class _InletResultScreenState extends State<InletResultScreen> {
@@ -28,22 +19,6 @@ class _InletResultScreenState extends State<InletResultScreen> {
   @override
   Widget build(BuildContext context) {
     return Consumer<InletProvider>(builder: (context, appState, child) {
-      final data = appState.currentIntChunk;
-      // final data = appState.currentIntChunk.isNotEmpty
-      //     ? appState.currentIntChunk
-      //     : appState.currentDoubleChunk.isNotEmpty
-      //         ? appState.currentDoubleChunk
-      //         : [];
-
-      final normalizedData =
-          normalizeToRange(data.map((elem) => elem.$1[0]).toList());
-
-      final xAccData = data
-          .asMap()
-          .entries
-          .map((entry) => FlSpot(entry.value.$2, normalizedData[entry.key]))
-          .toList();
-
       return Scaffold(
           appBar: AppBar(title: const Text('Selected Inlets'), actions: [
             IconButton(
@@ -52,95 +27,36 @@ class _InletResultScreenState extends State<InletResultScreen> {
                 },
                 icon: Icon(Icons.play_arrow))
           ]),
-          body: Column(
-              children: normalizedData
-                  .map((item) => Text(item.toString()))
-                  .toList()));
-      // body: xAccData.isEmpty
-      //     ? Container()
-      //     : Column(
-      //         mainAxisAlignment: MainAxisAlignment.center,
-      //         children: [
-      //           Text(
-      //             'Timestamp',
-      //             style: const TextStyle(
-      //               color: Color.fromARGB(255, 10, 10, 10),
-      //               fontSize: 18,
-      //               fontWeight: FontWeight.bold,
-      //             ),
-      //           ),
-      //           Text(
-      //             'User acceleration',
-      //             style: TextStyle(
-      //               color: Color.fromARGB(255, 10, 10, 10),
-      //               fontSize: 18,
-      //               fontWeight: FontWeight.bold,
-      //             ),
-      //           ),
-      //           AspectRatio(
-      //             aspectRatio: 16 / 9,
-      //             child: Padding(
-      //               padding: const EdgeInsets.only(bottom: 24.0),
-      //               child: LineChart(
-      //                 LineChartData(
-      //                   // minY: -5,
-      //                   // maxY: 5,
-      //                   minY: 0,
-      //                   maxY: 100,
-      //                   minX: xAccData.first.x,
-      //                   maxX: xAccData.last.x,
-      //                   lineTouchData: const LineTouchData(enabled: false),
-      //                   clipData: const FlClipData.all(),
-      //                   gridData: const FlGridData(
-      //                     show: true,
-      //                     drawVerticalLine: false,
-      //                   ),
-      //                   borderData: FlBorderData(show: false),
-      //                   lineBarsData: [
-      //                     line(xAccData),
-      //                   ],
-      //                   titlesData: const FlTitlesData(
-      //                     show: false,
-      //                   ),
-      //                 ),
-      //               ),
-      //             ),
-      //           )
-      //         ],
-      //       ));
+          body: ListView(
+              children: appState.writtenLines.entries.map((entry) {
+            return ListTile(
+              title: Text(entry.key),
+              trailing: PopupMenuButton<InletAction>(
+                onSelected: (InletAction? value) {
+                  switch (value) {
+                    case InletAction.stop:
+                      appState.closeInlet(entry.key);
+                      break;
+                    case InletAction.share:
+                      appState.shareResult(entry.key);
+                      break;
+                    default:
+                  }
+                },
+                itemBuilder: (BuildContext context) =>
+                    <PopupMenuEntry<InletAction>>[
+                  const PopupMenuItem<InletAction>(
+                    value: InletAction.stop,
+                    child: Text('Stop'),
+                  ),
+                  const PopupMenuItem<InletAction>(
+                    value: InletAction.share,
+                    child: Text('Share'),
+                  ),
+                ],
+              ),
+            );
+          }).toList()));
     });
   }
-
-  LineChartBarData line(List<FlSpot> points) {
-    return LineChartBarData(
-      spots: points,
-      dotData: const FlDotData(
-        show: false,
-      ),
-      gradient: LinearGradient(
-        colors: [
-          Color.fromARGB(255, 50, 168, 82),
-          Color.fromARGB(255, 245, 66, 66)
-        ],
-        stops: const [0.1, 1.0],
-      ),
-      barWidth: 4,
-      isCurved: false,
-    );
-  }
-
-  // LineChartBarData cosLine(List<FlSpot> points) {
-  //   return LineChartBarData(
-  //     spots: points,
-  //     dotData: const FlDotData(
-  //       show: false,
-  //     ),
-  //     gradient: LinearGradient(
-  //       colors: [widget.cosColor.withValues(alpha: 0), widget.cosColor],
-  //       stops: const [0.1, 1.0],
-  //     ),
-  //     barWidth: 4,
-  //     isCurved: false,
-  //   );
-  // }
 }

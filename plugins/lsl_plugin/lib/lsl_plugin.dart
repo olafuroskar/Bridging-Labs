@@ -1,6 +1,12 @@
 /// A library for interacting with the Lab Streaming Layer
 library;
 
+import 'dart:async';
+import 'dart:developer';
+import 'dart:isolate';
+
+import 'package:flutter/services.dart';
+import 'package:lsl_plugin/lsl_plugin.dart';
 import 'package:lsl_plugin/src/channel_formats/channel_format.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
 
@@ -25,3 +31,9 @@ part 'src/stream_info_factory.dart';
 part 'src/channel_formats/int_channel_format.dart';
 part 'src/channel_formats/double_channel_format.dart';
 part 'src/channel_formats/string_channel_format.dart';
+
+// Isolate workers
+part 'src/workers/outlet_worker.dart';
+
+// Helpers
+part 'src/utils/helpers.dart';

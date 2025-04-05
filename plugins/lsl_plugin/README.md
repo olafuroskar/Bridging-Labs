@@ -11,6 +11,7 @@ A Flutter plugin for interacting with the Lab Streaming Layer. Allows users to c
 5. [Windows](#windows)
 6. [Linux](#linux)
 7. [Examples](#example-usage)
+8. [Documentation](#documentation)
 
 ## Platform Support
 
@@ -93,3 +94,7 @@ final intStreamHandles = streamManager.getIntStreamHandles();
 /// Create an inlet manager from the first stream
 final inletManager = streamManager.createInlet(intStreamHandles[0]);
 ```
+
+## Documentation
+
+The documentation of classes and methods are heavily inspired by the excellent documentation of the [LSL Java interface](https://github.com/labstreaminglayer/liblsl-Java). Some documentation is taken directly from there and adapted for Dart.
