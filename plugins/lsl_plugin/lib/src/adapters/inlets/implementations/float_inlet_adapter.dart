@@ -52,7 +52,10 @@ class FloatInletAdapter extends InletAdapter<double> {
           sample.add(nativeSample[
               i * _inletContainer.inlet.streamInfo.channelCount + j]);
         }
-        samples.add((sample, nativeTimestamps[i]));
+        // Arbitrary time limit, anything even remotely close to 0 is not valid
+        if (nativeTimestamps[i] > 10) {
+          samples.add((sample, nativeTimestamps[i]));
+        }
       }
 
       checkError(ec);

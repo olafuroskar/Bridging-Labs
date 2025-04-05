@@ -54,7 +54,10 @@ class StringInletAdapter extends InletAdapter<String> {
               .cast<Utf8>()
               .toDartString());
         }
-        samples.add((sample, nativeTimestamps[i]));
+        // Arbitrary time limit, anything even remotely close to 0 is not valid
+        if (nativeTimestamps[i] > 10) {
+          samples.add((sample, nativeTimestamps[i]));
+        }
       }
 
       checkError(ec);

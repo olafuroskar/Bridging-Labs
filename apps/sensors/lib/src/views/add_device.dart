@@ -18,7 +18,8 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
                   appState.toggleDeviceSelection(value);
                 },
                 items: appState.devices.map((option) {
-                  return DropdownMenuItem(value: option, child: Text(option));
+                  return DropdownMenuItem(
+                      value: option.$1, child: Text(option.$1));
                 }).toList(),
               ),
               const SizedBox(height: 20),
