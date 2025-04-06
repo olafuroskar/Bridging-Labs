@@ -138,6 +138,7 @@ class AsyncStreamAdapter implements StreamAdapter {
     return inletAdapter;
   }
 
+  @override
   void destroyStreams() {
     _resolvedIntStreams.forEach((_, stream) {
       lsl.bindings.lsl_destroy_streaminfo(stream.streamInfoPointer);
@@ -155,7 +156,6 @@ class AsyncStreamAdapter implements StreamAdapter {
     _resolvedStringStreams.clear();
   }
 
-  /// Gets the handles for the currently saved int streams
   @override
   List<ResolvedStreamHandle<int>> getIntStreamHandles() {
     return _resolvedIntStreams.entries.map((entry) {
@@ -163,7 +163,6 @@ class AsyncStreamAdapter implements StreamAdapter {
     }).toList();
   }
 
-  /// Gets the handles for the currently saved double streams
   @override
   List<ResolvedStreamHandle<double>> getDoubleStreamHandles() {
     return _resolvedDoubleStreams.entries.map((entry) {
@@ -171,7 +170,6 @@ class AsyncStreamAdapter implements StreamAdapter {
     }).toList();
   }
 
-  /// Gets the handles for the currently saved String streams
   @override
   List<ResolvedStreamHandle<String>> getStringStreamHandles() {
     return _resolvedStringStreams.entries.map((entry) {

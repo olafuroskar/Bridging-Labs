@@ -18,7 +18,7 @@ abstract class InletAdapter<S> {
   ///
   /// [timeout] The timeout for this operation, if any. Use 0.0 to make the function non-blocking.
   /// {@endtemplate}
-  Future<Sample<S>?> pullSample([double timeout = 0]);
+  Sample<S>? pullSample([double timeout = 0]);
 
   /// {@template pull_chunk}
   /// Pull a chunk of data from the inlet.
@@ -29,7 +29,7 @@ abstract class InletAdapter<S> {
   ///
   /// [timeout] Optionally the timeout for this operation, if any. When the timeout expires, the function
   /// {@endtemplate}
-  Future<Chunk<S>?> pullChunk([double timeout = 0]);
+  Chunk<S>? pullChunk([double timeout = 0]);
 
   /// The following methods should not change on a type basis
   ///
@@ -44,7 +44,7 @@ abstract class InletAdapter<S> {
   ///
   /// [timeout] Optional timeout of the operation (default: no timeout).
   /// {@endtemplate}
-  Future<void> openStream([double timeout = double.infinity]) async {
+  void openStream([double timeout = double.infinity]) {
     return utils.openStream(_inletContainer._nativeInlet, timeout);
   }
 
@@ -83,7 +83,7 @@ abstract class InletAdapter<S> {
   ///
   /// [timeout] Timeout to acquire the first time-correction estimate (default: no timeout).
   /// {@endtemplate}
-  Future<double> timeCorrection([double timeout = double.infinity]) {
+  double timeCorrection([double timeout = double.infinity]) {
     return utils.timeCorrection(_inletContainer._nativeInlet, timeout);
   }
 

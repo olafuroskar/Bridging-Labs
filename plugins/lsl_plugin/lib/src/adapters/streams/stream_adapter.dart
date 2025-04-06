@@ -15,4 +15,7 @@ abstract class StreamAdapter {
 
   /// Gets the handles for the currently saved String streams
   List<ResolvedStreamHandle<String>> getStringStreamHandles();
+
+  /// Destroy local instances the currently saved streams
+  void destroyStreams();
 }

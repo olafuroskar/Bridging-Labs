@@ -19,12 +19,12 @@ class InletManager<S> {
   }
 
   /// {@macro pull_sample}
-  Future<Sample<S>?> pullSample([double timeout = 0]) async {
-    return await _inletAdapter.pullSample();
+  Sample<S>? pullSample([double timeout = 0]) {
+    return _inletAdapter.pullSample();
   }
 
   /// {@macro pull_chunk}
-  Future<Chunk<S>?> pullChunk([double timeout = 0]) {
+  Chunk<S>? pullChunk([double timeout = 0]) {
     return _inletAdapter.pullChunk(timeout);
   }
 
@@ -34,7 +34,7 @@ class InletManager<S> {
   }
 
   /// {@macro time_correction}
-  Future<double> timeCorrection([double timeout = double.infinity]) {
+  double timeCorrection([double timeout = double.infinity]) {
     return _inletAdapter.timeCorrection(timeout);
   }
 
@@ -50,12 +50,13 @@ class InletManager<S> {
 
   Stream<Sample<S>> startSampleStream() async* {
     if (isClosed) return;
-    final nominalSRate = getStreamInfo().nominalSRate.toInt();
+    final nominalSRate = getStreamInfo().nominalSRate;
+    final delay = Duration(milliseconds: (1000 / nominalSRate).toInt());
 
     while (true) {
-      await Future.delayed(Duration(seconds: nominalSRate));
+      await Future.delayed(delay);
 
-      final sample = await pullSample();
+      final sample = pullSample();
       if (sample != null && sample.$1.isNotEmpty) {
         yield sample;
       }
@@ -66,12 +67,12 @@ class InletManager<S> {
   Stream<Chunk<S>> startChunkStream() async* {
     if (isClosed) return;
     final nominalSRate = getStreamInfo().nominalSRate;
+    final delay = Duration(milliseconds: (1000 / nominalSRate).toInt());
 
     while (true) {
-      await Future.delayed(
-          Duration(milliseconds: (1000 / nominalSRate).toInt()));
+      await Future.delayed(delay);
 
-      final chunk = await pullChunk();
+      final chunk = pullChunk();
       if (chunk != null && chunk.isNotEmpty) {
         yield chunk;
       }

@@ -5,7 +5,6 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:isolate';
 
-import 'package:flutter/services.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
 import 'package:lsl_plugin/src/channel_formats/channel_format.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
@@ -34,6 +33,7 @@ part 'src/channel_formats/string_channel_format.dart';
 
 // Isolate workers
 part 'src/workers/outlet_worker.dart';
+part 'src/workers/inlet_worker.dart';
 
 // Helpers
 part 'src/utils/helpers.dart';
