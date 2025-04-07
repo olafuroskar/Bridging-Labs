@@ -203,6 +203,7 @@ class InletWorker {
     _responses.listen(_handleResponsesFromIsolate);
   }
 
+  /// Handles responses for completers
   void _handleResponse<T>(Completer<T> completer, Object? response) {
     if (response is RemoteError) {
       completer.completeError(response);
@@ -213,6 +214,7 @@ class InletWorker {
     }
   }
 
+  /// Handles responses for stream controllers
   void _handleStreamResponse<T>(StreamController<T> controller, T data) {
     controller.add(data);
   }
