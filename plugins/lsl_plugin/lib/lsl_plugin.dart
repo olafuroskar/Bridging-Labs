@@ -7,6 +7,8 @@ import 'dart:isolate';
 
 import 'package:lsl_plugin/lsl_plugin.dart';
 import 'package:lsl_plugin/src/channel_formats/channel_format.dart';
+// TODO: Ekki gott
+import 'package:lsl_plugin/src/liblsl.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
 
 // Managers
@@ -37,3 +39,4 @@ part 'src/workers/inlet_worker.dart';
 
 // Helpers
 part 'src/utils/helpers.dart';
+part 'src/utils/timestamp.dart';

@@ -9,7 +9,7 @@ class FloatOutletAdapter extends OutletAdapter<double> {
 
   @override
   void pushSample(List<double> sample,
-      [double? timestamp, bool pushthrough = false]) {
+      [Timestamp? timestamp, bool pushthrough = true]) {
     if (sample.isEmpty) {
       return;
     }
@@ -22,8 +22,8 @@ class FloatOutletAdapter extends OutletAdapter<double> {
       nativeSamplePointer[i] = sample[i];
     }
     if (timestamp != null) {
-      lsl.bindings.lsl_push_sample_ftp(
-          outletPointer, nativeSamplePointer, timestamp, pushthrough ? 1 : 0);
+      lsl.bindings.lsl_push_sample_ftp(outletPointer, nativeSamplePointer,
+          timestamp.toLslTime(), pushthrough ? 1 : 0);
     } else {
       lsl.bindings.lsl_push_sample_f(outletPointer, nativeSamplePointer);
     }
@@ -32,7 +32,7 @@ class FloatOutletAdapter extends OutletAdapter<double> {
 
   @override
   void pushChunk(List<List<double>> chunk,
-      [double? timestamp, bool pushthrough = false]) {
+      [Timestamp? timestamp, bool pushthrough = true]) {
     if (chunk.isEmpty) {
       return;
     }
@@ -52,7 +52,7 @@ class FloatOutletAdapter extends OutletAdapter<double> {
 
     if (timestamp != null) {
       lsl.bindings.lsl_push_chunk_ftp(outletPointer, nativeSamplePointer,
-          dataElements, timestamp, pushthrough ? 1 : 0);
+          dataElements, timestamp.toLslTime(), pushthrough ? 1 : 0);
     } else {
       lsl.bindings
           .lsl_push_chunk_f(outletPointer, nativeSamplePointer, chunkSize);
@@ -62,8 +62,8 @@ class FloatOutletAdapter extends OutletAdapter<double> {
 
   @override
   void pushChunkWithTimestamps(
-      List<List<double>> chunk, List<double> timestamps,
-      [bool pushthrough = false]) {
+      List<List<double>> chunk, List<Timestamp> timestamps,
+      [bool pushthrough = true]) {
     if (chunk.isEmpty) {
       return;
     }

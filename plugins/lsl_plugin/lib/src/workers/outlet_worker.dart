@@ -29,9 +29,9 @@ class OutletWorker {
       {String? name,
       StreamInfo<Object?>? streamInfo,
       List<T>? sample,
-      double? timestamp,
+      Timestamp? timestamp,
       List<List<T>>? chunk,
-      List<double>? timestamps}) {
+      List<Timestamp>? timestamps}) {
     _commands.send((
       id,
       command,
@@ -81,7 +81,7 @@ class OutletWorker {
   /// [sample] Data to be pushed to the stream
   /// [timestamp] Optional user provided timestamp
   Future<bool> pushSample(
-      String name, List<Object?> sample, double? timestamp) async {
+      String name, List<Object?> sample, Timestamp? timestamp) async {
     if (_closed) throw StateError('Closed');
     if (!streams.containsKey(name)) {
       throw Exception("Stream with name $name does not exists");
@@ -117,8 +117,8 @@ class OutletWorker {
   /// [name] The name of the stream
   /// [chunk] Data to be pushed to the stream
   /// [timestamps] Timestamps per sample
-  Future<bool> pushChunkWithTimestamp(
-      String name, List<List<Object?>> chunk, List<double> timestamps) async {
+  Future<bool> pushChunkWithTimestamp(String name, List<List<Object?>> chunk,
+      List<Timestamp> timestamps) async {
     if (_closed) throw StateError('Closed');
     if (!streams.containsKey(name)) {
       throw Exception("Stream with name $name does not exists");
@@ -245,11 +245,11 @@ class OutletWorker {
         List<int>?,
         List<double>?,
         List<String>?,
-        double?,
+        Timestamp?,
         List<List<int>>?,
         List<List<double>>?,
         List<List<String>>?,
-        List<double>?
+        List<Timestamp>?
       );
       try {
         switch (command) {

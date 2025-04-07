@@ -75,7 +75,7 @@ class OutletProvider extends ChangeNotifier {
 
   void addAccelerometerStream(String deviceId) async {
     List<List<double>> buffer = [];
-    List<double> timestampBuffer = [];
+    List<Timestamp> timestampBuffer = [];
 
     final streamInfo = StreamInfoFactory.createDoubleStreamInfo(
         deviceId, "Accelerometer", Double64ChannelFormat(),
@@ -93,7 +93,7 @@ class OutletProvider extends ChangeNotifier {
         .listen(
       (event) {
         buffer.add([event.x, event.y, event.z]);
-        timestampBuffer.add(event.timestamp.millisecondsSinceEpoch / 1000);
+        timestampBuffer.add(DartTimestamp(event.timestamp));
 
         if (buffer.length >= batchSize) {
           worker?.pushChunkWithTimestamp(deviceId, buffer, timestampBuffer);
@@ -108,7 +108,7 @@ class OutletProvider extends ChangeNotifier {
 
   void addPolarStream(String deviceId) async {
     List<List<int>> buffer = [];
-    List<double> timestampBuffer = [];
+    List<Timestamp> timestampBuffer = [];
 
     polar.connectToDevice(deviceId);
 
@@ -133,8 +133,8 @@ class OutletProvider extends ChangeNotifier {
     final subscription = polar.startPpgStreaming(deviceId).listen(
       (event) {
         buffer.addAll(event.samples.map((item) => item.channelSamples));
-        timestampBuffer.addAll(event.samples
-            .map((item) => item.timeStamp.millisecondsSinceEpoch / 1000));
+        timestampBuffer
+            .addAll(event.samples.map((item) => DartTimestamp(item.timeStamp)));
 
         if (buffer.length >= batchSize) {
           worker?.pushChunkWithTimestamp(deviceId, buffer, timestampBuffer);
