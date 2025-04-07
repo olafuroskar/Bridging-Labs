@@ -1,9 +1,9 @@
-part of '../main.dart';
+part of '../../main.dart';
 
 class _CreateOutletScreenState extends State<CreateOutletScreen> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppState>(builder: (_, appState, __) {
+    return Consumer<OutletProvider>(builder: (_, appState, __) {
       return Scaffold(
         appBar: AppBar(title: const Text('Create Outlet')),
         body: Padding(
@@ -16,7 +16,8 @@ class _CreateOutletScreenState extends State<CreateOutletScreen> {
                   appState.toggleDeviceSelection(value);
                 },
                 items: appState.devices.map((option) {
-                  return DropdownMenuItem(value: option, child: Text(option));
+                  return DropdownMenuItem(
+                      value: option.$1, child: Text(option.$1));
                 }).toList(),
               ),
               const SizedBox(height: 20),
@@ -31,8 +32,8 @@ class _CreateOutletScreenState extends State<CreateOutletScreen> {
                   final selectedDevice = appState.selectedDevice;
 
                   if (selectedDevice == null) return;
-                  await polar.connectToDevice(selectedDevice);
-                  await appState.addPolarStream(selectedDevice);
+                  await appState.addStream(selectedDevice);
+
                   if (context.mounted) {
                     Navigator.pop(context);
                   }
@@ -43,8 +44,7 @@ class _CreateOutletScreenState extends State<CreateOutletScreen> {
                 onPressed: () async {
                   final selectedDevice = appState.selectedDevice;
                   if (selectedDevice == null) return;
-                  await polar.disconnectFromDevice(selectedDevice);
-                  appState.stopPolarStreams();
+                  appState.stopStreams();
                 },
                 child: const Text('disconnect'),
               )

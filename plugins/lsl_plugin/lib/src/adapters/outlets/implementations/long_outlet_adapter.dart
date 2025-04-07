@@ -9,7 +9,7 @@ class LongOutletAdapter extends OutletAdapter<int> {
 
   @override
   void pushSample(List<int> sample,
-      [double? timestamp, bool pushthrough = false]) {
+      [Timestamp? timestamp, bool pushthrough = true]) {
     if (sample.isEmpty) {
       return;
     }
@@ -22,8 +22,8 @@ class LongOutletAdapter extends OutletAdapter<int> {
       nativeSamplePointer[i] = sample[i];
     }
     if (timestamp != null) {
-      lsl.bindings.lsl_push_sample_ltp(
-          outletPointer, nativeSamplePointer, timestamp, pushthrough ? 1 : 0);
+      lsl.bindings.lsl_push_sample_ltp(outletPointer, nativeSamplePointer,
+          timestamp.toLslTime(), pushthrough ? 1 : 0);
     } else {
       lsl.bindings.lsl_push_sample_l(outletPointer, nativeSamplePointer);
     }
@@ -32,27 +32,27 @@ class LongOutletAdapter extends OutletAdapter<int> {
 
   @override
   void pushChunk(List<List<int>> chunk,
-      [double? timestamp, bool pushthrough = false]) {
+      [Timestamp? timestamp, bool pushthrough = true]) {
     if (chunk.isEmpty) {
       return;
     }
 
     final outletPointer = _outletContainer._nativeOutlet;
 
-    final dataElements = chunk.length;
-    final channelCount = chunk[0].length;
+    final (dataElements, chunkSize, channelCount) =
+        utils.getDataElements(chunk);
 
     final nativeSamplePointer =
-        malloc.allocate<Int64>(dataElements * channelCount * sizeOf<Int64>());
-    for (var i = 0; i < dataElements; i++) {
+        malloc.allocate<Int64>(dataElements * sizeOf<Int64>());
+    for (var i = 0; i < chunkSize; i++) {
       for (var j = 0; j < channelCount; j++) {
-        nativeSamplePointer[i * dataElements + j] = chunk[i][j];
+        nativeSamplePointer[i * channelCount + j] = chunk[i][j];
       }
     }
 
     if (timestamp != null) {
       lsl.bindings.lsl_push_chunk_ltp(outletPointer, nativeSamplePointer,
-          dataElements, timestamp, pushthrough ? 1 : 0);
+          dataElements, timestamp.toLslTime(), pushthrough ? 1 : 0);
     } else {
       lsl.bindings
           .lsl_push_chunk_l(outletPointer, nativeSamplePointer, dataElements);
@@ -61,22 +61,23 @@ class LongOutletAdapter extends OutletAdapter<int> {
   }
 
   @override
-  void pushChunkWithTimestamps(List<List<int>> chunk, List<double> timestamps,
-      [bool pushthrough = false]) {
+  void pushChunkWithTimestamps(
+      List<List<int>> chunk, List<Timestamp> timestamps,
+      [bool pushthrough = true]) {
     if (chunk.isEmpty) {
       return;
     }
 
     final outletPointer = _outletContainer._nativeOutlet;
 
-    final dataElements = chunk.length;
-    final channelCount = chunk[0].length;
+    final (dataElements, chunkSize, channelCount) =
+        utils.getDataElements(chunk);
 
     final nativeSamplePointer =
-        malloc.allocate<Int64>(dataElements * channelCount * sizeOf<Int64>());
-    for (var i = 0; i < dataElements; i++) {
+        malloc.allocate<Int64>(dataElements * sizeOf<Int64>());
+    for (var i = 0; i < chunkSize; i++) {
       for (var j = 0; j < channelCount; j++) {
-        nativeSamplePointer[i * dataElements + j] = chunk[i][j];
+        nativeSamplePointer[i * channelCount + j] = chunk[i][j];
       }
     }
 

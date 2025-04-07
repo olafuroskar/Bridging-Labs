@@ -34,7 +34,7 @@ class _InletPageState extends State<InletPage> {
                 setState(() {
                   loading = true;
                 });
-                await inletModel.resolveStreams(2);
+                inletModel.resolveStreams(2);
                 setState(() {
                   loading = false;
                 });

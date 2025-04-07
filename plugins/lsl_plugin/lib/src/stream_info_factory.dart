@@ -6,23 +6,35 @@ part of '../../lsl_plugin.dart';
 /// This is undesirable as it facilitates weak typing. Therefore users of the package are required to
 /// create a stream info object through this service.
 class StreamInfoFactory {
+  /// Creates a stream info object with an integer channel format.
+  ///
+  /// {@macro stream_info}
+  /// [channelFormat] An integer channel format
   static StreamInfo<int> createIntStreamInfo(
       String name, String type, ChannelFormat<int> channelFormat,
-      [int channelCount = 1, double nominalSRate = 0, String sourceId = ""]) {
+      {int channelCount = 1, double nominalSRate = 0, String sourceId = ""}) {
     return StreamInfo(
         name, type, channelFormat, channelCount, nominalSRate, sourceId);
   }
 
+  /// Creates a stream info object with an double channel format.
+  ///
+  /// {@macro stream_info}
+  /// [channelFormat] An double channel format
   static StreamInfo<double> createDoubleStreamInfo(
       String name, String type, ChannelFormat<double> channelFormat,
-      [int channelCount = 1, double nominalSRate = 0, String sourceId = ""]) {
+      {int channelCount = 1, double nominalSRate = 0, String sourceId = ""}) {
     return StreamInfo(
         name, type, channelFormat, channelCount, nominalSRate, sourceId);
   }
 
+  /// Creates a stream info object with an string channel format.
+  ///
+  /// {@macro stream_info}
+  /// [channelFormat] An string channel format
   static StreamInfo<String> createStringStreamInfo(
       String name, String type, ChannelFormat<String> channelFormat,
-      [int channelCount = 1, double nominalSRate = 0, String sourceId = ""]) {
+      {int channelCount = 1, double nominalSRate = 0, String sourceId = ""}) {
     return StreamInfo(
         name, type, channelFormat, channelCount, nominalSRate, sourceId);
   }

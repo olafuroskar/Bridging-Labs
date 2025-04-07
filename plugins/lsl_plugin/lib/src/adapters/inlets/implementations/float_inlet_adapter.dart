@@ -10,83 +10,83 @@ class FloatInletAdapter extends InletAdapter<double> {
   }
 
   @override
-  Future<Chunk<double>?> pullChunk([double timeout = 0]) async {
+  Chunk<double>? pullChunk([double timeout = 0]) {
     final nativeInlet = _inletContainer._nativeInlet;
 
-    return await Isolate.run(() {
-      final ec = malloc.allocate<Int32>(sizeOf<Int32>());
+    final ec = malloc.allocate<Int32>(sizeOf<Int32>());
 
-      final (dataBufferLength, timeStampBufferLength) =
-          utils.getBufferLengths(_inletContainer);
+    final (dataBufferLength, timeStampBufferLength) =
+        utils.getBufferLengths(_inletContainer);
 
-      /// Allocate an array of length channelCount * maxChunkLen
-      ///
-      /// Example: 2 channels and max chunk length of 3
-      /// [ [1, 2, 3], [4, 5, 6] ] -> [1, 2, 3, 4, 5, 6]
-      final nativeSample =
-          malloc.allocate<Float>(dataBufferLength * sizeOf<Float>());
+    /// Allocate an array of length channelCount * maxChunkLen
+    ///
+    /// Example: 2 channels and max chunk length of 3
+    /// [ [1, 2, 3], [4, 5, 6] ] -> [1, 2, 3, 4, 5, 6]
+    final nativeSample =
+        malloc.allocate<Float>(dataBufferLength * sizeOf<Float>());
 
-      /// Allocate a corrisponding timestamp arra for each sample in the chunk
-      ///
-      /// Following the above example
-      /// [t1, t2, t3]
-      final nativeTimestamps =
-          malloc.allocate<Double>(timeStampBufferLength * sizeOf<Double>());
+    /// Allocate a corrisponding timestamp arra for each sample in the chunk
+    ///
+    /// Following the above example
+    /// [t1, t2, t3]
+    final nativeTimestamps =
+        malloc.allocate<Double>(timeStampBufferLength * sizeOf<Double>());
 
-      final numSamples = lsl.bindings.lsl_pull_chunk_f(
-          nativeInlet,
-          nativeSample,
-          nativeTimestamps,
-          dataBufferLength,
-          timeStampBufferLength,
-          timeout,
-          ec);
+    final dataElementsWritten = lsl.bindings.lsl_pull_chunk_f(
+        nativeInlet,
+        nativeSample,
+        nativeTimestamps,
+        dataBufferLength,
+        timeStampBufferLength,
+        timeout,
+        ec);
 
-      final Chunk<double> samples = [];
+    final numSamples =
+        dataElementsWritten / _inletContainer.inlet.streamInfo.channelCount;
 
-      for (var i = 0; i < numSamples; i++) {
-        final List<double> sample = [];
-        for (var j = 0;
-            j < _inletContainer.inlet.streamInfo.channelCount;
-            j++) {
-          sample.add(nativeSample[
-              i * _inletContainer.inlet.streamInfo.channelCount + j]);
-        }
+    final Chunk<double> samples = [];
+
+    for (var i = 0; i < numSamples; i++) {
+      final List<double> sample = [];
+      for (var j = 0; j < _inletContainer.inlet.streamInfo.channelCount; j++) {
+        sample.add(nativeSample[
+            i * _inletContainer.inlet.streamInfo.channelCount + j]);
+      }
+      // Arbitrary time limit, anything even remotely close to 0 is not valid
+      if (nativeTimestamps[i] > 10) {
         samples.add((sample, nativeTimestamps[i]));
       }
+    }
 
-      checkError(ec);
-      malloc.free(ec);
-      malloc.free(nativeSample);
-      malloc.free(nativeTimestamps);
+    checkError(ec);
+    malloc.free(ec);
+    malloc.free(nativeSample);
+    malloc.free(nativeTimestamps);
 
-      return samples;
-    });
+    return samples;
   }
 
   @override
-  Future<Sample<double>?> pullSample([double timeout = 0]) async {
+  Sample<double>? pullSample([double timeout = 0]) {
     final inlet = _inletContainer._nativeInlet;
 
-    return await Isolate.run(() {
-      final ec = malloc.allocate<Int32>(sizeOf<Int32>());
-      final nativeSample = malloc.allocate<Float>(
-          _inletContainer.inlet.streamInfo.channelCount * sizeOf<Float>());
+    final ec = malloc.allocate<Int32>(sizeOf<Int32>());
+    final nativeSample = malloc.allocate<Float>(
+        _inletContainer.inlet.streamInfo.channelCount * sizeOf<Float>());
 
-      final timestamp = lsl.bindings.lsl_pull_sample_f(inlet, nativeSample,
-          _inletContainer.inlet.streamInfo.channelCount, timeout, ec);
+    final timestamp = lsl.bindings.lsl_pull_sample_f(inlet, nativeSample,
+        _inletContainer.inlet.streamInfo.channelCount, timeout, ec);
 
-      final List<double> sample = [];
+    final List<double> sample = [];
 
-      for (var i = 0; i < _inletContainer.inlet.streamInfo.channelCount; i++) {
-        sample.add(nativeSample[i]);
-      }
+    for (var i = 0; i < _inletContainer.inlet.streamInfo.channelCount; i++) {
+      sample.add(nativeSample[i]);
+    }
 
-      checkError(ec);
-      malloc.free(ec);
-      malloc.free(nativeSample);
+    checkError(ec);
+    malloc.free(ec);
+    malloc.free(nativeSample);
 
-      return (sample, timestamp);
-    });
+    return (sample, timestamp);
   }
 }

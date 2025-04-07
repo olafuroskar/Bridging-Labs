@@ -11,7 +11,7 @@ class DoubleOutletAdapter extends OutletAdapter<double> {
 
   @override
   void pushSample(List<double> sample,
-      [double? timestamp, bool pushthrough = false]) {
+      [Timestamp? timestamp, bool pushthrough = true]) {
     if (sample.isEmpty) {
       return;
     }
@@ -25,8 +25,8 @@ class DoubleOutletAdapter extends OutletAdapter<double> {
     }
 
     if (timestamp != null) {
-      lsl.bindings.lsl_push_sample_dtp(
-          outletPointer, nativeSamplePointer, timestamp, pushthrough ? 1 : 0);
+      lsl.bindings.lsl_push_sample_dtp(outletPointer, nativeSamplePointer,
+          timestamp.toLslTime(), pushthrough ? 1 : 0);
     } else {
       lsl.bindings.lsl_push_sample_d(outletPointer, nativeSamplePointer);
     }
@@ -35,27 +35,28 @@ class DoubleOutletAdapter extends OutletAdapter<double> {
 
   @override
   void pushChunk(List<List<double>> chunk,
-      [double? timestamp, bool pushthrough = false]) {
+      [Timestamp? timestamp, bool pushthrough = true]) {
     if (chunk.isEmpty) {
       return;
     }
 
     final outletPointer = _outletContainer._nativeOutlet;
 
-    final dataElements = chunk.length;
-    final channelCount = chunk[0].length;
+    final (dataElements, chunkSize, channelCount) =
+        utils.getDataElements(chunk);
 
     final nativeSamplePointer =
-        malloc.allocate<Double>(dataElements * channelCount * sizeOf<Double>());
-    for (var i = 0; i < dataElements; i++) {
+        malloc.allocate<Double>(dataElements * sizeOf<Double>());
+
+    for (var i = 0; i < chunkSize; i++) {
       for (var j = 0; j < channelCount; j++) {
-        nativeSamplePointer[i * dataElements + j] = chunk[i][j];
+        nativeSamplePointer[i * channelCount + j] = chunk[i][j];
       }
     }
 
     if (timestamp != null) {
       lsl.bindings.lsl_push_chunk_dtp(outletPointer, nativeSamplePointer,
-          dataElements, timestamp, pushthrough ? 1 : 0);
+          dataElements, timestamp.toLslTime(), pushthrough ? 1 : 0);
     } else {
       lsl.bindings
           .lsl_push_chunk_d(outletPointer, nativeSamplePointer, dataElements);
@@ -65,22 +66,22 @@ class DoubleOutletAdapter extends OutletAdapter<double> {
 
   @override
   void pushChunkWithTimestamps(
-      List<List<double>> chunk, List<double> timestamps,
-      [bool pushthrough = false]) {
+      List<List<double>> chunk, List<Timestamp> timestamps,
+      [bool pushthrough = true]) {
     if (chunk.isEmpty) {
       return;
     }
 
     final outletPointer = _outletContainer._nativeOutlet;
 
-    final dataElements = chunk.length;
-    final channelCount = chunk[0].length;
+    final (dataElements, chunkSize, channelCount) =
+        utils.getDataElements(chunk);
 
     final nativeSamplePointer =
-        malloc.allocate<Double>(dataElements * channelCount * sizeOf<Double>());
-    for (var i = 0; i < dataElements; i++) {
+        malloc.allocate<Double>(dataElements * sizeOf<Double>());
+    for (var i = 0; i < chunkSize; i++) {
       for (var j = 0; j < channelCount; j++) {
-        nativeSamplePointer[i * dataElements + j] = chunk[i][j];
+        nativeSamplePointer[i * channelCount + j] = chunk[i][j];
       }
     }
 

@@ -1,16 +1,16 @@
 library;
 
 import 'dart:ffi';
-import 'dart:isolate';
 
 import 'package:ffi/ffi.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
+import 'package:lsl_plugin/src/adapters/inlets/processing_options.dart';
 import 'package:lsl_plugin/src/adapters/inlets/utils.dart' as utils;
 import 'package:lsl_plugin/src/adapters/streams/resolved_stream.dart';
 import 'package:lsl_plugin/src/adapters/utils.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
-import 'package:lsl_plugin/src/types.dart';
+import 'package:lsl_plugin/src/utils/error_code.dart';
 
 part 'implementations/int_inlet_adapter.dart';
 part 'implementations/short_inlet_adapter.dart';

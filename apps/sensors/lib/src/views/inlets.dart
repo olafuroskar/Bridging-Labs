@@ -1,11 +1,11 @@
-part of '../main.dart';
+part of '../../main.dart';
 
 class InletScreen extends StatelessWidget {
   const InletScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<InletProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -37,12 +37,12 @@ class InletScreen extends StatelessWidget {
         ],
       ),
       body: ListView(
-        children: appState.streams.map((inlet) {
-          final selected = appState.selectedInlets.contains(inlet.info.name);
+        children: appState.handles.map((handle) {
+          final selected = appState.selectedInlets.contains(handle.id);
           return CheckboxListTile(
             value: selected,
-            title: Text(inlet.info.name),
-            onChanged: (_) => appState.toggleInletSelection(inlet.info.name),
+            title: Text(handle.info.name),
+            onChanged: (_) => appState.toggleInletSelection(handle.id),
           );
         }).toList(),
       ),

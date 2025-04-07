@@ -1,11 +1,11 @@
-part of '../main.dart';
+part of '../../main.dart';
 
 final polar = Polar();
 
 class _AddDeviceScreenState extends State<AddDeviceScreen> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppState>(builder: (_, appState, __) {
+    return Consumer<OutletProvider>(builder: (_, appState, __) {
       return Scaffold(
         appBar: AppBar(title: const Text('Find device')),
         body: Padding(
@@ -18,7 +18,8 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
                   appState.toggleDeviceSelection(value);
                 },
                 items: appState.devices.map((option) {
-                  return DropdownMenuItem(value: option, child: Text(option));
+                  return DropdownMenuItem(
+                      value: option.$1, child: Text(option.$1));
                 }).toList(),
               ),
               const SizedBox(height: 20),

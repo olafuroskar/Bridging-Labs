@@ -8,6 +8,9 @@ PODS:
     - FlutterMacOS
   - lsl_plugin (0.0.1):
     - Flutter
+  - path_provider_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
   - permission_handler_apple (9.3.0):
     - Flutter
   - polar (0.0.1):
@@ -19,6 +22,10 @@ PODS:
     - SwiftProtobuf (~> 1.0)
     - Zip (~> 2.1.2)
   - RxSwift (6.5.0)
+  - sensors_plus (0.0.1):
+    - Flutter
+  - share_plus (0.0.1):
+    - Flutter
   - SwiftProtobuf (1.29.0)
   - Zip (2.1.2)
 
@@ -27,8 +34,11 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_blue_plus_darwin (from `.symlinks/plugins/flutter_blue_plus_darwin/darwin`)
   - lsl_plugin (from `.symlinks/plugins/lsl_plugin/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - polar (from `.symlinks/plugins/polar/ios`)
+  - sensors_plus (from `.symlinks/plugins/sensors_plus/ios`)
+  - share_plus (from `.symlinks/plugins/share_plus/ios`)
 
 SPEC REPOS:
   trunk:
@@ -47,10 +57,16 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_blue_plus_darwin/darwin"
   lsl_plugin:
     :path: ".symlinks/plugins/lsl_plugin/ios"
+  path_provider_foundation:
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
   polar:
     :path: ".symlinks/plugins/polar/ios"
+  sensors_plus:
+    :path: ".symlinks/plugins/sensors_plus/ios"
+  share_plus:
+    :path: ".symlinks/plugins/share_plus/ios"
 
 SPEC CHECKSUMS:
   Alamofire: 3ca42e259043ee0dc5c0cdd76c4bc568b8e42af7
@@ -58,10 +74,13 @@ SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_blue_plus_darwin: 3ea4ec9133b377febcc8a70b28cd2d2dc9242bd9
   lsl_plugin: cb3154979978d7e39df08b72439f1b89039f21d7
+  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
   polar: 72c115bddd9aef3e3cc3eaba1196ecd99c59b8b6
   PolarBleSdk: e3df6f62b6ed34701d2e1d74ebe24fd8245062ca
   RxSwift: 5710a9e6b17f3c3d6e40d6e559b9fa1e813b2ef8
+  sensors_plus: 7229095999f30740798f0eeef5cd120357a8f4f2
+  share_plus: 8b6f8b3447e494cca5317c8c3073de39b3600d1f
   SwiftProtobuf: b7aa08087e2ab6d162862d143020091254095f69
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
 

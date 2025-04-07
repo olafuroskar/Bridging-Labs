@@ -1,4 +1,4 @@
-part of '../main.dart';
+part of '../../main.dart';
 
 class OutletScreen extends StatefulWidget {
   const OutletScreen({super.key});

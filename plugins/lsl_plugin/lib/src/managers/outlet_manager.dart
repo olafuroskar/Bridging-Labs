@@ -54,19 +54,19 @@ class OutletManager<S> {
 
   /// {@macro push_sample}
   void pushSample(List<S> sample,
-      [double? timestamp, bool pushthrough = false]) {
+      [Timestamp? timestamp, bool pushthrough = true]) {
     return _outletAdapter.pushSample(sample, timestamp, pushthrough);
   }
 
   /// {@macro push_chunk}
   void pushChunk(List<List<S>> chunk,
-      [double? timestamp, bool pushthrough = false]) {
+      [Timestamp? timestamp, bool pushthrough = true]) {
     return _outletAdapter.pushChunk(chunk, timestamp, pushthrough);
   }
 
   /// {@macro push_chunk_with_timestamps}
-  void pushChunkWithTimastamps(List<List<S>> chunk, List<double> timestamps,
-      [bool pushthrough = false]) {
+  void pushChunkWithTimestamps(List<List<S>> chunk, List<Timestamp> timestamps,
+      [bool pushthrough = true]) {
     return _outletAdapter.pushChunkWithTimestamps(
         chunk, timestamps, pushthrough);
   }

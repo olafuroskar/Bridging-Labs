@@ -18,7 +18,7 @@ abstract class InletAdapter<S> {
   ///
   /// [timeout] The timeout for this operation, if any. Use 0.0 to make the function non-blocking.
   /// {@endtemplate}
-  Future<Sample<S>?> pullSample([double timeout = 0]);
+  Sample<S>? pullSample([double timeout = 0]);
 
   /// {@template pull_chunk}
   /// Pull a chunk of data from the inlet.
@@ -29,7 +29,7 @@ abstract class InletAdapter<S> {
   ///
   /// [timeout] Optionally the timeout for this operation, if any. When the timeout expires, the function
   /// {@endtemplate}
-  Future<Chunk<S>?> pullChunk([double timeout = 0]);
+  Chunk<S>? pullChunk([double timeout = 0]);
 
   /// The following methods should not change on a type basis
   ///
@@ -44,7 +44,7 @@ abstract class InletAdapter<S> {
   ///
   /// [timeout] Optional timeout of the operation (default: no timeout).
   /// {@endtemplate}
-  Future<void> openStream([double timeout = double.infinity]) async {
+  void openStream([double timeout = double.infinity]) {
     return utils.openStream(_inletContainer._nativeInlet, timeout);
   }
 
@@ -83,7 +83,7 @@ abstract class InletAdapter<S> {
   ///
   /// [timeout] Timeout to acquire the first time-correction estimate (default: no timeout).
   /// {@endtemplate}
-  Future<double> timeCorrection([double timeout = double.infinity]) {
+  double timeCorrection([double timeout = double.infinity]) {
     return utils.timeCorrection(_inletContainer._nativeInlet, timeout);
   }
 
@@ -108,5 +108,22 @@ abstract class InletAdapter<S> {
   /// {@endtemplate}
   bool wasClockReset() {
     return utils.wasClockReset(_inletContainer._nativeInlet);
+  }
+
+  /// {@template set_post_processing}
+  /// Set post-processing flags to use.
+  ///
+  /// By default, the inlet performs NO post-processing and returns the ground-truth time stamps, which
+  /// can then be manually synchronized using [timeCorrection], and then smoothed/dejittered if
+  /// desired.
+  ///
+  /// This function allows automating these two and possibly more operations.
+  /// When you enable this, you will no longer receive or be able to recover the original time stamps.
+  /// [flags] The desired [ProcessingOptions], [ProcessingOptions.all] is a good setting to use.
+  ///
+  /// returns an error code if nonzero, can be #lsl_argument_error if an unknown flag was passed in.
+  /// {@endtemplate}
+  ErrorCode setPostProcessing(ProcessingOptions flags) {
+    return utils.setPostProcessing(_inletContainer._nativeInlet, flags);
   }
 }
