@@ -5,9 +5,7 @@ class InletProvider extends ChangeNotifier {
 
   Map<String, int> writtenLines = {};
 
-  List<ResolvedStreamHandle<int>> intStreams = [];
-  List<ResolvedStreamHandle<double>> doubleStreams = [];
-  List<ResolvedStreamHandle<String>> stringStreams = [];
+  List<ResolvedStreamHandle<Object?>> handles = [];
 
   List<String> selectedInlets = [];
   StreamManager streamManager = StreamManager();
@@ -15,9 +13,9 @@ class InletProvider extends ChangeNotifier {
       inlets = {};
 
   List<String> get streams =>
-      intStreams.map((stream) => stream.info.name).toList() +
-      doubleStreams.map((stream) => stream.info.name).toList() +
-      stringStreams.map((stream) => stream.info.name).toList();
+      handles.map((handle) => handle.info.name).toList();
+
+  InletWorker? worker;
 
   void toggleInletSelection(String inlet) {
     if (selectedInlets.contains(inlet)) {
@@ -34,27 +32,20 @@ class InletProvider extends ChangeNotifier {
   }
 
   void clearInlets() {
-    for (var inlet in inlets.values) {
-      inlet.$2.cancel();
-      inlet.$1.closeStream();
-    }
-    inlets.clear();
+    worker?.close();
   }
 
   Future<void> resolveStreams(double waitTime) async {
-    await streamManager.resolveStreams(waitTime);
-    intStreams = streamManager.getIntStreamHandles();
-    doubleStreams = streamManager.getDoubleStreamHandles();
-    stringStreams = streamManager.getStringStreamHandles();
+    worker ??= await InletWorker.spawn();
+
+    handles = await worker?.resolveStreams() ?? [];
 
     // This call tells the widgets that are listening to this model to rebuild.
     notifyListeners();
   }
 
   void closeInlet(String key) {
-    inlets[key]?.$2.cancel();
-    inlets[key]?.$1.closeStream();
-    inlets.remove(key);
+    worker?.stop(key);
   }
 
   void shareResult(String key) async {
@@ -63,93 +54,37 @@ class InletProvider extends ChangeNotifier {
     await Share.shareXFiles([XFile(filePath)]);
   }
 
-  void _openInlet<S>(ResolvedStreamHandle<S> stream,
-      void Function(Chunk<S> chunk) onData, void Function() onDone) async {
-    final key = stream.info.name;
-
-    // Inlet has already been created for this stream
-    if (inlets.containsKey(key)) return;
-
-    final inletManager = streamManager.createInlet(stream);
-
-    // Open the stream
-    await inletManager.openStream();
-
-    // Start streaming chunks from the stream
-    final listener =
-        inletManager.startChunkStream().listen(onData, onDone: onDone);
-
-    inlets[key] = (inletManager, listener);
-  }
-
   void createInlet() async {
-    for (var stream in intStreams) {
-      final sink = await openCsvFile(stream.id);
+    for (var inlet in selectedInlets) {
+      final sink = await openCsvFile(inlet);
+
       final List<List<dynamic>> buffer = [];
-      writtenLines[stream.id] = 0;
+      writtenLines[inlet] = 0;
 
-      _openInlet<int>(stream, (chunk) {
-        buffer.addAll(chunk.map((item) =>
-            [item.$2.toString()] + item.$1.map((x) => x.toString()).toList()));
+      final opened = await worker?.open(inlet);
 
-        if (buffer.length > maxBufferSize) {
-          writeRow(sink, buffer);
-          buffer.clear();
-          writtenLines[stream.id] = writtenLines[stream.id]! + maxBufferSize;
-          notifyListeners();
-        }
-      }, () {
-        if (buffer.isNotEmpty) {
-          writeRow(sink, buffer);
-        }
-        sink.close();
-      });
+      if (opened != null && opened) {
+        final chunkStream = await worker?.startChunkStream(inlet);
+        chunkStream?.listen((chunk) {
+          buffer.addAll(chunk.map((item) =>
+              [item.$2.toString()] +
+              item.$1.map((x) => x.toString()).toList()));
+
+          if (buffer.length > maxBufferSize) {
+            writeRow(sink, buffer);
+            buffer.clear();
+            writtenLines[inlet] = writtenLines[inlet]! + maxBufferSize;
+            notifyListeners();
+          }
+        }, onDone: () {
+          if (buffer.isNotEmpty) {
+            writeRow(sink, buffer);
+          }
+          sink.close();
+        });
+      }
     }
 
-    for (var stream in doubleStreams) {
-      final sink = await openCsvFile(stream.id);
-      final List<List<dynamic>> buffer = [];
-      writtenLines[stream.id] = 0;
-
-      _openInlet<double>(stream, (chunk) {
-        buffer.addAll(chunk.map((item) =>
-            [item.$2.toString()] + item.$1.map((x) => x.toString()).toList()));
-
-        if (buffer.length > maxBufferSize) {
-          writeRow(sink, buffer);
-          buffer.clear();
-          writtenLines[stream.id] = writtenLines[stream.id]! + maxBufferSize;
-          notifyListeners();
-        }
-      }, () {
-        if (buffer.isNotEmpty) {
-          writeRow(sink, buffer);
-        }
-        sink.close();
-      });
-    }
-
-    for (var stream in stringStreams) {
-      final sink = await openCsvFile(stream.id);
-      final List<List<dynamic>> buffer = [];
-      writtenLines[stream.id] = 0;
-
-      _openInlet<String>(stream, (chunk) {
-        buffer.addAll(chunk.map((item) => [item.$2.toString()] + item.$1));
-
-        if (buffer.length > maxBufferSize) {
-          writeRow(sink, buffer);
-          buffer.clear();
-          writtenLines[stream.id] = writtenLines[stream.id]! + maxBufferSize;
-          notifyListeners();
-        }
-      }, () {
-        if (buffer.isNotEmpty) {
-          writeRow(sink, buffer);
-        }
-        sink.close();
-      });
-    }
     notifyListeners();
   }
 

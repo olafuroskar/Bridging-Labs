@@ -1,5 +1,4 @@
 import 'dart:ffi';
-import 'dart:isolate';
 
 import 'package:ffi/ffi.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
@@ -10,16 +9,14 @@ import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
 import 'package:lsl_plugin/src/utils/stream_info.dart';
 
 /// {@macro open_stream}
-Future<void> openStream(lsl_inlet inlet, double timeout) async {
-  await Isolate.run(() {
-    // Allocate the memory needed on the heap
-    final ec = malloc.allocate<Int32>(sizeOf<Int32>());
+void openStream(lsl_inlet inlet, double timeout) async {
+  // Allocate the memory needed on the heap
+  final ec = malloc.allocate<Int32>(sizeOf<Int32>());
 
-    lsl.bindings.lsl_open_stream(inlet, timeout, ec);
+  lsl.bindings.lsl_open_stream(inlet, timeout, ec);
 
-    checkError(ec);
-    malloc.free(ec);
-  });
+  checkError(ec);
+  malloc.free(ec);
 }
 
 /// {@macro close_stream}
@@ -44,17 +41,15 @@ int samplesAvailable(lsl_inlet inlet) {
 }
 
 /// {@macro time_correction}
-Future<double> timeCorrection(lsl_inlet inlet, double timeout) async {
-  return await Isolate.run(() {
-    // Allocate the memory needed on the heap
-    final ec = malloc.allocate<Int32>(sizeOf<Int32>());
-    final offset = lsl.bindings.lsl_time_correction(inlet, timeout, ec);
+double timeCorrection(lsl_inlet inlet, double timeout) {
+  // Allocate the memory needed on the heap
+  final ec = malloc.allocate<Int32>(sizeOf<Int32>());
+  final offset = lsl.bindings.lsl_time_correction(inlet, timeout, ec);
 
-    checkError(ec);
-    malloc.free(ec);
+  checkError(ec);
+  malloc.free(ec);
 
-    return offset;
-  });
+  return offset;
 }
 
 /// {@macro was_clock_reset}

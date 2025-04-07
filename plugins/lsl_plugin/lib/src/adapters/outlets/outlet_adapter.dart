@@ -19,7 +19,7 @@ abstract class OutletAdapter<S> {
   /// precedence over the pushthrough flag
   /// {@endtemplate}
   void pushSample(List<S> sample,
-      [double? timestamp, bool pushthrough = false]);
+      [Timestamp? timestamp, bool pushthrough = true]);
 
   /// {@template push_chunk}
   /// Push a chunk of multiplexed samples into the outlet. Single timestamp provided.
@@ -31,7 +31,7 @@ abstract class OutletAdapter<S> {
   /// Note that the chunk_size, if specified at outlet construction, takes precedence over the pushthrough flag.
   /// {@endtemplate}
   void pushChunk(List<List<S>> chunk,
-      [double? timestamp, bool pushthrough = false]);
+      [Timestamp? timestamp, bool pushthrough = true]);
 
   /// {@template push_chunk_with_timestamps}
   /// Push a chunk of multiplexed samples into the outlet. One timestamp per sample is provided.
@@ -41,8 +41,8 @@ abstract class OutletAdapter<S> {
   /// [pushthrough] Optionally whether to push the chunk through to the receivers instead of buffering it with subsequent samples.
   /// Note that the chunk_size, if specified at outlet construction, takes precedence over the pushthrough flag.
   /// {@endtemplate}
-  void pushChunkWithTimestamps(List<List<S>> chunk, List<double> timestamps,
-      [bool pushthrough = false]);
+  void pushChunkWithTimestamps(List<List<S>> chunk, List<Timestamp> timestamps,
+      [bool pushthrough = true]);
 
   /// {@template destroy}
   /// Destroys the given outlet

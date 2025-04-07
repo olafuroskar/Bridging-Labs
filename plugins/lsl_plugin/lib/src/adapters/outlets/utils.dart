@@ -12,8 +12,6 @@ lsl_outlet createOutlet<S>(Outlet<S> outlet, ChannelFormat<S> channelFormat) {
   // Required on Android, TODO: Explain more...
   lsl.multicastLock.acquireMulticastLock();
 
-  // print("Created outlet: ${outlet.streamInfo.channelCount}");
-
   final streamInfo = lsl.bindings.lsl_create_streaminfo(
       outlet.streamInfo.name.toNativeUtf8().cast<Char>(),
       outlet.streamInfo.type.toNativeUtf8().cast<Char>(),
@@ -54,12 +52,12 @@ Future<bool> waitForConsumers(lsl_outlet outlet, double timeout) async {
   }
 }
 
-Pointer<Double> allocatTimestamps(List<double> timestamps) {
+Pointer<Double> allocatTimestamps(List<Timestamp> timestamps) {
   final dataElements = timestamps.length;
   final nativeTimestampsPointer =
       malloc.allocate<Double>(dataElements * sizeOf<Double>());
   for (var i = 0; i < dataElements; i++) {
-    nativeTimestampsPointer[i] = timestamps[i];
+    nativeTimestampsPointer[i] = timestamps[i].toLslTime();
   }
   return nativeTimestampsPointer;
 }

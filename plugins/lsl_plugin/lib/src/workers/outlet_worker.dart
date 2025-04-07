@@ -1,26 +1,19 @@
 part of '../../lsl_plugin.dart';
 
-enum CommandType {
+enum OutletCommandType {
   start("START"),
   pushSample("PUSH_SAMPLE"),
   pushChunk("PUSH_CHUNK"),
   pushChunkWithTimestamp("PUSH_CHUNK_WITH_TIMESTAMP"),
   stop("STOP");
 
-  const CommandType(this.value);
+  const OutletCommandType(this.value);
   final String value;
-}
-
-class _IsolateData {
-  final RootIsolateToken rootIsolateToken;
-  final SendPort sendPort;
-
-  _IsolateData(this.rootIsolateToken, this.sendPort);
 }
 
 /// An isolate worker class for outlets
 ///
-/// Spawns an isolate which handles keeping track of and pushing to outlets.
+/// Spawns an isolate which handles keeping track of and pushing to streams.
 /// Based on https://dart.dev/language/isolates
 class OutletWorker {
   // Tied to instances
@@ -32,13 +25,13 @@ class OutletWorker {
 
   Map<String, StreamInfo> streams = {};
 
-  void sendCommand<T extends Object?>(int id, CommandType command,
+  void sendCommand<T extends Object?>(int id, OutletCommandType command,
       {String? name,
       StreamInfo<Object?>? streamInfo,
       List<T>? sample,
-      double? timestamp,
+      Timestamp? timestamp,
       List<List<T>>? chunk,
-      List<double>? timestamps}) {
+      List<Timestamp>? timestamps}) {
     _commands.send((
       id,
       command,
@@ -70,7 +63,7 @@ class OutletWorker {
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    sendCommand(id, CommandType.start,
+    sendCommand(id, OutletCommandType.start,
         name: streamInfo.name, streamInfo: streamInfo);
     final success = await completer.future;
 
@@ -88,7 +81,7 @@ class OutletWorker {
   /// [sample] Data to be pushed to the stream
   /// [timestamp] Optional user provided timestamp
   Future<bool> pushSample(
-      String name, List<Object?> sample, double? timestamp) async {
+      String name, List<Object?> sample, Timestamp? timestamp) async {
     if (_closed) throw StateError('Closed');
     if (!streams.containsKey(name)) {
       throw Exception("Stream with name $name does not exists");
@@ -97,7 +90,7 @@ class OutletWorker {
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    sendCommand(id, CommandType.pushChunk,
+    sendCommand(id, OutletCommandType.pushChunk,
         name: name, sample: sample, timestamp: timestamp);
     return await completer.future;
   }
@@ -115,7 +108,7 @@ class OutletWorker {
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    sendCommand(id, CommandType.pushChunk, name: name, chunk: chunk);
+    sendCommand(id, OutletCommandType.pushChunk, name: name, chunk: chunk);
     return await completer.future;
   }
 
@@ -124,8 +117,8 @@ class OutletWorker {
   /// [name] The name of the stream
   /// [chunk] Data to be pushed to the stream
   /// [timestamps] Timestamps per sample
-  Future<bool> pushChunkWithTimestamp(
-      String name, List<List<Object?>> chunk, List<double> timestamps) async {
+  Future<bool> pushChunkWithTimestamp(String name, List<List<Object?>> chunk,
+      List<Timestamp> timestamps) async {
     if (_closed) throw StateError('Closed');
     if (!streams.containsKey(name)) {
       throw Exception("Stream with name $name does not exists");
@@ -134,7 +127,7 @@ class OutletWorker {
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    sendCommand(id, CommandType.pushChunkWithTimestamp,
+    sendCommand(id, OutletCommandType.pushChunkWithTimestamp,
         name: name, chunk: chunk, timestamps: timestamps);
     return await completer.future;
   }
@@ -151,7 +144,7 @@ class OutletWorker {
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    sendCommand(id, CommandType.stop, name: name);
+    sendCommand(id, OutletCommandType.stop, name: name);
 
     final result = await completer.future;
     if (result) {
@@ -173,11 +166,9 @@ class OutletWorker {
       ));
     };
 
-    RootIsolateToken rootIsolateToken = RootIsolateToken.instance!;
     // Spawn the isolate.
     try {
-      await Isolate.spawn(_startRemoteIsolate,
-          _IsolateData(rootIsolateToken, initPort.sendPort));
+      await Isolate.spawn(_startRemoteIsolate, initPort.sendPort);
     } on Object {
       initPort.close();
       rethrow;
@@ -246,7 +237,7 @@ class OutletWorker {
         timestamps
       ) = message as (
         int,
-        CommandType,
+        OutletCommandType,
         String,
         StreamInfo<int>?,
         StreamInfo<double>?,
@@ -254,15 +245,15 @@ class OutletWorker {
         List<int>?,
         List<double>?,
         List<String>?,
-        double?,
+        Timestamp?,
         List<List<int>>?,
         List<List<double>>?,
         List<List<String>>?,
-        List<double>?
+        List<Timestamp>?
       );
       try {
         switch (command) {
-          case CommandType.start:
+          case OutletCommandType.start:
             OutletManager? manager;
             if (intStreamInfo != null) {
               manager = _addStream<int>(intStreamInfo);
@@ -277,7 +268,7 @@ class OutletWorker {
             }
             sendPort.send((id, manager != null));
             break;
-          case CommandType.pushSample:
+          case OutletCommandType.pushSample:
             if (intSample != null) {
               outlets[name]?.pushSample(intSample, timestamp);
             } else if (doubleSample != null) {
@@ -290,7 +281,7 @@ class OutletWorker {
             }
             sendPort.send((id, true));
             break;
-          case CommandType.pushChunk:
+          case OutletCommandType.pushChunk:
             if (intChunk != null) {
               outlets[name]?.pushChunk(intChunk);
             } else if (doubleChunk != null) {
@@ -303,7 +294,7 @@ class OutletWorker {
             }
             sendPort.send((id, true));
             break;
-          case CommandType.pushChunkWithTimestamp:
+          case OutletCommandType.pushChunkWithTimestamp:
             if (timestamps == null) {
               sendPort.send((id, false));
               break;
@@ -320,7 +311,7 @@ class OutletWorker {
             }
             sendPort.send((id, true));
             break;
-          case CommandType.stop:
+          case OutletCommandType.stop:
             outlets[name]?.destroy();
             outlets.remove(name);
             sendPort.send((id, true));
@@ -334,13 +325,8 @@ class OutletWorker {
 
   /// Creates the needed ports for the worker and sends them back to the main isolate
   static void _startRemoteIsolate(
-    _IsolateData isolatData,
+    SendPort sendPort,
   ) {
-    final sendPort = isolatData.sendPort;
-    final rootIsolateToken = isolatData.rootIsolateToken;
-
-    BackgroundIsolateBinaryMessenger.ensureInitialized(rootIsolateToken);
-
     final receivePort = ReceivePort();
     sendPort.send(receivePort.sendPort);
 
@@ -363,7 +349,6 @@ class OutletWorker {
       return OutletManager(streamInfo);
     } catch (e) {
       log("Stream creation failed: $e");
-      print("Stream creation failed: $e");
       return null;
     }
   }
