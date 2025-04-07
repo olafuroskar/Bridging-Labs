@@ -109,4 +109,21 @@ abstract class InletAdapter<S> {
   bool wasClockReset() {
     return utils.wasClockReset(_inletContainer._nativeInlet);
   }
+
+  /// {@template set_post_processing}
+  /// Set post-processing flags to use.
+  ///
+  /// By default, the inlet performs NO post-processing and returns the ground-truth time stamps, which
+  /// can then be manually synchronized using [timeCorrection], and then smoothed/dejittered if
+  /// desired.
+  ///
+  /// This function allows automating these two and possibly more operations.
+  /// When you enable this, you will no longer receive or be able to recover the original time stamps.
+  /// [flags] The desired [ProcessingOptions], [ProcessingOptions.all] is a good setting to use.
+  ///
+  /// returns an error code if nonzero, can be #lsl_argument_error if an unknown flag was passed in.
+  /// {@endtemplate}
+  ErrorCode setPostProcessing(ProcessingOptions flags) {
+    return utils.setPostProcessing(_inletContainer._nativeInlet, flags);
+  }
 }

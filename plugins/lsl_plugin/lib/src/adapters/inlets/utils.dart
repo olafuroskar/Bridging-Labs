@@ -3,9 +3,11 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
 import 'package:lsl_plugin/src/adapters/inlets/inlets.dart';
+import 'package:lsl_plugin/src/adapters/inlets/processing_options.dart';
 import 'package:lsl_plugin/src/adapters/utils.dart';
 import 'package:lsl_plugin/src/liblsl.dart';
 import 'package:lsl_plugin/src/lsl_bindings_generated.dart';
+import 'package:lsl_plugin/src/utils/error_code.dart';
 import 'package:lsl_plugin/src/utils/stream_info.dart';
 
 /// {@macro open_stream}
@@ -56,6 +58,18 @@ double timeCorrection(lsl_inlet inlet, double timeout) {
 bool wasClockReset(lsl_inlet inlet) {
   final clockWasReset = lsl.bindings.lsl_was_clock_reset(inlet);
   return clockWasReset == 1;
+}
+
+ErrorCode setPostProcessing(lsl_inlet inlet, ProcessingOptions flags) {
+  final code = lsl.bindings.lsl_set_postprocessing(inlet, flags.value);
+  return switch (code) {
+    0 => ErrorCode.noError,
+    -1 => ErrorCode.timeoutError,
+    -2 => ErrorCode.lostError,
+    -3 => ErrorCode.argumentError,
+    -4 => ErrorCode.internalError,
+    _ => ErrorCode.internalError
+  };
 }
 
 (int, int) getBufferLengths(InletContainer inletContainer) {
