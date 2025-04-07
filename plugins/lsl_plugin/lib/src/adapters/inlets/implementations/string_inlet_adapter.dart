@@ -32,7 +32,7 @@ class StringInletAdapter extends InletAdapter<String> {
     final nativeTimestamps =
         malloc.allocate<Double>(timeStampBufferLength * sizeOf<Double>());
 
-    final numSamples = lsl.bindings.lsl_pull_chunk_str(
+    final dataElementsWritten = lsl.bindings.lsl_pull_chunk_str(
         nativeInlet,
         nativeSample,
         nativeTimestamps,
@@ -40,6 +40,9 @@ class StringInletAdapter extends InletAdapter<String> {
         timeStampBufferLength,
         timeout,
         ec);
+
+    final numSamples =
+        dataElementsWritten / _inletContainer.inlet.streamInfo.channelCount;
 
     final Chunk<String> samples = [];
 

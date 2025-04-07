@@ -32,8 +32,17 @@ class LongInletAdapter extends InletAdapter<int> {
     final nativeTimestamps =
         malloc.allocate<Double>(timeStampBufferLength * sizeOf<Double>());
 
-    final numSamples = lsl.bindings.lsl_pull_chunk_l(nativeInlet, nativeSample,
-        nativeTimestamps, dataBufferLength, timeStampBufferLength, timeout, ec);
+    final dataElementsWritten = lsl.bindings.lsl_pull_chunk_l(
+        nativeInlet,
+        nativeSample,
+        nativeTimestamps,
+        dataBufferLength,
+        timeStampBufferLength,
+        timeout,
+        ec);
+
+    final numSamples =
+        dataElementsWritten / _inletContainer.inlet.streamInfo.channelCount;
 
     final Chunk<int> samples = [];
 
