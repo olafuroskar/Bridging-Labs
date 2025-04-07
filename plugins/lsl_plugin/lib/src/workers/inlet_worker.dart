@@ -97,24 +97,76 @@ class InletWorker {
     return success;
   }
 
-  Future<bool> startSampleStream(String streamId) async {
+  /// Starts a (Dart) stream which yields samples from the specified LSL stream.
+  ///
+  /// [streamId] The id of the LSL stream to pull samples from.
+  ///
+  /// The method creates a stream controller on the main isolate and the handler on the
+  /// worker isolate also creates a stream which yields samples back to main isolate
+  /// which further pushes them to the listener.
+  Future<Stream<Sample<Object?>>> startSampleStream(String streamId) async {
     if (_closed) throw StateError('Closed');
 
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
 
-    /// The controllers `add` method can then be called in the [_handleResponsesFromIsolate] method when
+    /// The controller's `add` method can then be called in the [_handleResponsesFromIsolate] method when
     /// samples are yielded from the worker.
-    final streamController = StreamController<Sample<Object?>>(onListen: () {
-      /// Initialise a sample stream on the inlet worker
-      sendCommand(id, InletCommandType.startSampleStream, streamId: streamId);
-    });
+    final streamController = StreamController<Sample<Object?>>();
 
+    /// Initialise a sample stream on the inlet worker
+    sendCommand(id, InletCommandType.startSampleStream, streamId: streamId);
     final success = await completer.future;
 
     if (success) {
       _activeSampleRequests[streamId] = streamController;
+    }
+
+    return streamController.stream;
+  }
+
+  /// Starts a (Dart) stream which yields chunks from the specified LSL stream.
+  ///
+  /// [streamId] The id of the LSL stream to pull chunks from.
+  ///
+  /// The method creates a stream controller on the main isolate and the handler on the
+  /// worker isolate also creates a stream which yields chunks back to main isolate
+  /// which further pushes them to the listener.
+  Future<Stream<Chunk<Object?>>> startChunkStream(String streamId) async {
+    if (_closed) throw StateError('Closed');
+
+    final completer = Completer<bool>.sync();
+    final id = _idCounter++;
+    _activeRequests[id] = completer;
+
+    /// The controller's `add` method can then be called in the [_handleResponsesFromIsolate] method when
+    /// chunks are yielded from the worker.
+    final streamController = StreamController<Chunk<Object?>>();
+
+    /// Initialise a chunk stream on the inlet worker
+    sendCommand(id, InletCommandType.startChunkStream, streamId: streamId);
+    final success = await completer.future;
+
+    if (success) {
+      _activeChunkRequests[streamId] = streamController;
+    }
+
+    return streamController.stream;
+  }
+
+  Future<bool> stop(String streamId) async {
+    if (_closed) throw StateError('Closed');
+
+    final completer = Completer<bool>.sync();
+    final id = _idCounter++;
+    _activeRequests[id] = completer;
+    sendCommand(id, InletCommandType.stop, streamId: streamId);
+    final success = await completer.future;
+
+    // Add the stream to active inlets
+    if (success) {
+      activeInlets.add(streamId);
     }
 
     return success;
@@ -166,23 +218,23 @@ class InletWorker {
   }
 
   void _handleResponsesFromIsolate(message) {
-    final (id, command, response, streamId) = message as (
-      int,
-      InletCommandType,
-      Object?,
-      String?,
-    );
+    final (id, response, streamId, stopping) =
+        message as (int, Object?, String?, bool?);
 
     if (response is Sample<Object?>) {
-      final controller = _activeSampleRequests.remove(streamId)!;
+      final controller = _activeSampleRequests[streamId]!;
       _handleStreamResponse<Sample<Object?>>(controller, response);
     } else if (response is Chunk<Object?>) {
-      final controller = _activeChunkRequests.remove(streamId)!;
+      final controller = _activeChunkRequests[streamId]!;
       _handleStreamResponse<Chunk<Object?>>(controller, response);
-    } else if (command == InletCommandType.resolve) {
+    } else if (response is List<ResolvedStreamHandle<Object?>>) {
       final completer = _activeHandleRequests.remove(id)!;
       _handleResponse(completer, response);
     } else {
+      if (stopping ?? false) {
+        _activeSampleRequests.remove(streamId);
+        _activeChunkRequests.remove(streamId);
+      }
       final completer = _activeRequests.remove(id)!;
       _handleResponse(completer, response);
     }
@@ -199,6 +251,11 @@ class InletWorker {
     final StreamManager streamManager = StreamManager();
     final Map<String, InletManager<Object?>> inlets = {};
 
+    void sendMessageFromWorker(int id, Object? response,
+        {String? streamId, bool stopping = false}) {
+      sendPort.send((id, response, streamId, stopping));
+    }
+
     // Listen to messages *from* the main isolate
     receivePort.listen((message) {
       if (message == 'shutdown') {
@@ -208,17 +265,21 @@ class InletWorker {
       }
 
       final (id, command, streamId, waitTime) =
-          message as (int, InletCommandType, String, double);
+          message as (int, InletCommandType, String?, double?);
 
       try {
         switch (command) {
           case InletCommandType.resolve:
             List<ResolvedStreamHandle<Object?>> resolvedStreams = [];
-            streamManager.resolveStreams(waitTime);
+            streamManager.resolveStreams(waitTime ?? 2);
             resolvedStreams.addAll(streamManager.getStreamHandles());
-            sendPort.send((id, resolvedStreams));
+            sendMessageFromWorker(id, resolvedStreams);
             break;
           case InletCommandType.open:
+            if (streamId == null) {
+              sendMessageFromWorker(id, false);
+              break;
+            }
             final inlet = streamManager.createInletFromId(streamId);
 
             if (inlet != null) {
@@ -226,30 +287,33 @@ class InletWorker {
               inlets[streamId] = inlet;
             }
 
-            sendPort.send((id, inlet != null));
+            sendMessageFromWorker(id, inlet != null, streamId: streamId);
             break;
           case InletCommandType.startSampleStream:
-            final subscription =
-                inlets[streamId]?.startSampleStream().listen((sample) {
-              sendPort.send((id, command, sample, streamId));
+            final inlet = inlets[streamId];
+
+            final subscription = inlet?.startSampleStream().listen((sample) {
+              sendMessageFromWorker(id, sample, streamId: streamId);
             });
-            sendPort.send((id, command, subscription != null, streamId));
+            sendMessageFromWorker(id, subscription != null, streamId: streamId);
             break;
           case InletCommandType.startChunkStream:
-            final subscription =
-                inlets[streamId]?.startChunkStream().listen((chunk) {
-              sendPort.send((id, command, chunk, streamId));
+            final inlet = inlets[streamId];
+
+            final subscription = inlet?.startChunkStream().listen((chunk) {
+              sendMessageFromWorker(id, chunk, streamId: streamId);
             });
-            sendPort.send((id, command, subscription != null, streamId));
+            sendMessageFromWorker(id, subscription != null, streamId: streamId);
             break;
           case InletCommandType.stop:
             inlets[streamId]?.closeStream();
             inlets.remove(streamId);
-            sendPort.send((id, true));
+            sendMessageFromWorker(id, true, streamId: streamId);
             break;
         }
       } catch (e) {
-        sendPort.send((id, command, RemoteError(e.toString(), '')));
+        sendMessageFromWorker(id, RemoteError(e.toString(), ''),
+            streamId: streamId);
       }
     });
   }

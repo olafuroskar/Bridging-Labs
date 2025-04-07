@@ -18,8 +18,8 @@ class InletModel extends ChangeNotifier {
   /// An unmodifiable view of the int outlets
   UnmodifiableListView<String> get inlets => UnmodifiableListView(_inlets.keys);
 
-  Future<void> resolveStreams(double waitTime) async {
-    await streamManager.resolveStreams(waitTime);
+  void resolveStreams(double waitTime) {
+    streamManager.resolveStreams(waitTime);
     _streams = streamManager.getIntStreamHandles();
 
     // This call tells the widgets that are listening to this model to rebuild.

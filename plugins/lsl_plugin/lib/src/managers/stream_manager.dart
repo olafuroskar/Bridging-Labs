@@ -5,7 +5,7 @@ class StreamManager {
 
   StreamManager();
 
-  Future<void> resolveStreams(double waitTime) {
+  void resolveStreams(double waitTime) {
     return _streamAdapter.resolveStreams(waitTime);
   }
 
@@ -52,7 +52,6 @@ class StreamManager {
 
   InletManager<Object?>? createInletFromId(String streamId) {
     final handle = getStreamHandle(streamId);
-    if (handle != null) return null;
 
     if (handle is ResolvedStreamHandle<int>) {
       return createInlet<int>(handle);

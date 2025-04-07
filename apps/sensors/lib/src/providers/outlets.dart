@@ -12,8 +12,6 @@ class OutletProvider extends ChangeNotifier {
   String? selectedDevice;
   Map<String, (StreamSubscription<Object?>, StreamType)> streams = {};
   bool isWorkerListenedTo = false;
-
-  // final worker = Worker();
   OutletWorker? worker;
 
   Future<void> findDevices() async {
@@ -35,11 +33,7 @@ class OutletProvider extends ChangeNotifier {
   }
 
   Future<void> addStream(String deviceId) async {
-    print("trying to add stream");
-
     worker ??= await OutletWorker.spawn();
-
-    print("after spawn");
 
     if (deviceId == "Gyroscope") {
       addGyroscopeStream(deviceId);
@@ -86,8 +80,7 @@ class OutletProvider extends ChangeNotifier {
     final streamInfo = StreamInfoFactory.createDoubleStreamInfo(
         deviceId, "Accelerometer", Double64ChannelFormat(),
         channelCount: 3,
-        nominalSRate: intervalToFrequency(SensorInterval.normalInterval),
-        sourceId: deviceId);
+        nominalSRate: intervalToFrequency(SensorInterval.normalInterval));
 
     final result = await worker?.addStream(streamInfo);
 
@@ -119,26 +112,19 @@ class OutletProvider extends ChangeNotifier {
 
     polar.connectToDevice(deviceId);
 
-    print("Connected");
-
     try {
       await polar.sdkFeatureReady.firstWhere((e) =>
           e.identifier == deviceId &&
           e.feature == PolarSdkFeature.onlineStreaming);
     } catch (e) {
-      print("$e");
+      log("$e");
     }
-    print("features");
 
     final streamInfo = StreamInfoFactory.createIntStreamInfo(
         "Polar $deviceId", "PPG", Int64ChannelFormat(),
         channelCount: 4, nominalSRate: 135, sourceId: deviceId);
 
-    print("Trying to add stream");
-
     final result = await worker?.addStream(streamInfo);
-
-    print(result);
 
     if (result == null || !result) {
       return;
