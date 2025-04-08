@@ -120,8 +120,10 @@ class OutletProvider extends ChangeNotifier {
       log("$e");
     }
 
+    final name = "Polar $deviceId";
+
     final streamInfo = StreamInfoFactory.createIntStreamInfo(
-        "Polar $deviceId", "PPG", Int64ChannelFormat(),
+        name, "PPG", Int64ChannelFormat(),
         channelCount: 4, nominalSRate: 135, sourceId: deviceId);
 
     final result = await worker?.addStream(streamInfo);
@@ -137,7 +139,7 @@ class OutletProvider extends ChangeNotifier {
             .addAll(event.samples.map((item) => DartTimestamp(item.timeStamp)));
 
         if (buffer.length >= batchSize) {
-          worker?.pushChunkWithTimestamp(deviceId, buffer, timestampBuffer);
+          worker?.pushChunkWithTimestamp(name, buffer, timestampBuffer);
           buffer.clear();
           timestampBuffer.clear();
         }

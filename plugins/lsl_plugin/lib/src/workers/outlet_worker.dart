@@ -11,6 +11,13 @@ enum OutletCommandType {
   final String value;
 }
 
+class IsolateArguments {
+  final SendPort sendPort;
+  final RootIsolateToken rootIsolateToken;
+
+  IsolateArguments(this.sendPort, this.rootIsolateToken);
+}
+
 /// An isolate worker class for outlets
 ///
 /// Spawns an isolate which handles keeping track of and pushing to streams.
@@ -168,7 +175,8 @@ class OutletWorker {
 
     // Spawn the isolate.
     try {
-      await Isolate.spawn(_startRemoteIsolate, initPort.sendPort);
+      await Isolate.spawn(_startRemoteIsolate,
+          IsolateArguments(initPort.sendPort, RootIsolateToken.instance!));
     } on Object {
       initPort.close();
       rethrow;
@@ -324,14 +332,14 @@ class OutletWorker {
   }
 
   /// Creates the needed ports for the worker and sends them back to the main isolate
-  static void _startRemoteIsolate(
-    SendPort sendPort,
-  ) {
+  static void _startRemoteIsolate(IsolateArguments args) {
+    BackgroundIsolateBinaryMessenger.ensureInitialized(args.rootIsolateToken);
+
     final receivePort = ReceivePort();
-    sendPort.send(receivePort.sendPort);
+    args.sendPort.send(receivePort.sendPort);
 
     /// Initialise the handler
-    _handleCommandsToIsolate(receivePort, sendPort);
+    _handleCommandsToIsolate(receivePort, args.sendPort);
   }
 
   void close() {

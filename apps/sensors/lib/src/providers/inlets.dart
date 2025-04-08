@@ -54,9 +54,15 @@ class InletProvider extends ChangeNotifier {
     await Share.shareXFiles([XFile(filePath)]);
   }
 
-  void createInlet() async {
+  void createInlet({Map<String, List<String>?>? columnNames}) async {
     for (var inlet in selectedInlets) {
       final sink = await openCsvFile(inlet);
+      if (columnNames != null && columnNames[inlet] != null) {
+        final columns = columnNames[inlet];
+        if (columns != null) {
+          writeRow(sink, [columns]);
+        }
+      }
 
       final List<List<dynamic>> buffer = [];
       writtenLines[inlet] = 0;
@@ -71,6 +77,8 @@ class InletProvider extends ChangeNotifier {
               item.$1.map((x) => x.toString()).toList()));
 
           if (buffer.length > maxBufferSize) {
+            print("🫡 Writing");
+
             writeRow(sink, buffer);
             buffer.clear();
             writtenLines[inlet] = writtenLines[inlet]! + maxBufferSize;
