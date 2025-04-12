@@ -280,17 +280,10 @@ class InletWorker {
             }
             final inlet = streamManager.createInletFromId(streamId);
 
-            // print("The inlet $streamId");
             if (inlet != null) {
               if (synchronize ?? false) {
-                print("=== 1 ===");
-                inlet.getStreamInfo();
-                print("=== 2 ===");
                 inlet.setPostProcessing(
                     [ProcessingOptions.clockSync, ProcessingOptions.dejitter]);
-                print("=== 3 ===");
-                inlet.getStreamInfo();
-                print("=== 4 ===");
               }
               inlet.openStream();
               inlets[streamId] = inlet;
