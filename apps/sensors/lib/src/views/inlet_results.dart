@@ -30,7 +30,10 @@ class _InletResultScreenState extends State<InletResultScreen> {
           body: ListView(
               children: appState.writtenLines.entries.map((entry) {
             return ListTile(
-              title: Text(entry.key),
+              title: Text(appState.handles
+                  .firstWhere((handle) => handle.id == entry.key)
+                  .info
+                  .name),
               trailing: PopupMenuButton<InletAction>(
                 onSelected: (InletAction? value) {
                   switch (value) {

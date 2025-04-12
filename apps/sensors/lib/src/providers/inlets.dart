@@ -2,6 +2,7 @@ part of '../../main.dart';
 
 class InletProvider extends ChangeNotifier {
   int maxBufferSize = 150;
+  bool? synchronize = false;
 
   Map<String, int> writtenLines = {};
 
@@ -16,6 +17,11 @@ class InletProvider extends ChangeNotifier {
       handles.map((handle) => handle.info.name).toList();
 
   InletWorker? worker;
+
+  void setSynchronization(bool? val) {
+    synchronize = val;
+    notifyListeners();
+  }
 
   void toggleInletSelection(String inlet) {
     if (selectedInlets.contains(inlet)) {
@@ -67,7 +73,8 @@ class InletProvider extends ChangeNotifier {
       final List<List<dynamic>> buffer = [];
       writtenLines[inlet] = 0;
 
-      final opened = await worker?.open(inlet);
+      final opened =
+          await worker?.open(inlet, synchronize: synchronize ?? false);
 
       if (opened != null && opened) {
         final chunkStream = await worker?.startChunkStream(inlet);

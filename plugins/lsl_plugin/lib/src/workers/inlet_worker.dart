@@ -45,13 +45,8 @@ class InletWorker {
       _activeChunkRequests.isEmpty;
 
   void sendCommand<T extends Object?>(int id, InletCommandType command,
-      {String? streamId, double? waitTime}) {
-    _commands.send((
-      id,
-      command,
-      streamId,
-      waitTime,
-    ));
+      {String? streamId, double? waitTime, bool? synchronize}) {
+    _commands.send((id, command, streamId, waitTime, synchronize));
   }
 
   /// Discover streams on the network
@@ -80,13 +75,14 @@ class InletWorker {
   /// Open an inlet on a given stream.
   ///
   /// [streamId] The id of the stream on which an inlets should be opened
-  Future<bool> open(String streamId) async {
+  Future<bool> open(String streamId, {bool synchronize = false}) async {
     if (_closed) throw StateError('Closed');
 
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    sendCommand(id, InletCommandType.open, streamId: streamId);
+    sendCommand(id, InletCommandType.open,
+        streamId: streamId, synchronize: synchronize);
     final success = await completer.future;
 
     // Add the stream to active inlets
@@ -266,15 +262,15 @@ class InletWorker {
         return;
       }
 
-      final (id, command, streamId, waitTime) =
-          message as (int, InletCommandType, String?, double?);
+      final (id, command, streamId, waitTime, synchronize) =
+          message as (int, InletCommandType, String?, double?, bool?);
 
       try {
         switch (command) {
           case InletCommandType.resolve:
             List<ResolvedStreamHandle<Object?>> resolvedStreams = [];
             streamManager.resolveStreams(waitTime ?? 2);
-            resolvedStreams.addAll(streamManager.getStreamHandles());
+            resolvedStreams = streamManager.getStreamHandles();
             sendMessageFromWorker(id, resolvedStreams);
             break;
           case InletCommandType.open:
@@ -284,7 +280,18 @@ class InletWorker {
             }
             final inlet = streamManager.createInletFromId(streamId);
 
+            // print("The inlet $streamId");
             if (inlet != null) {
+              if (synchronize ?? false) {
+                print("=== 1 ===");
+                inlet.getStreamInfo();
+                print("=== 2 ===");
+                inlet.setPostProcessing(
+                    [ProcessingOptions.clockSync, ProcessingOptions.dejitter]);
+                print("=== 3 ===");
+                inlet.getStreamInfo();
+                print("=== 4 ===");
+              }
               inlet.openStream();
               inlets[streamId] = inlet;
             }

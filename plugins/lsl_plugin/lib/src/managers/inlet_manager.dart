@@ -48,6 +48,10 @@ class InletManager<S> {
     return _inletAdapter.wasClockReset();
   }
 
+  ErrorCode setPostProcessing(List<ProcessingOptions> flags) {
+    return _inletAdapter.setPostProcessing(flags);
+  }
+
   Stream<Sample<S>> startSampleStream() async* {
     if (isClosed) return;
     final nominalSRate = getStreamInfo().nominalSRate;
