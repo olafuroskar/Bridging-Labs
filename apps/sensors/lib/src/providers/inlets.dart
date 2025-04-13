@@ -54,21 +54,26 @@ class InletProvider extends ChangeNotifier {
     worker?.stop(key);
   }
 
-  void shareResult(String key) async {
+  void shareResult(String key, String name) async {
     final directory = await getApplicationDocumentsDirectory();
     final filePath = '${directory.path}/$key.csv';
-    await Share.shareXFiles([XFile(filePath)]);
+
+    List<XFile> files = [XFile(filePath)];
+
+    await Share.shareXFiles(files);
   }
 
-  void createInlet({Map<String, List<String>?>? columnNames}) async {
+  void createInlet() async {
     for (var inlet in selectedInlets) {
+      final handle = handles.firstWhere((handle) => handle.id == inlet);
       final sink = await openCsvFile(inlet);
-      if (columnNames != null && columnNames[inlet] != null) {
-        final columns = columnNames[inlet];
-        if (columns != null) {
-          writeRow(sink, [columns]);
-        }
-      }
+      writeRow(
+          sink, [List.generate(handle.info.channelCount, (index) => index)]);
+
+      final offsetSink = await openCsvFile("$inlet-offset");
+      writeRow(offsetSink, [
+        ["collection_time", "offset"]
+      ]);
 
       final List<List<dynamic>> buffer = [];
       writtenLines[inlet] = 0;
@@ -76,7 +81,7 @@ class InletProvider extends ChangeNotifier {
       final opened =
           await worker?.open(inlet, synchronize: synchronize ?? false);
 
-      if (opened != null && opened) {
+      if (opened ?? false) {
         final chunkStream = await worker?.startChunkStream(inlet);
         chunkStream?.listen((chunk) {
           buffer.addAll(chunk.map((item) =>
@@ -84,8 +89,6 @@ class InletProvider extends ChangeNotifier {
               item.$1.map((x) => x.toString()).toList()));
 
           if (buffer.length > maxBufferSize) {
-            print("🫡 Writing");
-
             writeRow(sink, buffer);
             buffer.clear();
             writtenLines[inlet] = writtenLines[inlet]! + maxBufferSize;
@@ -95,6 +98,17 @@ class InletProvider extends ChangeNotifier {
           if (buffer.isNotEmpty) {
             writeRow(sink, buffer);
           }
+          sink.close();
+        });
+
+        final offsetStream = await worker?.startTimeCorrectionStream(inlet);
+        offsetStream?.listen((offset) {
+          writeRow(offsetSink, [
+            [offset.$1, offset.$2]
+          ]);
+
+          notifyListeners();
+        }, onDone: () {
           sink.close();
         });
       }
