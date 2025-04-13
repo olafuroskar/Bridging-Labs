@@ -5,6 +5,7 @@ enum InletCommandType {
   open("OPEN"),
   startSampleStream("START_SAMPLE_STREAM"),
   startChunkStream("START_CHUNK_STREAM"),
+  startTimeCorrection("START_TIME_CORRECTION"),
   stop("STOP");
 
   const InletCommandType(this.value);
@@ -32,8 +33,15 @@ class InletWorker {
   /// Keeps track of (Dart) streams which yield LSL chunks
   final Map<String, StreamController<Chunk<Object?>>> _activeChunkRequests = {};
 
+  /// Keeps track of (Dart) streams which yield LSL time correction offsets
+  final Map<String, StreamController<TimeOffset>>
+      _activeTimeCorrectionRequests = {};
+
   int _idCounter = 0;
   bool _closed = false;
+
+  /// Has the post processing option of the inlet been set to automatically synchronise the stream?
+  bool _isAutoSync = false;
 
   Map<String, ResolvedStreamHandle<Object?>> streams = {};
   Set<String> activeInlets = {};
@@ -42,7 +50,8 @@ class InletWorker {
       _activeRequests.isEmpty &&
       _activeHandleRequests.isEmpty &&
       _activeSampleRequests.isEmpty &&
-      _activeChunkRequests.isEmpty;
+      _activeChunkRequests.isEmpty &&
+      _activeTimeCorrectionRequests.isEmpty;
 
   void sendCommand<T extends Object?>(int id, InletCommandType command,
       {String? streamId, double? waitTime, bool? synchronize}) {
@@ -88,6 +97,7 @@ class InletWorker {
     // Add the stream to active inlets
     if (success) {
       activeInlets.add(streamId);
+      _isAutoSync = synchronize;
     }
 
     return success;
@@ -146,6 +156,38 @@ class InletWorker {
 
     if (success) {
       _activeChunkRequests[streamId] = streamController;
+    }
+
+    return streamController.stream;
+  }
+
+  /// Starts a (Dart) stream which yields time correction offsets from the specified LSL stream.
+  ///
+  /// [streamId] The id of the LSL stream to pull chunks from.
+  ///
+  /// The method creates a stream controller on the main isolate and the handler on the
+  /// worker isolate also creates a stream which yields time correction offsets back to main isolate
+  /// which further pushes them to the listener.
+  Future<Stream<TimeOffset>> startTimeCorrectionStream(String streamId) async {
+    if (_closed) throw StateError('Closed');
+    if (_isAutoSync) {
+      throw StateError('Automatic synchronization has already been set');
+    }
+
+    final completer = Completer<bool>.sync();
+    final id = _idCounter++;
+    _activeRequests[id] = completer;
+
+    /// The controller's `add` method can then be called in the [_handleResponsesFromIsolate] method when
+    /// offsets are yielded from the worker.
+    final streamController = StreamController<TimeOffset>();
+
+    /// Initialise a time correction stream on the inlet worker
+    sendCommand(id, InletCommandType.startTimeCorrection, streamId: streamId);
+    final success = await completer.future;
+
+    if (success) {
+      _activeTimeCorrectionRequests[streamId] = streamController;
     }
 
     return streamController.stream;
@@ -225,6 +267,9 @@ class InletWorker {
     } else if (response is Chunk<Object?>) {
       final controller = _activeChunkRequests[streamId]!;
       _handleStreamResponse<Chunk<Object?>>(controller, response);
+    } else if (response is TimeOffset) {
+      final controller = _activeTimeCorrectionRequests[streamId]!;
+      _handleStreamResponse<TimeOffset>(controller, response);
     } else if (response is List<ResolvedStreamHandle<Object?>>) {
       final completer = _activeHandleRequests.remove(id)!;
       _handleResponse(completer, response);
@@ -304,6 +349,15 @@ class InletWorker {
 
             final subscription = inlet?.startChunkStream().listen((chunk) {
               sendMessageFromWorker(id, chunk, streamId: streamId);
+            });
+            sendMessageFromWorker(id, subscription != null, streamId: streamId);
+            break;
+          case InletCommandType.startTimeCorrection:
+            final inlet = inlets[streamId];
+
+            final subscription =
+                inlet?.startTimeCorrectionStream().listen((offset) {
+              sendMessageFromWorker(id, offset, streamId: streamId);
             });
             sendMessageFromWorker(id, subscription != null, streamId: streamId);
             break;
