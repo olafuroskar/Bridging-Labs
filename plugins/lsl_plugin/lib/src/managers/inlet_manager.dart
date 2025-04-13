@@ -2,6 +2,7 @@ part of 'managers.dart';
 
 class InletManager<S> {
   late final InletAdapter<S> _inletAdapter;
+  final UtilsAdapter _utilsAdapter = UtilsAdapter();
   bool isClosed = true;
 
   InletManager._(this._inletAdapter);
@@ -48,6 +49,10 @@ class InletManager<S> {
     return _inletAdapter.wasClockReset();
   }
 
+  ErrorCode setPostProcessing(List<ProcessingOptions> flags) {
+    return _inletAdapter.setPostProcessing(flags);
+  }
+
   Stream<Sample<S>> startSampleStream() async* {
     if (isClosed) return;
     final nominalSRate = getStreamInfo().nominalSRate;
@@ -76,6 +81,22 @@ class InletManager<S> {
       if (chunk != null && chunk.isNotEmpty) {
         yield chunk;
       }
+      if (isClosed) break;
+    }
+  }
+
+  Stream<TimeOffset> startTimeCorrectionStream(
+      {Duration interval = const Duration(seconds: 5),
+      double timeout = double.infinity}) async* {
+    if (isClosed) return;
+
+    while (true) {
+      await Future.delayed(interval);
+
+      final offset = timeCorrection(timeout);
+      final now = _utilsAdapter.localClock();
+      yield (now, offset);
+
       if (isClosed) break;
     }
   }

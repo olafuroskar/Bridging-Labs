@@ -5,7 +5,9 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:isolate';
 
+import 'package:flutter/services.dart';
 import 'package:lsl_plugin/lsl_plugin.dart';
+import 'package:lsl_plugin/src/adapters/inlets/processing_options.dart';
 import 'package:lsl_plugin/src/channel_formats/channel_format.dart';
 // TODO: Ekki gott
 import 'package:lsl_plugin/src/liblsl.dart';

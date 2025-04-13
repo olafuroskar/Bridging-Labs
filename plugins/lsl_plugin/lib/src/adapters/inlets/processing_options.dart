@@ -19,7 +19,7 @@ enum ProcessingOptions {
   threadsafe(8),
 
   /// The combination of all possible post-processing options.
-  all(15);
+  all(1 | 2 | 4 | 8);
 
   final int value;
   const ProcessingOptions(this.value);

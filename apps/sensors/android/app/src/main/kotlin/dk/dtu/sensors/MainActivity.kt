@@ -1,4 +1,4 @@
-package com.example.sensors
+package dk.dtu.sensors
 
 import io.flutter.embedding.android.FlutterActivity
 

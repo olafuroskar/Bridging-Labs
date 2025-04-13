@@ -33,7 +33,10 @@ class InletScreen extends StatelessWidget {
               appState.clearInlets();
             },
             icon: const Icon(Icons.delete),
-          )
+          ),
+          Checkbox(
+              value: appState.synchronize,
+              onChanged: (val) => appState.setSynchronization(val))
         ],
       ),
       body: ListView(

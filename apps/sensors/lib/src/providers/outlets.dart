@@ -6,6 +6,8 @@ enum StreamType {
 }
 
 const batchSize = 20;
+final gyroscope = "Gyroscope ${Platform.operatingSystem}";
+final accelerometer = "Accelerometer ${Platform.operatingSystem}";
 
 class OutletProvider extends ChangeNotifier {
   List<(String, StreamType)> devices = [];
@@ -17,8 +19,8 @@ class OutletProvider extends ChangeNotifier {
   Future<void> findDevices() async {
     if (Platform.isIOS || Platform.isAndroid) {
       devices = [
-        ('Gyroscope', StreamType.device),
-        ("Accelerometer", StreamType.device)
+        (gyroscope, StreamType.device),
+        (accelerometer, StreamType.device)
       ];
     }
 
@@ -35,9 +37,9 @@ class OutletProvider extends ChangeNotifier {
   Future<void> addStream(String deviceId) async {
     worker ??= await OutletWorker.spawn();
 
-    if (deviceId == "Gyroscope") {
+    if (deviceId == gyroscope) {
       addGyroscopeStream(deviceId);
-    } else if (deviceId == "Accelerometer") {
+    } else if (deviceId == accelerometer) {
       addAccelerometerStream(deviceId);
     } else {
       addPolarStream(deviceId);
@@ -120,8 +122,10 @@ class OutletProvider extends ChangeNotifier {
       log("$e");
     }
 
+    final name = "Polar $deviceId";
+
     final streamInfo = StreamInfoFactory.createIntStreamInfo(
-        "Polar $deviceId", "PPG", Int64ChannelFormat(),
+        name, "PPG", Int64ChannelFormat(),
         channelCount: 4, nominalSRate: 135, sourceId: deviceId);
 
     final result = await worker?.addStream(streamInfo);
@@ -137,7 +141,7 @@ class OutletProvider extends ChangeNotifier {
             .addAll(event.samples.map((item) => DartTimestamp(item.timeStamp)));
 
         if (buffer.length >= batchSize) {
-          worker?.pushChunkWithTimestamp(deviceId, buffer, timestampBuffer);
+          worker?.pushChunkWithTimestamp(name, buffer, timestampBuffer);
           buffer.clear();
           timestampBuffer.clear();
         }
