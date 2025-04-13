@@ -9,6 +9,7 @@ class InletResultScreen extends StatefulWidget {
 
 enum InletAction {
   stop,
+  shareOffset,
   share;
 }
 
@@ -29,8 +30,12 @@ class _InletResultScreenState extends State<InletResultScreen> {
           ]),
           body: ListView(
               children: appState.writtenLines.entries.map((entry) {
+            final name = appState.handles
+                .firstWhere((handle) => handle.id == entry.key)
+                .info
+                .name;
             return ListTile(
-              title: Text(entry.key),
+              title: Text(name),
               trailing: PopupMenuButton<InletAction>(
                 onSelected: (InletAction? value) {
                   switch (value) {
@@ -38,7 +43,10 @@ class _InletResultScreenState extends State<InletResultScreen> {
                       appState.closeInlet(entry.key);
                       break;
                     case InletAction.share:
-                      appState.shareResult(entry.key);
+                      appState.shareResult(entry.key, name);
+                      break;
+                    case InletAction.shareOffset:
+                      appState.shareResult("${entry.key}-offset", name);
                       break;
                     default:
                   }
@@ -52,6 +60,10 @@ class _InletResultScreenState extends State<InletResultScreen> {
                   const PopupMenuItem<InletAction>(
                     value: InletAction.share,
                     child: Text('Share'),
+                  ),
+                  const PopupMenuItem<InletAction>(
+                    value: InletAction.shareOffset,
+                    child: Text('Share offset'),
                   ),
                 ],
               ),

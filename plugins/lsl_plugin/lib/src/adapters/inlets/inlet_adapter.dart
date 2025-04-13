@@ -123,7 +123,7 @@ abstract class InletAdapter<S> {
   ///
   /// returns an error code if nonzero, can be #lsl_argument_error if an unknown flag was passed in.
   /// {@endtemplate}
-  ErrorCode setPostProcessing(ProcessingOptions flags) {
+  ErrorCode setPostProcessing(List<ProcessingOptions> flags) {
     return utils.setPostProcessing(_inletContainer._nativeInlet, flags);
   }
 }
