@@ -19,7 +19,7 @@ A Flutter plugin for interacting with the Lab Streaming Layer. Allows users to c
 | :-----: | :-: | :---: | :-: | :---: | :-----: |
 |   ✅    | ✅  | ⚠️ \* | ❌  |  ❓   |   ❓    |
 
-\* Requires special permission from Apple that has not been tested. [macOS](macos)
+\* For production grade development special permission is required from Apple to use multicast capabilities that has not been tested. [macOS](macos) However, if not meant for distribution on App Store, un-sandboxing the Mac app will allow multicast usage.
 
 ## Android
 

@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  muse_sdk
   permission_handler_windows
   share_plus
   url_launcher_windows
