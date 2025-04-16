@@ -35,3 +35,6 @@ build/
 # Access to the Muse SDK is required to use this plugin, which can be applied for here https://choosemuse.com/pages/developers
 # Therefore the needed libraries are not included in this plugin, but must be supplied by the user
 ios/**/*.framework
+android/libs/libmuse_android.jar
+android/src/main/jniLibs/**/libmuse_android.so
+

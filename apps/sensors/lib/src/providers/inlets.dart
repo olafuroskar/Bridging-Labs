@@ -101,16 +101,18 @@ class InletProvider extends ChangeNotifier {
           sink.close();
         });
 
-        final offsetStream = await worker?.startTimeCorrectionStream(inlet);
-        offsetStream?.listen((offset) {
-          writeRow(offsetSink, [
-            [offset.$1, offset.$2]
-          ]);
+        if (synchronize == null || !synchronize!) {
+          final offsetStream = await worker?.startTimeCorrectionStream(inlet);
+          offsetStream?.listen((offset) {
+            writeRow(offsetSink, [
+              [offset.$1, offset.$2]
+            ]);
 
-          notifyListeners();
-        }, onDone: () {
-          sink.close();
-        });
+            notifyListeners();
+          }, onDone: () {
+            sink.close();
+          });
+        }
       }
     }
 

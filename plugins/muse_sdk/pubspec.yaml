@@ -5,7 +5,9 @@ homepage:
 
 environment:
   sdk: ^3.6.0
-  flutter: '>=3.3.0'
+  flutter: ">=3.3.0"
+
+resolution: workspace
 
 dependencies:
   flutter:

@@ -13,4 +13,5 @@ environment:
 workspace:
   - plugins/lsl_plugin
   - plugins/multicast_lock
+  - plugins/muse_sdk
   - apps/sensors

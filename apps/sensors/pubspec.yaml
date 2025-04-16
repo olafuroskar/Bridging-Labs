@@ -48,6 +48,8 @@ dependencies:
   path_provider: ^2.1.5
   csv: ^6.0.0
   share_plus: ^10.1.4
+  muse_sdk: ^0.0.1
+  permission_handler: ^11.4.0
 
 resolution: workspace
 

@@ -26,4 +26,28 @@ abstract class MuseSdkPlatform extends PlatformInterface {
   Future<String?> getPlatformVersion() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
+
+  Stream<dynamic> getMuseEvents() {
+    throw UnimplementedError('getMuseEvents() has not been implemented.');
+  }
+
+  void initialize() {
+    throw UnimplementedError('initialize() has not been implemented.');
+  }
+
+  Future<bool> isBluetoothEnabled() {
+    throw UnimplementedError('isBluetoothEnabled() has not been implemented.');
+  }
+
+  void refreshMuseList() {
+    throw UnimplementedError('refreshMuseList() has not been implemented.');
+  }
+
+  Future<void> connect(int muse) {
+    throw UnimplementedError('connect() has not been implemented.');
+  }
+
+  void disconnect() {
+    throw UnimplementedError('disconnect() has not been implemented.');
+  }
 }

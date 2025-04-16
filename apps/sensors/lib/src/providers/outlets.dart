@@ -2,7 +2,8 @@ part of '../../main.dart';
 
 enum StreamType {
   device,
-  polar;
+  polar,
+  muse;
 }
 
 const batchSize = 20;
@@ -15,6 +16,8 @@ class OutletProvider extends ChangeNotifier {
   Map<String, (StreamSubscription<Object?>, StreamType)> streams = {};
   bool isWorkerListenedTo = false;
   OutletWorker? worker;
+  final _museSdkPlugin = MuseSdk();
+  List<String> _muses = [];
 
   Future<void> findDevices() async {
     if (Platform.isIOS || Platform.isAndroid) {
@@ -31,6 +34,22 @@ class OutletProvider extends ChangeNotifier {
       }
     });
 
+    final granted = (await Permission.bluetoothScan.request().isGranted) &&
+        (await Permission.bluetoothConnect.request().isGranted);
+
+    if (granted && Platform.isAndroid) {
+      // Only supports Android for now
+      _museSdkPlugin.initialize();
+      _museSdkPlugin.getConnectionStream().listen((muses) {
+        if (muses == null) return;
+
+        for (var muse in muses) {
+          devices.add((muse, StreamType.muse));
+          _muses = muses;
+        }
+      });
+    }
+
     notifyListeners();
   }
 
@@ -42,7 +61,12 @@ class OutletProvider extends ChangeNotifier {
     } else if (deviceId == accelerometer) {
       addAccelerometerStream(deviceId);
     } else {
-      addPolarStream(deviceId);
+      final type = devices.firstWhere((device) => deviceId == device.$1).$2;
+      if (type == StreamType.polar) {
+        addPolarStream(deviceId);
+      } else {
+        addMuseStream(deviceId);
+      }
     }
   }
 
@@ -137,9 +161,11 @@ class OutletProvider extends ChangeNotifier {
     final subscription = polar.startPpgStreaming(deviceId).listen(
       (event) {
         buffer.addAll(event.samples.map((item) => item.channelSamples));
-        timestampBuffer
-            .addAll(event.samples.map((item) => DartTimestamp(item.timeStamp)));
+        timestampBuffer.addAll(
+            event.samples.map((item) => DartTimestamp(item.timeStamp.toUtc())));
 
+        print(
+            "Last from Polar ${event.samples[event.samples.length - 1].timeStamp} vs current: ${DateTime.now()}");
         if (buffer.length >= batchSize) {
           worker?.pushChunkWithTimestamp(name, buffer, timestampBuffer);
           buffer.clear();
@@ -151,6 +177,45 @@ class OutletProvider extends ChangeNotifier {
     streams[deviceId] = (subscription, StreamType.polar);
   }
 
+  void addMuseStream(String deviceId) async {
+    List<List<double>> buffer = [];
+    List<Timestamp> timestampBuffer = [];
+
+    await _museSdkPlugin.connect(_muses.indexOf(deviceId));
+
+    final name = deviceId;
+
+    final streamInfo = StreamInfoFactory.createDoubleStreamInfo(
+        name, "PPG", Double64ChannelFormat(),
+        channelCount: 3, nominalSRate: 64, sourceId: deviceId);
+
+    final result = await worker?.addStream(streamInfo);
+
+    if (result == null || !result) {
+      return;
+    }
+
+    final subscription = _museSdkPlugin.getPpgStream().listen(
+      (event) {
+        if (event == null) return;
+
+        print(
+            "Time diff: ${DateTime.now().toUtc()} vs. ${event[0].$1.toUtc()}");
+
+        buffer.addAll(event.map((item) => item.$2));
+        timestampBuffer.addAll(event.map((item) => DartTimestamp(item.$1)));
+
+        if (buffer.length >= batchSize) {
+          worker?.pushChunkWithTimestamp(name, buffer, timestampBuffer);
+          buffer.clear();
+          timestampBuffer.clear();
+        }
+      },
+    );
+
+    streams[deviceId] = (subscription, StreamType.muse);
+  }
+
   void stopStreams() {
     for (var stream in streams.entries) {
       stream.value.$1.cancel();
@@ -158,6 +223,8 @@ class OutletProvider extends ChangeNotifier {
         polar.disconnectFromDevice(stream.key);
       }
     }
+    // Disconnects all Muse devices
+    _museSdkPlugin.disconnect();
     worker?.close();
     worker = null;
   }

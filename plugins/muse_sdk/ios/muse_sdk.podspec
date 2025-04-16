@@ -27,7 +27,7 @@ A new Flutter plugin project.
   # see https://developer.apple.com/documentation/bundleresources/privacy_manifest_files
   # s.resource_bundles = {'muse_sdk_privacy' => ['Resources/PrivacyInfo.xcprivacy']}
   
-  s.vendored_frameworks = 'Muse.framework'
-  s.preserve_paths = "Muse.framework"
-  s.frameworks = "Muse"
+  # s.vendored_frameworks = 'Muse.framework'
+  # s.preserve_paths = "Muse.framework"
+  # s.frameworks = "Muse"
 end
