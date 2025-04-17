@@ -23,10 +23,7 @@ Powered by native bindings via [`lsl_ffi`](https://pub.dev/packages/lsl_ffi) and
 
 ## 🚀 Getting started
 
-Before using `lsl_flutter`, ensure:
-
-- You are targeting a platform supported by both Flutter and LSL (i.e., not web).
-- For mobile, you may need to include the LSL native libraries in your project’s platform folders.
+Before using `lsl_flutter`, ensure you are targeting a platform supported by both Flutter and LSL (i.e., not web).
 
 Install via `pubspec.yaml`:
 
@@ -137,7 +134,7 @@ final worker = await InletWorker.spawn();
 // Resolve available streams on the network
 final handles = await worker.resolveStreams() ?? [];
 
-// Open an inlet on the first resolved stream
+// Open an inlet on the first resolved stream and make LSL handle postprocessing synchronization automatically
 final opened = await worker.open(handles[0].id, synchronize: true);
 
 // Create a Dart stream for the inlet
