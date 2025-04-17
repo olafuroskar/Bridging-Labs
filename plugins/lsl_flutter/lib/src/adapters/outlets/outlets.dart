@@ -4,6 +4,7 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 import 'package:lsl_bindings/lsl_bindings.dart';
+import 'package:lsl_flutter/lsl_flutter.dart';
 import 'package:lsl_flutter/src/liblsl.dart';
 import 'package:lsl_flutter/src/adapters/outlets/utils.dart' as utils;
 
