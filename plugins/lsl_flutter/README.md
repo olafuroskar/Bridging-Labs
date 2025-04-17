@@ -75,7 +75,7 @@ The package exposes three manager classes, one for _inlets_, one fore _outlets_ 
 // Create a stream information object for PPG data that will have integer samples, 4 channels,
 // and a nominal sampling rate of 135 Hz
 final streamInfo = StreamInfoFactory.createIntStreamInfo(
-    name, "PPG", Int64ChannelFormat(),
+    "Test PPG", "PPG", Int64ChannelFormat(),
     channelCount: 4, nominalSRate: 135, sourceId: deviceId);
 
 // Create an outlet manager with the stream information, this furthermore opens the outlet
@@ -85,7 +85,7 @@ final manager = OutletManager(streamInfo);
 manager.pushSample([1, 2, 3, 4]);
 ```
 
-To discover streams a resolver can be created
+To discover streams, a stream manager can be created
 
 ```dart
 // Create a stream manager
@@ -106,6 +106,45 @@ For convenience a Dart stream can be created on the inlet manager that emits ava
 ```dart
 // Start a sample stream and listen
 final subscription = inletManager.startSampleStream().listen((sample) {
+  log("Sample: ${sample.$1}");
+  log("Timestamp: ${sample.$2}");
+});
+```
+
+As the underlying plugin relies on foreign function interfaces, this code by default runs synchronously and may block the main thread in some cases, especially when working with inlets. Therefore the package provides two isolate workers, one for inlets and one for outlets.
+
+```dart
+// --- Outlet ---
+// Create a stream information object for PPG data that will have integer samples, 4 channels,
+// and a nominal sampling rate of 135 Hz
+final streamInfo = StreamInfoFactory.createIntStreamInfo(
+    "Test PPG", "PPG", Int64ChannelFormat(),
+    channelCount: 4, nominalSRate: 135, sourceId: deviceId);
+
+// Spawn an outlet isolate worker
+final worker = await OutletWorker.spawn();
+
+// Add a new stream outlet
+final success = await worker.addStream(streamInfo);
+
+// Push a sample to the newly created outlet
+await worker.pushSample("Test PPG", sample);
+
+// --- Outlet ---
+// Spawn an inlet worker
+final worker = await InletWorker.spawn();
+
+// Resolve available streams on the network
+final handles = await worker.resolveStreams() ?? [];
+
+// Open an inlet on the first resolved stream
+final opened = await worker.open(handles[0].id, synchronize: true);
+
+// Create a Dart stream for the inlet
+final stream = await worker.startSampleStream(inlet);
+
+// Listen to sample stream
+stream?.listen((sample) {
   log("Sample: ${sample.$1}");
   log("Timestamp: ${sample.$2}");
 });
