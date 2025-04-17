@@ -17,4 +17,4 @@ final DynamicLibrary _dylib = () {
 }();
 
 /// The bindings to the native functions in [_dylib].
-final LslBindingsBindings bindings = LslBindingsBindings(_dylib);
+final LslBindingsBindings lslBindings = LslBindingsBindings(_dylib);
