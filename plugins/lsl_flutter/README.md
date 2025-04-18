@@ -147,6 +147,10 @@ stream?.listen((sample) {
 });
 ```
 
+## Documentation
+
+The documentation of classes and methods are heavily inspired by the documentation of the [LSL Java interface](https://github.com/labstreaminglayer/liblsl-Java). Some documentation is taken directly from there and adapted for Dart.
+
 <!--
 This README describes the package. If you publish this package to pub.dev,
 this README's contents appear on the landing page for your package.
