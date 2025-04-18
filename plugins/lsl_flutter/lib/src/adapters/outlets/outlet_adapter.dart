@@ -37,7 +37,7 @@ abstract class OutletAdapter<S> {
   /// Push a chunk of multiplexed samples into the outlet. One timestamp per sample is provided.
   ///
   /// [chunk] A rectangular array of values for multiple samples.
-  /// [timestamp] An array of timestamp values holding time stamps for each sample in the data buffer.
+  /// [timestamps] An array of timestamp values holding time stamps for each sample in the data buffer.
   /// [pushthrough] Optionally whether to push the chunk through to the receivers instead of buffering it with subsequent samples.
   /// Note that the chunk_size, if specified at outlet construction, takes precedence over the pushthrough flag.
   /// {@endtemplate}
@@ -48,9 +48,11 @@ abstract class OutletAdapter<S> {
   /// Destroys the given outlet
   /// {@endtemplate}
   void destroy() {
-    return utils.destroy(
-      _outletContainer._nativeOutlet,
-    );
+    final nativeInfo =
+        lsl.bindings.lsl_get_info(_outletContainer._nativeOutlet);
+    lsl.bindings.lsl_destroy_outlet(_outletContainer._nativeOutlet);
+    lsl.bindings.lsl_destroy_streaminfo(nativeInfo);
+    lsl.releaseMulticastLock(_outletContainer.outlet.streamInfo.name);
   }
 
   /// {@template get_stream_info}
@@ -59,7 +61,10 @@ abstract class OutletAdapter<S> {
   /// This is what was used to create the stream (and also has the Additional Network Information fields assigned).
   /// {@endtemplate}
   StreamInfo getStreamInfo() {
-    return utils.getOutletStreamInfo(_outletContainer._nativeOutlet);
+    final nativeInfo =
+        lsl.bindings.lsl_get_info(_outletContainer._nativeOutlet);
+
+    return stream_utils.getStreamInfo(nativeInfo);
   }
 
   /// {@template have_consumers}
@@ -68,7 +73,9 @@ abstract class OutletAdapter<S> {
   /// While it does not hurt, there is technically no reason to push samples if there is no consumer.
   /// {@endtemplate}
   bool haveConsumers() {
-    return utils.haveConsumers(_outletContainer._nativeOutlet);
+    final result =
+        lsl.bindings.lsl_have_consumers(_outletContainer._nativeOutlet);
+    return result > 0;
   }
 
   /// {@template wait_for_consumers}
@@ -76,7 +83,13 @@ abstract class OutletAdapter<S> {
   ///
   /// returns true if the wait was successful, false if the [timeout] expired.
   /// {@endtemplate}
-  Future<bool> waitForConsumers(double timeout) {
-    return utils.waitForConsumers(_outletContainer._nativeOutlet, timeout);
+  Future<bool> waitForConsumers(double timeout) async {
+    try {
+      return lsl.bindings
+              .lsl_wait_for_consumers(_outletContainer._nativeOutlet, timeout) >
+          0;
+    } catch (e) {
+      return false;
+    }
   }
 }

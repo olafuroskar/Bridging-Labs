@@ -3,7 +3,7 @@ part of '../outlets.dart';
 class IntOutletAdapter extends OutletAdapter<int> {
   /// {@macro create}
   IntOutletAdapter._(Outlet<int> outlet) {
-    final nativeOutlet = utils.createOutlet(outlet, Int32ChannelFormat());
+    final nativeOutlet = createOutlet(outlet, Int32ChannelFormat());
     _outletContainer = OutletContainer._(outlet, nativeOutlet);
   }
 
@@ -38,8 +38,7 @@ class IntOutletAdapter extends OutletAdapter<int> {
 
     final outletPointer = _outletContainer._nativeOutlet;
 
-    final (dataElements, chunkSize, channelCount) =
-        utils.getDataElements(chunk);
+    final (dataElements, chunkSize, channelCount) = getDataElements(chunk);
 
     final nativeSamplePointer =
         malloc.allocate<Int32>(dataElements * sizeOf<Int32>());
@@ -69,8 +68,7 @@ class IntOutletAdapter extends OutletAdapter<int> {
 
     final outletPointer = _outletContainer._nativeOutlet;
 
-    final (dataElements, chunkSize, channelCount) =
-        utils.getDataElements(chunk);
+    final (dataElements, chunkSize, channelCount) = getDataElements(chunk);
 
     final nativeSamplePointer =
         malloc.allocate<Int32>(dataElements * sizeOf<Int32>());
@@ -80,7 +78,7 @@ class IntOutletAdapter extends OutletAdapter<int> {
       }
     }
 
-    final nativeTimestampsPointer = utils.allocatTimestamps(timestamps);
+    final nativeTimestampsPointer = allocatTimestamps(timestamps);
 
     lsl.bindings.lsl_push_chunk_itnp(outletPointer, nativeSamplePointer,
         dataElements, nativeTimestampsPointer, pushthrough ? 1 : 0);

@@ -3,7 +3,7 @@ part of '../outlets.dart';
 class FloatOutletAdapter extends OutletAdapter<double> {
   /// {@macro create}
   FloatOutletAdapter._(Outlet<double> outlet) {
-    final nativeOutlet = utils.createOutlet(outlet, Double64ChannelFormat());
+    final nativeOutlet = createOutlet(outlet, Double64ChannelFormat());
     _outletContainer = OutletContainer._(outlet, nativeOutlet);
   }
 
@@ -39,8 +39,7 @@ class FloatOutletAdapter extends OutletAdapter<double> {
 
     final outletPointer = _outletContainer._nativeOutlet;
 
-    final (dataElements, chunkSize, channelCount) =
-        utils.getDataElements(chunk);
+    final (dataElements, chunkSize, channelCount) = getDataElements(chunk);
 
     final nativeSamplePointer =
         malloc.allocate<Float>(dataElements * sizeOf<Float>());
@@ -70,8 +69,7 @@ class FloatOutletAdapter extends OutletAdapter<double> {
 
     final outletPointer = _outletContainer._nativeOutlet;
 
-    final (dataElements, chunkSize, channelCount) =
-        utils.getDataElements(chunk);
+    final (dataElements, chunkSize, channelCount) = getDataElements(chunk);
 
     final nativeSamplePointer =
         malloc.allocate<Float>(dataElements * sizeOf<Float>());
@@ -81,7 +79,7 @@ class FloatOutletAdapter extends OutletAdapter<double> {
       }
     }
 
-    final nativeTimestampsPointer = utils.allocatTimestamps(timestamps);
+    final nativeTimestampsPointer = allocatTimestamps(timestamps);
 
     lsl.bindings.lsl_push_chunk_ftnp(outletPointer, nativeSamplePointer,
         dataElements, nativeTimestampsPointer, pushthrough ? 1 : 0);

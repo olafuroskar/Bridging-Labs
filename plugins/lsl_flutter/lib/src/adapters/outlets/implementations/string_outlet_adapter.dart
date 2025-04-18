@@ -3,7 +3,7 @@ part of '../outlets.dart';
 class StringOutletAdapter extends OutletAdapter<String> {
   /// {@macro create}
   StringOutletAdapter._(Outlet<String> outlet) {
-    final nativeOutlet = utils.createOutlet(outlet, CftStringChannelFormat());
+    final nativeOutlet = createOutlet(outlet, CftStringChannelFormat());
     _outletContainer = OutletContainer._(outlet, nativeOutlet);
   }
 
@@ -48,8 +48,7 @@ class StringOutletAdapter extends OutletAdapter<String> {
 
     final outletPointer = _outletContainer._nativeOutlet;
 
-    final (dataElements, chunkSize, channelCount) =
-        utils.getDataElements(chunk);
+    final (dataElements, chunkSize, channelCount) = getDataElements(chunk);
 
     Pointer<Char> toString(String text) => text.toNativeUtf8().cast<Char>();
 
@@ -84,8 +83,7 @@ class StringOutletAdapter extends OutletAdapter<String> {
 
     final outletPointer = _outletContainer._nativeOutlet;
 
-    final (dataElements, chunkSize, channelCount) =
-        utils.getDataElements(chunk);
+    final (dataElements, chunkSize, channelCount) = getDataElements(chunk);
 
     Pointer<Char> toString(String text) => text.toNativeUtf8().cast<Char>();
 
@@ -99,7 +97,7 @@ class StringOutletAdapter extends OutletAdapter<String> {
       }
     }
 
-    final nativeTimestamps = utils.allocatTimestamps(timestamps);
+    final nativeTimestamps = allocatTimestamps(timestamps);
 
     lsl.bindings.lsl_push_chunk_strtnp(outletPointer, nativeSamplePointer,
         dataElements, nativeTimestamps, pushthrough ? 1 : 0);
