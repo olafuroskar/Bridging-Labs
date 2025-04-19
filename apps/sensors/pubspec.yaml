@@ -30,8 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  lsl_plugin:
-    path: ../../plugins/lsl_plugin
+  lsl_flutter:
+    path: ../../plugins/lsl_flutter
   # self_science_station:
   #   git:
   #     url: git@gitlab.com:spooksmus_/self-science.git

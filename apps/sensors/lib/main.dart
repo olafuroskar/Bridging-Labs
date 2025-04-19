@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
-import 'package:lsl_plugin/lsl_plugin.dart';
+import 'package:lsl_flutter/lsl_flutter.dart';
 import 'package:muse_sdk/muse_sdk.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';

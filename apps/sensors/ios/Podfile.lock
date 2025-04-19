@@ -6,7 +6,7 @@ PODS:
   - flutter_blue_plus_darwin (0.0.2):
     - Flutter
     - FlutterMacOS
-  - lsl_plugin (0.0.1):
+  - lsl_bindings (0.0.1):
     - Flutter
   - muse_sdk (0.0.1):
     - Flutter
@@ -35,7 +35,7 @@ DEPENDENCIES:
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - Flutter (from `Flutter`)
   - flutter_blue_plus_darwin (from `.symlinks/plugins/flutter_blue_plus_darwin/darwin`)
-  - lsl_plugin (from `.symlinks/plugins/lsl_plugin/ios`)
+  - lsl_bindings (from `.symlinks/plugins/lsl_bindings/ios`)
   - muse_sdk (from `.symlinks/plugins/muse_sdk/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
@@ -58,8 +58,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_blue_plus_darwin:
     :path: ".symlinks/plugins/flutter_blue_plus_darwin/darwin"
-  lsl_plugin:
-    :path: ".symlinks/plugins/lsl_plugin/ios"
+  lsl_bindings:
+    :path: ".symlinks/plugins/lsl_bindings/ios"
   muse_sdk:
     :path: ".symlinks/plugins/muse_sdk/ios"
   path_provider_foundation:
@@ -78,7 +78,7 @@ SPEC CHECKSUMS:
   device_info_plus: bf2e3232933866d73fe290f2942f2156cdd10342
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_blue_plus_darwin: 3ea4ec9133b377febcc8a70b28cd2d2dc9242bd9
-  lsl_plugin: cb3154979978d7e39df08b72439f1b89039f21d7
+  lsl_bindings: bb49781396d805738ece894100a0ce8d98c5cc92
   muse_sdk: 165d037eed0b5550317e390deedf810fef9e1cb2
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2

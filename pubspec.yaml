@@ -11,7 +11,8 @@ environment:
 # ```
 # to the pubspec.yaml file of the package
 workspace:
-  - plugins/lsl_plugin
+  - plugins/lsl_bindings
+  - plugins/lsl_flutter
   - plugins/multicast_lock
   - plugins/muse_sdk
   - apps/sensors
