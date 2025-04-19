@@ -1,3 +1,40 @@
+Low-level Dart bindings to the [Lab Streaming Layer (LSL)](https://github.com/sccn/labstreaminglayer) C API, generated and maintained for use with Dart FFI.
+
+This package is intended for advanced users who want fine-grained control over native LSL interop in their own Dart or Flutter applications.
+
+If you're looking for a higher-level abstraction for streaming or receiving LSL data in Flutter, consider using [`lsl_flutter`](https://pub.dev/packages/lsl_flutter), which builds on top of these bindings.
+
+## Features
+
+- Direct access to LSL’s C API through Dart FFI
+- Cross-platform support: macOS, iOS (via `.xcframework`), Windows, and Android
+
+## Getting started
+
+1. Add `dart:ffi` as a dependency, as it is needed for memory management and type conversion.
+
+2. Add this package to your `pubspec.yaml`:
+
+```yaml
+dependencies:
+  lsl_bindings: ^1.0.0
+```
+
+## Usage
+
+```dart
+import 'package:lsl_bindings/lsl_bindings.dart';
+
+final streamInfo = lslBindings.lsl_create_streaminfo(
+  "Test stream".toNativeUtf8().cast<Char>(),
+  "EEG".toNativeUtf8().cast<Char>(),
+  4,
+  256,
+  lsl_channel_format_t.cft_double64,
+  "Source id".toNativeUtf8().cast<Char>());
+```
+
+<!--
 # lsl_bindings
 
 A new Flutter FFI plugin project.
@@ -30,7 +67,7 @@ The `pubspec.yaml` specifies FFI plugins as follows:
     platforms:
       some_platform:
         ffiPlugin: true
-```
+````
 
 This configuration invokes the native build for the various target platforms
 and bundles the binaries in Flutter applications using these FFI plugins.
@@ -39,34 +76,34 @@ This can be combined with dartPluginClass, such as when FFI is used for the
 implementation of one platform in a federated plugin:
 
 ```yaml
-  plugin:
-    implements: some_other_plugin
-    platforms:
-      some_platform:
-        dartPluginClass: SomeClass
-        ffiPlugin: true
+plugin:
+  implements: some_other_plugin
+  platforms:
+    some_platform:
+      dartPluginClass: SomeClass
+      ffiPlugin: true
 ```
 
 A plugin can have both FFI and method channels:
 
 ```yaml
-  plugin:
-    platforms:
-      some_platform:
-        pluginClass: SomeName
-        ffiPlugin: true
+plugin:
+  platforms:
+    some_platform:
+      pluginClass: SomeName
+      ffiPlugin: true
 ```
 
 The native build systems that are invoked by FFI (and method channel) plugins are:
 
-* For Android: Gradle, which invokes the Android NDK for native builds.
-  * See the documentation in android/build.gradle.
-* For iOS and MacOS: Xcode, via CocoaPods.
-  * See the documentation in ios/lsl_bindings.podspec.
-  * See the documentation in macos/lsl_bindings.podspec.
-* For Linux and Windows: CMake.
-  * See the documentation in linux/CMakeLists.txt.
-  * See the documentation in windows/CMakeLists.txt.
+- For Android: Gradle, which invokes the Android NDK for native builds.
+  - See the documentation in android/build.gradle.
+- For iOS and MacOS: Xcode, via CocoaPods.
+  - See the documentation in ios/lsl_bindings.podspec.
+  - See the documentation in macos/lsl_bindings.podspec.
+- For Linux and Windows: CMake.
+  - See the documentation in linux/CMakeLists.txt.
+  - See the documentation in windows/CMakeLists.txt.
 
 ## Binding to native code
 
@@ -89,4 +126,4 @@ For example, see `sumAsync` in `lib/lsl_bindings.dart`.
 For help getting started with Flutter, view our
 [online documentation](https://docs.flutter.dev), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
-
+-->
