@@ -50,6 +50,8 @@ dependencies:
   share_plus: ^10.1.4
   muse_sdk: ^0.0.1
   permission_handler: ^11.4.0
+  just_audio: ^0.10.0
+  audio_service: ^0.18.18
 
 resolution: workspace
 
@@ -73,6 +75,8 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  assets:
+    - assets/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

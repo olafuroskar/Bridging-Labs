@@ -19,6 +19,25 @@ class OutletProvider extends ChangeNotifier {
   final _museSdkPlugin = MuseSdk();
   List<String> _muses = [];
 
+  late MyAudioHandler service;
+
+  OutletProvider() {
+    print("outlet init");
+    _init();
+  }
+
+  _init() async {
+    print("service init");
+    service = await AudioService.init(
+        builder: () => MyAudioHandler(),
+        config: AudioServiceConfig(
+          androidNotificationChannelId: 'dk.dtu.sensors.audio',
+          androidNotificationChannelName: 'Audio Playback',
+          androidNotificationOngoing: true,
+          // androidStopForegroundOnPause: false,
+        ));
+  }
+
   Future<void> findDevices() async {
     if (Platform.isIOS || Platform.isAndroid) {
       devices = [
@@ -55,6 +74,8 @@ class OutletProvider extends ChangeNotifier {
 
   Future<void> addStream(String deviceId) async {
     worker ??= await OutletWorker.spawn();
+
+    service.play();
 
     if (deviceId == gyroscope) {
       addGyroscopeStream(deviceId);
@@ -164,8 +185,6 @@ class OutletProvider extends ChangeNotifier {
         timestampBuffer.addAll(
             event.samples.map((item) => DartTimestamp(item.timeStamp.toUtc())));
 
-        print(
-            "Last from Polar ${event.samples[event.samples.length - 1].timeStamp} vs current: ${DateTime.now()}");
         if (buffer.length >= batchSize) {
           worker?.pushChunkWithTimestamp(name, buffer, timestampBuffer);
           buffer.clear();
@@ -199,9 +218,6 @@ class OutletProvider extends ChangeNotifier {
       (event) {
         if (event == null) return;
 
-        print(
-            "Time diff: ${DateTime.now().toUtc()} vs. ${event[0].$1.toUtc()}");
-
         buffer.addAll(event.map((item) => item.$2));
         timestampBuffer.addAll(event.map((item) => DartTimestamp(item.$1)));
 
@@ -217,6 +233,8 @@ class OutletProvider extends ChangeNotifier {
   }
 
   void stopStreams() {
+    service.stop();
+
     for (var stream in streams.entries) {
       stream.value.$1.cancel();
       if (stream.value.$2 == StreamType.polar) {
