@@ -60,8 +60,10 @@ bool wasClockReset(lsl_inlet inlet) {
   return clockWasReset == 1;
 }
 
-ErrorCode setPostProcessing(lsl_inlet inlet, ProcessingOptions flags) {
-  final code = lsl.bindings.lsl_set_postprocessing(inlet, flags.value);
+ErrorCode setPostProcessing(lsl_inlet inlet, List<ProcessingOptions> flags) {
+  // Bitwise OR the elements of the flags list to get the desired postprocessing setting.
+  final flagsValue = flags.fold(0, (prev, curr) => prev | curr.value);
+  final code = lsl.bindings.lsl_set_postprocessing(inlet, flagsValue);
   return switch (code) {
     0 => ErrorCode.noError,
     -1 => ErrorCode.timeoutError,
