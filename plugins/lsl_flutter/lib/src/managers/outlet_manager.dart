@@ -5,19 +5,49 @@ part of 'managers.dart';
 /// An instance can be re-used for multiple outlets (after being destroyed of course), but
 /// creaing new instances instead is incouraged for clarity.
 class OutletManager<S> {
-  late int chunkSize;
-  late int maxBuffered;
+  late int _chunkSize;
+  late int _maxBuffered;
   late StreamInfo<S> _streamInfo;
 
   late OutletAdapter<S> _outletAdapter;
 
+  /// Whether device vs. host time offsets should be recorded
+  late bool _recordOffsets;
+
+  /// Whether offsets should be applied to timestamps when pushing
+  late bool _applyOffsets;
+
+  /// The interval in which offsets are calculated
+  late double _offsetCalculationInterval;
+
+  /// Keep track of the last base (host) timestamp
+  double _lastBase = 0;
+
+  /// Keep track of last offset to avoid lookup each time it's used
+  double _lastOffset = 0;
+
+  /// The recorder offsets between host and device
+  final List<double> _offsets = [];
+
   /// {@macro create}
+  /// [recordOffsets] Whether device vs. host time offsets should be recorded
+  /// [applyOffsets] Whether offsets should be applied to timestamps when pushing
+  /// [offsetCalculationInterval] The interval in which offsets are calculated
   OutletManager(StreamInfo<S> streamInfo,
-      [int outletChunkSize = 0, int outletMaxBuffered = 360]) {
+      {int outletChunkSize = 0,
+      int outletMaxBuffered = 360,
+      bool recordOffsets = false,
+      bool applyOffsets = false,
+      double offsetCalculationInterval = 5.0}) {
     _streamInfo = streamInfo;
-    chunkSize = outletChunkSize;
-    maxBuffered = outletMaxBuffered;
-    final outlet = Outlet<S>(_streamInfo, chunkSize, maxBuffered);
+    _chunkSize = outletChunkSize;
+    _maxBuffered = outletMaxBuffered;
+
+    _recordOffsets = recordOffsets;
+    _applyOffsets = applyOffsets;
+    _offsetCalculationInterval = offsetCalculationInterval;
+
+    final outlet = Outlet<S>(_streamInfo, _chunkSize, _maxBuffered);
 
     OutletAdapter<S>? outletAdapter;
 
@@ -55,20 +85,36 @@ class OutletManager<S> {
   /// {@macro push_sample}
   void pushSample(List<S> sample,
       [Timestamp? timestamp, bool pushthrough = true]) {
-    return _outletAdapter.pushSample(sample, timestamp, pushthrough);
+    _updateOffset(timestamp);
+
+    return _outletAdapter.pushSample(
+        sample,
+        !_applyOffsets ? timestamp : _applyOffsetToOptionalTimestamp(timestamp),
+        pushthrough);
   }
 
   /// {@macro push_chunk}
   void pushChunk(List<List<S>> chunk,
       [Timestamp? timestamp, bool pushthrough = true]) {
-    return _outletAdapter.pushChunk(chunk, timestamp, pushthrough);
+    _updateOffset(timestamp);
+
+    return _outletAdapter.pushChunk(
+        chunk,
+        !_applyOffsets ? timestamp : _applyOffsetToOptionalTimestamp(timestamp),
+        pushthrough);
   }
 
   /// {@macro push_chunk_with_timestamps}
   void pushChunkWithTimestamps(List<List<S>> chunk, List<Timestamp> timestamps,
       [bool pushthrough = true]) {
+    _updateOffset(timestamps.first);
+
     return _outletAdapter.pushChunkWithTimestamps(
-        chunk, timestamps, pushthrough);
+        chunk,
+        !_applyOffsets
+            ? timestamps
+            : timestamps.map(_applyOffsetToTimestamp).toList(),
+        pushthrough);
   }
 
   /// {@macro destroy}
@@ -87,7 +133,42 @@ class OutletManager<S> {
   }
 
   /// {@macro wait_for_consumers}
-  Future<bool> waitForConsumers(double timeout) {
+  bool waitForConsumers(double timeout) {
     return _outletAdapter.waitForConsumers(timeout);
+  }
+
+  /// Gets the estimated time offset between the clock of the intermediary device (the app) and the device providing timestamps.
+  List<double> get offsets => _offsets;
+
+  /// Update the
+  void _updateOffset(Timestamp? timestamp) {
+    if (!_recordOffsets && !_applyOffsets) return;
+
+    if (timestamp == null) {
+      throw Exception(
+          "The record/apply offsets option can only be used when timestamps are provided explicitly");
+    }
+
+    final base = DartTimestamp(DateTime.now()).toLslTime();
+
+    /// If unsufficient time has passed, exit early
+    if (base - _lastBase < _offsetCalculationInterval) return;
+
+    final t0 = timestamp.toLslTime();
+    _lastOffset = t0 - base;
+
+    offsets.add(_lastOffset);
+    _lastBase = base;
+  }
+
+  /// Apply the last recorded offset to a timestamp
+  Timestamp? _applyOffsetToOptionalTimestamp(Timestamp? timestamp) {
+    if (timestamp == null) return null;
+    return _applyOffsetToTimestamp(timestamp);
+  }
+
+  /// Apply the last recorded offset to a timestamp
+  Timestamp _applyOffsetToTimestamp(Timestamp timestamp) {
+    return LslTimestamp(timestamp.toLslTime() + _lastOffset);
   }
 }
