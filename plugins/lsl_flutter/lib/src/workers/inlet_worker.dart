@@ -46,6 +46,7 @@ class InletWorker {
   Map<String, ResolvedStreamHandle<Object?>> streams = {};
   Set<String> activeInlets = {};
 
+  /// Are there any active requests
   bool get areActiveRequestsEmpty =>
       _activeRequests.isEmpty &&
       _activeHandleRequests.isEmpty &&
@@ -54,8 +55,14 @@ class InletWorker {
       _activeTimeCorrectionRequests.isEmpty;
 
   void sendCommand<T extends Object?>(int id, InletCommandType command,
-      {String? streamId, double? waitTime, bool? synchronize}) {
-    _commands.send((id, command, streamId, waitTime, synchronize));
+      {String? streamId,
+      double? waitTime,
+      bool? synchronize,
+      String? prop,
+      String? value,
+      String? pred}) {
+    _commands.send(
+        (id, command, streamId, waitTime, synchronize, prop, value, pred));
   }
 
   /// Discover streams on the network
@@ -69,6 +76,54 @@ class InletWorker {
     final id = _idCounter++;
     _activeHandleRequests[id] = completer;
     sendCommand(id, InletCommandType.resolve, waitTime: waitTime);
+    final handles = await completer.future;
+
+    // Add the resolved streams to the streams list for lookup
+    if (handles.isNotEmpty) {
+      for (final handle in handles) {
+        streams[handle.id] = handle;
+      }
+    }
+
+    return handles;
+  }
+
+  /// Discover streams on the network by stream property
+  ///
+  /// [waitTime] Maximum wait time in seconds
+  Future<List<ResolvedStreamHandle<Object?>>> resolveStreamsByProp(
+      String prop, String value,
+      {double waitTime = 2}) async {
+    if (_closed) throw StateError('Closed');
+
+    final completer = Completer<List<ResolvedStreamHandle<Object?>>>.sync();
+    final id = _idCounter++;
+    _activeHandleRequests[id] = completer;
+    sendCommand(id, InletCommandType.resolve,
+        waitTime: waitTime, prop: prop, value: value);
+    final handles = await completer.future;
+
+    // Add the resolved streams to the streams list for lookup
+    if (handles.isNotEmpty) {
+      for (final handle in handles) {
+        streams[handle.id] = handle;
+      }
+    }
+
+    return handles;
+  }
+
+  /// Discover streams on the network that match a given predicate
+  ///
+  /// [waitTime] Maximum wait time in seconds
+  Future<List<ResolvedStreamHandle<Object?>>> resolveStreamsByPred(String pred,
+      {double waitTime = 2}) async {
+    if (_closed) throw StateError('Closed');
+
+    final completer = Completer<List<ResolvedStreamHandle<Object?>>>.sync();
+    final id = _idCounter++;
+    _activeHandleRequests[id] = completer;
+    sendCommand(id, InletCommandType.resolve, waitTime: waitTime, pred: pred);
     final handles = await completer.future;
 
     // Add the resolved streams to the streams list for lookup
@@ -307,14 +362,29 @@ class InletWorker {
         return;
       }
 
-      final (id, command, streamId, waitTime, synchronize) =
-          message as (int, InletCommandType, String?, double?, bool?);
+      final (id, command, streamId, waitTime, synchronize, prop, value, pred) =
+          message as (
+        int,
+        InletCommandType,
+        String?,
+        double?,
+        bool?,
+        String?,
+        String?,
+        String?
+      );
 
       try {
         switch (command) {
           case InletCommandType.resolve:
             List<ResolvedStreamHandle<Object?>> resolvedStreams = [];
-            streamManager.resolveStreams(waitTime ?? 2);
+            if (prop != null && value != null) {
+              streamManager.resolveStreamsByProp(waitTime ?? 2, prop, value, 0);
+            } else if (pred != null) {
+              streamManager.resolveStreamsByPred(waitTime ?? 2, pred, 0);
+            } else {
+              streamManager.resolveStreams(waitTime ?? 2);
+            }
             resolvedStreams = streamManager.getStreamHandles();
             sendMessageFromWorker(id, resolvedStreams);
             break;
