@@ -38,6 +38,14 @@ class OutletProvider extends ChangeNotifier {
         ));
   }
 
+  _audioPlay() {
+    if (Platform.isIOS) service.play();
+  }
+
+  _audioStop() {
+    if (Platform.isIOS) service.stop();
+  }
+
   Future<void> findDevices() async {
     if (Platform.isIOS || Platform.isAndroid) {
       devices = [
@@ -75,7 +83,7 @@ class OutletProvider extends ChangeNotifier {
   Future<void> addStream(String deviceId) async {
     worker ??= await OutletWorker.spawn();
 
-    service.play();
+    _audioPlay();
 
     if (deviceId == gyroscope) {
       addGyroscopeStream(deviceId);
@@ -173,7 +181,11 @@ class OutletProvider extends ChangeNotifier {
         name, "PPG", Int64ChannelFormat(),
         channelCount: 4, nominalSRate: 135, sourceId: deviceId);
 
-    final result = await worker?.addStream(streamInfo);
+    // The Polar Verity Sense's internal clock has drifted requiring some preprocessing
+    final config =
+        OutletConfig.fromOffsetConfig(mode: OffsetMode.applyFirstToSamples);
+
+    final result = await worker?.addStream(streamInfo, config);
 
     if (result == null || !result) {
       return;
@@ -233,7 +245,7 @@ class OutletProvider extends ChangeNotifier {
   }
 
   void stopStreams() {
-    service.stop();
+    _audioStop();
 
     for (var stream in streams.entries) {
       stream.value.$1.cancel();

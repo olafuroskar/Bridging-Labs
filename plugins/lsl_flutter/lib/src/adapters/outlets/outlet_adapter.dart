@@ -83,7 +83,7 @@ abstract class OutletAdapter<S> {
   ///
   /// returns true if the wait was successful, false if the [timeout] expired.
   /// {@endtemplate}
-  Future<bool> waitForConsumers(double timeout) async {
+  bool waitForConsumers(double timeout) {
     try {
       return lsl.bindings
               .lsl_wait_for_consumers(_outletContainer._nativeOutlet, timeout) >
