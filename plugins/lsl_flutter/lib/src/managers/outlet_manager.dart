@@ -1,174 +1,170 @@
 part of 'managers.dart';
 
-/// A service for interacting with a single outlet
+/// How should host/device time offsets be handled in the outlet manager.
+enum OffsetMode {
+  /// Don't handle host/device time offsets
+  none,
+
+  /// Records the estimated host/device time offset periodically.
+  record,
+
+  /// Applies the first recorded host/device offset and ignores subsequent offsets.
+  ///
+  /// This option is only meant to offset the streamed samples once. Changing the offsets
+  /// during the lifetime of the outlet may skew the data, as the data may also be post-
+  /// processed when it reaches an inlet.
+  applyFirstToSamples
+}
+
+class OutletConfig {
+  final int chunkSize;
+  final int maxBuffered;
+  final OffsetMode mode;
+  final double offsetCalculationInterval;
+
+  /// [chunkSize] Optionally the desired chunk granularity (in samples) for transmission.
+  /// If specified as 0, each push operation yields one chunk.
+  /// [maxBuffered] Optionally the maximum amount of data to buffer (in seconds if there is a
+  /// nominal sampling rate, otherwise x100 in samples). A good default is 360, which corresponds to 6
+  /// minutes of data. Note that, for high-bandwidth data you will almost certainly want to use a lower
+  /// value here to avoid  running out of RAM.
+  /// [mode] The mode to use for processing host/device time offsets.
+  /// [offsetCalculationInterval] - Interval (in seconds) for computing new offsets.
+  const OutletConfig(this.chunkSize, this.maxBuffered, this.mode,
+      this.offsetCalculationInterval);
+
+  OutletConfig.fromOffsetConfig(
+      {OffsetMode mode = OffsetMode.none, double offsetCalculationInterval = 5})
+      : this(0, 360, mode, offsetCalculationInterval);
+}
+
+/// A service for interacting with a single outlet.
 ///
-/// An instance can be re-used for multiple outlets (after being destroyed of course), but
-/// creaing new instances instead is incouraged for clarity.
+/// An instance can be reused for multiple outlets (after being destroyed),
+/// but creating new instances instead is encouraged for clarity.
 class OutletManager<S> {
-  late int _chunkSize;
-  late int _maxBuffered;
-  late StreamInfo<S> _streamInfo;
+  late final StreamInfo<S> _streamInfo;
+  late final OutletAdapter<S> _outletAdapter;
+  late final OutletConfig _config;
 
-  late OutletAdapter<S> _outletAdapter;
-
-  /// Whether device vs. host time offsets should be recorded
-  late bool _recordOffsets;
-
-  /// Whether offsets should be applied to timestamps when pushing
-  late bool _applyOffsets;
-
-  /// The interval in which offsets are calculated
-  late double _offsetCalculationInterval;
-
-  /// Keep track of the last base (host) timestamp
   double _lastBase = 0;
-
-  /// Keep track of last offset to avoid lookup each time it's used
-  double _lastOffset = 0;
-
-  /// The recorder offsets between host and device
+  double? _lastOffset;
   final List<double> _offsets = [];
 
-  /// {@macro create}
-  /// [recordOffsets] Whether device vs. host time offsets should be recorded
-  /// [applyOffsets] Whether offsets should be applied to timestamps when pushing
-  /// [offsetCalculationInterval] The interval in which offsets are calculated
-  OutletManager(StreamInfo<S> streamInfo,
-      {int outletChunkSize = 0,
-      int outletMaxBuffered = 360,
-      bool recordOffsets = false,
-      bool applyOffsets = false,
-      double offsetCalculationInterval = 5.0}) {
+  /// Creates a new [OutletManager].
+  ///
+  /// [streamInfo] Metadata on the stream to be created
+  /// [config] Configuration parameters specified in [OutletConfig]
+  OutletManager(StreamInfo<S> streamInfo, [OutletConfig? config]) {
     _streamInfo = streamInfo;
-    _chunkSize = outletChunkSize;
-    _maxBuffered = outletMaxBuffered;
+    _config = config ?? OutletConfig(0, 360, OffsetMode.none, 5);
 
-    _recordOffsets = recordOffsets;
-    _applyOffsets = applyOffsets;
-    _offsetCalculationInterval = offsetCalculationInterval;
-
-    final outlet = Outlet<S>(_streamInfo, _chunkSize, _maxBuffered);
-
-    OutletAdapter<S>? outletAdapter;
+    final outlet =
+        Outlet<S>(_streamInfo, _config.chunkSize, _config.maxBuffered);
 
     if (S == int) {
-      /// Get the appropriate outlet adapter for the given integer channel format
-      ///
-      /// Here we have already established that S is in fact int
-      /// Furthermore, from the `T extends ChannelFormat<T>` type constraint we know that streamInfo.channelFormat
-      /// must be of type ChannelFormat<int>. The factory returns a narrower type but we must cast it back to a wider one.
-      outletAdapter = OutletAdapterFactory.createIntAdapterFromChannelFormat(
+      _outletAdapter = OutletAdapterFactory.createIntAdapterFromChannelFormat(
           outlet as Outlet<int>) as OutletAdapter<S>;
     } else if (S == double) {
-      /// Get the appropriate outlet adapter for the given double channel format
-      ///
-      /// Here we have already established that S is in fact double
-      /// Furthermore, from the `T extends ChannelFormat<T>` type constraint we know that streamInfo.channelFormat
-      /// must be of type ChannelFormat<double>. The factory returns a narrower type but we must cast it back to a wider one.
-      outletAdapter = OutletAdapterFactory.createDoubleAdapterFromChannelFormat(
-          outlet as Outlet<double>) as OutletAdapter<S>;
+      _outletAdapter =
+          OutletAdapterFactory.createDoubleAdapterFromChannelFormat(
+              outlet as Outlet<double>) as OutletAdapter<S>;
     } else if (S == String) {
-      /// Get the appropriate outlet adapter for the given String channel format
-      ///
-      /// Here we have already established that S is in fact String
-      /// Furthermore, from the `T extends ChannelFormat<T>` type constraint we know that streamInfo.channelFormat
-      /// must be of type ChannelFormat<String>. The factory returns a narrower type but we must cast it back to a wider one.
-      outletAdapter = OutletAdapterFactory.createStringAdapterFromChannelFormat(
-          outlet as Outlet<String>) as OutletAdapter<S>;
+      _outletAdapter =
+          OutletAdapterFactory.createStringAdapterFromChannelFormat(
+              outlet as Outlet<String>) as OutletAdapter<S>;
     } else {
       throw Exception("Unsupported type $S");
     }
-
-    _outletAdapter = outletAdapter;
   }
 
-  /// {@macro push_sample}
+  /// Pushes a single sample to the outlet.
   void pushSample(List<S> sample,
       [Timestamp? timestamp, bool pushthrough = true]) {
     _updateOffset(timestamp);
 
-    return _outletAdapter.pushSample(
-        sample,
-        !_applyOffsets ? timestamp : _applyOffsetToOptionalTimestamp(timestamp),
-        pushthrough);
+    _outletAdapter.pushSample(
+      sample,
+      _config.mode != OffsetMode.applyFirstToSamples
+          ? timestamp
+          : _applyOffsetToOptionalTimestamp(timestamp),
+      pushthrough,
+    );
   }
 
-  /// {@macro push_chunk}
+  /// Pushes a chunk of samples to the outlet.
   void pushChunk(List<List<S>> chunk,
       [Timestamp? timestamp, bool pushthrough = true]) {
     _updateOffset(timestamp);
 
-    return _outletAdapter.pushChunk(
-        chunk,
-        !_applyOffsets ? timestamp : _applyOffsetToOptionalTimestamp(timestamp),
-        pushthrough);
+    _outletAdapter.pushChunk(
+      chunk,
+      _config.mode != OffsetMode.applyFirstToSamples
+          ? timestamp
+          : _applyOffsetToOptionalTimestamp(timestamp),
+      pushthrough,
+    );
   }
 
-  /// {@macro push_chunk_with_timestamps}
+  /// Pushes a chunk of samples with explicit timestamps.
   void pushChunkWithTimestamps(List<List<S>> chunk, List<Timestamp> timestamps,
       [bool pushthrough = true]) {
     _updateOffset(timestamps.first);
 
-    return _outletAdapter.pushChunkWithTimestamps(
-        chunk,
-        !_applyOffsets
-            ? timestamps
-            : timestamps.map(_applyOffsetToTimestamp).toList(),
-        pushthrough);
+    _outletAdapter.pushChunkWithTimestamps(
+      chunk,
+      _config.mode != OffsetMode.applyFirstToSamples
+          ? timestamps
+          : timestamps.map(_applyOffsetToTimestamp).toList(),
+      pushthrough,
+    );
   }
 
-  /// {@macro destroy}
-  void destroy() {
-    return _outletAdapter.destroy();
-  }
+  /// Destroys the outlet.
+  void destroy() => _outletAdapter.destroy();
 
-  /// {@macro get_stream_info}
-  StreamInfo getStreamInfo() {
-    return _outletAdapter.getStreamInfo();
-  }
+  /// Returns the [StreamInfo] for the outlet.
+  StreamInfo getStreamInfo() => _outletAdapter.getStreamInfo();
 
-  /// {@macro have_consumers}
-  bool haveConsumers() {
-    return _outletAdapter.haveConsumers();
-  }
+  /// Returns whether there are consumers connected to this outlet.
+  bool haveConsumers() => _outletAdapter.haveConsumers();
 
-  /// {@macro wait_for_consumers}
-  bool waitForConsumers(double timeout) {
-    return _outletAdapter.waitForConsumers(timeout);
-  }
+  /// Waits for consumers to connect, with a timeout.
+  bool waitForConsumers(double timeout) =>
+      _outletAdapter.waitForConsumers(timeout);
 
-  /// Gets the estimated time offset between the clock of the intermediary device (the app) and the device providing timestamps.
+  /// Returns the list of recorded time offsets between host and device clocks.
   List<double> get offsets => _offsets;
 
-  /// Update the
   void _updateOffset(Timestamp? timestamp) {
-    if (!_recordOffsets && !_applyOffsets) return;
+    if (_config.mode == OffsetMode.none) return;
+
+    /// If first offset is only to be applied, exit if it has been stored once already.
+    if (_lastOffset != null && _config.mode == OffsetMode.applyFirstToSamples) {
+      return;
+    }
 
     if (timestamp == null) {
       throw Exception(
-          "The record/apply offsets option can only be used when timestamps are provided explicitly");
+        "Offsets can only be used when timestamps are provided explicitly.",
+      );
     }
 
     final base = DartTimestamp(DateTime.now()).toLslTime();
+    if (base - _lastBase < _config.offsetCalculationInterval) return;
 
-    /// If unsufficient time has passed, exit early
-    if (base - _lastBase < _offsetCalculationInterval) return;
-
-    final t0 = timestamp.toLslTime();
-    _lastOffset = t0 - base;
-
-    offsets.add(_lastOffset);
+    final offset = timestamp.toLslTime() - base;
+    _lastOffset = offset;
+    _offsets.add(offset);
     _lastBase = base;
   }
 
-  /// Apply the last recorded offset to a timestamp
   Timestamp? _applyOffsetToOptionalTimestamp(Timestamp? timestamp) {
     if (timestamp == null) return null;
     return _applyOffsetToTimestamp(timestamp);
   }
 
-  /// Apply the last recorded offset to a timestamp
   Timestamp _applyOffsetToTimestamp(Timestamp timestamp) {
-    return LslTimestamp(timestamp.toLslTime() + _lastOffset);
+    return LslTimestamp(timestamp.toLslTime() + (_lastOffset ?? 0));
   }
 }
