@@ -153,7 +153,7 @@ class OutletManager<S> {
     final base = DartTimestamp(DateTime.now()).toLslTime();
     if (base - _lastBase < _config.offsetCalculationInterval) return;
 
-    final offset = timestamp.toLslTime() - base;
+    final offset = base - timestamp.toLslTime();
     _lastOffset = offset;
     _offsets.add(offset);
     _lastBase = base;
