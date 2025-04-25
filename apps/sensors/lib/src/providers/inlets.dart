@@ -67,8 +67,10 @@ class InletProvider extends ChangeNotifier {
     for (var inlet in selectedInlets) {
       final handle = handles.firstWhere((handle) => handle.id == inlet);
       final sink = await openCsvFile(inlet);
-      writeRow(
-          sink, [List.generate(handle.info.channelCount, (index) => index)]);
+      writeRow(sink, [
+        ['timestamp'] +
+            List.generate(handle.info.channelCount, (index) => index.toString())
+      ]);
 
       final offsetSink = await openCsvFile("$inlet-offset");
       writeRow(offsetSink, [
