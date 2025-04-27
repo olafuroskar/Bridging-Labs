@@ -14,17 +14,17 @@ class AvailableDevices extends StatelessWidget {
               child: Text("No available sources"),
             )
           : ListView(
-              children: appState.devices.map((device) {
+              children: appState.devices.values.map((device) {
                 return ListTile(
-                  title: Text(device.$2),
+                  title: Text(device.$1),
                   // onTap: () => appState.toggleDeviceSelection(device.$1),
-                  trailing: device.$4
+                  trailing: device.$3
                       ? IconButton(
                           onPressed: () async {
                             final confirmed =
                                 await showConfirmationDialog(context);
                             if (confirmed ?? false) {
-                              appState.stopStream(device.$2);
+                              appState.stopStream(device.$1);
                             }
                           },
                           icon: Icon(Icons.stop, color: Colors.red))
@@ -33,8 +33,8 @@ class AvailableDevices extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                   builder: (_) => OutletFormScreen(
-                                        defaultConfig: getConfig(device.$2,
-                                            "PPG", device.$3, device.$1),
+                                        defaultConfig: getConfig(
+                                            device.$1, "PPG", device.$2),
                                       ))),
                           icon: Icon(Icons.wifi_tethering)),
                 );

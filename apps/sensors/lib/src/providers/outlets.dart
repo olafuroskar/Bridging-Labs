@@ -9,10 +9,10 @@ enum StreamType {
 
 const batchSize = 20;
 
-typedef Device = (int id, String name, StreamType streamType, bool active);
+typedef Device = (String name, StreamType streamType, bool active);
 
 class OutletProvider extends ChangeNotifier {
-  List<Device> devices = [];
+  Map<String, Device> devices = {};
 
   String? selectedDevice;
   Map<String, (StreamSubscription<Object?>, StreamType)> streams = {};
@@ -47,9 +47,9 @@ class OutletProvider extends ChangeNotifier {
   }
 
   _addDevice(String name, StreamType streamType) {
-    final id =
-        (devices.map((device) => device.$1).toList() + [0]).reduce(max) + 1;
-    devices.add((id, name, streamType, false));
+    if (devices.containsKey(name)) return;
+
+    devices[name] = ((name, streamType, false));
   }
 
   Future<void> findDevices() async {
@@ -60,10 +60,8 @@ class OutletProvider extends ChangeNotifier {
     }
 
     polar.searchForDevice().listen((event) {
-      if (!devices.any((item) => item.$2 == event.deviceId)) {
-        _addDevice(event.deviceId, StreamType.polar);
-        notifyListeners();
-      }
+      _addDevice(event.deviceId, StreamType.polar);
+      notifyListeners();
     });
 
     final granted = (await Permission.bluetoothScan.request().isGranted) &&
@@ -85,6 +83,15 @@ class OutletProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  updateDeviceName(String? oldName, String newName) {
+    if (oldName == null) return;
+    final oldDevice = devices[oldName];
+    if (oldDevice == null) return;
+
+    devices[newName] = (newName, oldDevice.$2, oldDevice.$3);
+    devices.remove(oldName);
+  }
+
   Future<void> addStream(OutletConfigDto config) async {
     worker ??= await OutletWorker.spawn();
 
@@ -101,7 +108,7 @@ class OutletProvider extends ChangeNotifier {
         addMuseStream(config.name, config);
     }
 
-    _activate(config.deviceId);
+    _activate(config.name);
     notifyListeners();
   }
 
@@ -271,6 +278,8 @@ class OutletProvider extends ChangeNotifier {
     }
 
     streams.remove(name);
+    _deactivate(name);
+
     if (streams.isEmpty) {
       worker?.close();
       worker = null;
@@ -305,12 +314,18 @@ class OutletProvider extends ChangeNotifier {
         configDto.mode, configDto.offsetCalculationInterval);
   }
 
-  void _activate(int deviceId) {
-    test(Device device) => device.$1 == deviceId;
+  void _activate(String name) {
+    var oldDevice = devices[name];
+    if (oldDevice == null) return;
 
-    var oldDevice = devices.firstWhere(test);
-    devices.removeWhere(test);
-    devices.insert(0, (oldDevice.$1, oldDevice.$2, oldDevice.$3, true));
+    devices[name] = (oldDevice.$1, oldDevice.$2, true);
+  }
+
+  void _deactivate(String name) {
+    var oldDevice = devices[name];
+    if (oldDevice == null) return;
+
+    devices[name] = (oldDevice.$1, oldDevice.$2, false);
   }
 
   StreamInfo<double> _createDoubleStreamInfo(OutletConfigDto config) {

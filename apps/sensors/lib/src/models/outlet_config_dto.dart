@@ -5,9 +5,6 @@ class OutletConfigDto {
   /// Device metadata - The type of stream, e.g. Polar device, Muse device, internal gyroscope etc.
   final StreamType streamType;
 
-  /// Device metadata - id of the device.
-  final int deviceId;
-
   /// The name of the stream to be created
   final String name;
 
@@ -49,7 +46,6 @@ class OutletConfigDto {
       {required this.name,
       required this.type,
       required this.streamType,
-      required this.deviceId,
       required this.channelFormat,
       required this.channelCount,
       required this.nominalSRate,

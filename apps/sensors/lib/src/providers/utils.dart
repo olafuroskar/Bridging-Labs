@@ -5,13 +5,12 @@ import 'package:sensors/main.dart';
 import 'package:sensors/src/models/outlet_config_dto.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
-OutletConfigDto polarConfig(String name, String type, int deviceId) {
+OutletConfigDto polarConfig(String name, String type) {
   return OutletConfigDto(
     name: name,
     channelFormat: Int64ChannelFormat(),
     type: type,
     streamType: StreamType.polar,
-    deviceId: deviceId,
     channelCount: 4,
     useLslTimestamps: false,
     nominalSRate: 135,
@@ -20,13 +19,12 @@ OutletConfigDto polarConfig(String name, String type, int deviceId) {
   );
 }
 
-OutletConfigDto museConfig(String name, String type, int deviceId) {
+OutletConfigDto museConfig(String name, String type) {
   return OutletConfigDto(
     name: name,
     channelFormat: Int64ChannelFormat(),
     type: type,
     streamType: StreamType.muse,
-    deviceId: deviceId,
     channelCount: 3,
     useLslTimestamps: false,
     nominalSRate: 64,
@@ -34,14 +32,12 @@ OutletConfigDto museConfig(String name, String type, int deviceId) {
   );
 }
 
-OutletConfigDto sensorsConfig(
-    String name, String type, StreamType streamType, int deviceId) {
+OutletConfigDto sensorsConfig(String name, String type, StreamType streamType) {
   return OutletConfigDto(
     name: name,
     channelFormat: Double64ChannelFormat(),
     type: type,
     streamType: streamType,
-    deviceId: deviceId,
     channelCount: 3,
     useLslTimestamps: false,
     nominalSRate: intervalToFrequency(SensorInterval.normalInterval),
@@ -49,16 +45,15 @@ OutletConfigDto sensorsConfig(
   );
 }
 
-OutletConfigDto getConfig(
-    String name, String type, StreamType streamType, int deviceId) {
+OutletConfigDto getConfig(String name, String type, StreamType streamType) {
   switch (streamType) {
     case StreamType.gyroscope:
-      return sensorsConfig(name, type, StreamType.gyroscope, deviceId);
+      return sensorsConfig(name, type, StreamType.gyroscope);
     case StreamType.accelerometer:
-      return sensorsConfig(name, type, StreamType.accelerometer, deviceId);
+      return sensorsConfig(name, type, StreamType.accelerometer);
     case StreamType.muse:
-      return museConfig(name, type, deviceId);
+      return museConfig(name, type);
     case StreamType.polar:
-      return polarConfig(name, type, deviceId);
+      return polarConfig(name, type);
   }
 }
