@@ -9,7 +9,6 @@ import 'package:flutter/services.dart';
 import 'package:lsl_bindings/lsl_bindings.dart';
 import 'package:lsl_flutter/lsl_flutter.dart';
 import 'package:lsl_flutter/src/adapters/inlets/processing_options.dart';
-import 'package:lsl_flutter/src/channel_formats/channel_format.dart';
 // TODO: Ekki gott
 import 'package:lsl_flutter/src/liblsl.dart';
 
@@ -31,6 +30,7 @@ part 'package:lsl_flutter/src/domain/stream_info.dart';
 part 'src/stream_info_factory.dart';
 
 // Channel formats
+part 'src/channel_formats/channel_format.dart';
 part 'src/channel_formats/int_channel_format.dart';
 part 'src/channel_formats/double_channel_format.dart';
 part 'src/channel_formats/string_channel_format.dart';

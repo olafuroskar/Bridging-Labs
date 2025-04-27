@@ -1,8 +1,12 @@
 import 'dart:ffi';
 
 void checkError(Pointer<Int32> ec) {
-  if (ec[0] < 0) {
-    switch (ec[0]) {
+  checkErrorValue(ec[0]);
+}
+
+void checkErrorValue(int e) {
+  if (e < 0) {
+    switch (e) {
       case -1:
         throw Exception("The operation failed due to a timeout.");
       case -2:

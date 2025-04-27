@@ -3,17 +3,21 @@ part of 'managers.dart';
 /// How should host/device time offsets be handled in the outlet manager.
 enum OffsetMode {
   /// Don't handle host/device time offsets
-  none,
+  none("none"),
 
   /// Records the estimated host/device time offset periodically.
-  record,
+  record("record"),
 
   /// Applies the first recorded host/device offset and ignores subsequent offsets.
   ///
   /// This option is only meant to offset the streamed samples once. Changing the offsets
   /// during the lifetime of the outlet may skew the data, as the data may also be post-
   /// processed when it reaches an inlet.
-  applyFirstToSamples
+  applyFirstToSamples("apply first to samples");
+
+  final String value;
+
+  const OffsetMode(this.value);
 }
 
 class OutletConfig {

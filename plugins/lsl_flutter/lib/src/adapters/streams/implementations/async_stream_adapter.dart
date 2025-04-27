@@ -6,6 +6,7 @@ import 'package:lsl_flutter/lsl_flutter.dart';
 import 'package:lsl_flutter/src/adapters/inlets/inlets.dart';
 import 'package:lsl_flutter/src/adapters/streams/resolved_stream.dart';
 import 'package:lsl_flutter/src/adapters/streams/stream_adapter.dart';
+import 'package:lsl_flutter/src/adapters/utils.dart';
 import 'package:lsl_flutter/src/liblsl.dart';
 import 'package:lsl_flutter/src/utils/stream_info.dart';
 
@@ -32,7 +33,10 @@ class AsyncStreamAdapter implements StreamAdapter {
 
     // Resolve all streams on the network and write them to the buffer.
     // Return the number of streams found
-    var numStreams = lsl.bindings.lsl_resolve_all(buffer, bufferSize, waitTime);
+    final numStreams =
+        lsl.bindings.lsl_resolve_all(buffer, bufferSize, waitTime);
+
+    checkErrorValue(numStreams);
 
     for (var i = 0; i < numStreams; i++) {
       final info = getStreamInfo(buffer[i]);

@@ -126,7 +126,7 @@ class OutletWorker {
   /// [name] The name of the stream
   /// [chunk] Data to be pushed to the stream
   /// [timestamps] Timestamps per sample
-  Future<bool> pushChunkWithTimestamp(String name, List<List<Object?>> chunk,
+  Future<bool> pushChunkWithTimestamps(String name, List<List<Object?>> chunk,
       List<Timestamp> timestamps) async {
     if (_closed) throw StateError('Closed');
     if (!streams.containsKey(name)) {
