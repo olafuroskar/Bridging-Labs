@@ -1,17 +1,19 @@
 part of '../../main.dart';
 
 enum StreamType {
-  device,
+  gyroscope,
+  accelerometer,
   polar,
   muse;
 }
 
 const batchSize = 20;
-final gyroscope = "Gyroscope ${Platform.operatingSystem}";
-final accelerometer = "Accelerometer ${Platform.operatingSystem}";
+
+typedef Device = (int id, String name, StreamType streamType, bool active);
 
 class OutletProvider extends ChangeNotifier {
-  List<(String, StreamType)> devices = [];
+  List<Device> devices = [];
+
   String? selectedDevice;
   Map<String, (StreamSubscription<Object?>, StreamType)> streams = {};
   bool isWorkerListenedTo = false;
@@ -22,12 +24,10 @@ class OutletProvider extends ChangeNotifier {
   late MyAudioHandler service;
 
   OutletProvider() {
-    print("outlet init");
     _init();
   }
 
   _init() async {
-    print("service init");
     service = await AudioService.init(
         builder: () => MyAudioHandler(),
         config: AudioServiceConfig(
@@ -46,17 +46,22 @@ class OutletProvider extends ChangeNotifier {
     if (Platform.isIOS) service.stop();
   }
 
+  _addDevice(String name, StreamType streamType) {
+    final id =
+        (devices.map((device) => device.$1).toList() + [0]).reduce(max) + 1;
+    devices.add((id, name, streamType, false));
+  }
+
   Future<void> findDevices() async {
     if (Platform.isIOS || Platform.isAndroid) {
-      devices = [
-        (gyroscope, StreamType.device),
-        (accelerometer, StreamType.device)
-      ];
+      _addDevice("Gyroscope ${Platform.operatingSystem}", StreamType.gyroscope);
+      _addDevice("Accelerometer ${Platform.operatingSystem}",
+          StreamType.accelerometer);
     }
 
     polar.searchForDevice().listen((event) {
-      if (!devices.any((item) => item.$1 == event.deviceId)) {
-        devices.add((event.deviceId, StreamType.polar));
+      if (!devices.any((item) => item.$2 == event.deviceId)) {
+        _addDevice(event.deviceId, StreamType.polar);
         notifyListeners();
       }
     });
@@ -71,7 +76,7 @@ class OutletProvider extends ChangeNotifier {
         if (muses == null) return;
 
         for (var muse in muses) {
-          devices.add((muse, StreamType.muse));
+          _addDevice(muse, StreamType.muse);
           _muses = muses;
         }
       });
@@ -80,34 +85,33 @@ class OutletProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addStream(String deviceId) async {
+  Future<void> addStream(OutletConfigDto config) async {
     worker ??= await OutletWorker.spawn();
 
     _audioPlay();
 
-    if (deviceId == gyroscope) {
-      addGyroscopeStream(deviceId);
-    } else if (deviceId == accelerometer) {
-      addAccelerometerStream(deviceId);
-    } else {
-      final type = devices.firstWhere((device) => deviceId == device.$1).$2;
-      if (type == StreamType.polar) {
-        addPolarStream(deviceId);
-      } else {
-        addMuseStream(deviceId);
-      }
+    switch (config.streamType) {
+      case StreamType.gyroscope:
+        addGyroscopeStream(config);
+      case StreamType.accelerometer:
+        addAccelerometerStream(config);
+      case StreamType.polar:
+        addPolarStream(config.name, config);
+      case StreamType.muse:
+        addMuseStream(config.name, config);
     }
+
+    _activate(config.deviceId);
+    notifyListeners();
   }
 
-  void addGyroscopeStream(String deviceId) async {
+  /// Creates and subscribes to a gyroscope data stream
+  void addGyroscopeStream(OutletConfigDto config) async {
     List<List<double>> buffer = [];
+    List<Timestamp> timestampBuffer = [];
 
-    final streamInfo = StreamInfoFactory.createDoubleStreamInfo(
-        deviceId, "Gyroscope", Double64ChannelFormat(),
-        channelCount: 3,
-        nominalSRate: intervalToFrequency(SensorInterval.normalInterval));
-
-    final result = await worker?.addStream(streamInfo);
+    final result = await worker?.addStream(
+        _createDoubleStreamInfo(config), _getConfig(config));
 
     if (result == null || !result) {
       return;
@@ -118,26 +122,31 @@ class OutletProvider extends ChangeNotifier {
             .listen(
       (event) {
         buffer.add([event.x, event.y, event.z]);
+        timestampBuffer.add(DartTimestamp(event.timestamp));
+
         if (buffer.length >= batchSize) {
-          worker?.pushChunk(deviceId, buffer);
+          if (config.useLslTimestamps) {
+            worker?.pushChunk(config.name, buffer);
+          } else {
+            worker?.pushChunkWithTimestamps(
+                config.name, buffer, timestampBuffer);
+          }
           buffer.clear();
+          timestampBuffer.clear();
         }
       },
     );
 
-    streams[deviceId] = (subscription, StreamType.device);
+    streams[config.name] = (subscription, StreamType.gyroscope);
   }
 
-  void addAccelerometerStream(String deviceId) async {
+  /// Creates and subscribes to an accelerometer data stream
+  void addAccelerometerStream(OutletConfigDto config) async {
     List<List<double>> buffer = [];
     List<Timestamp> timestampBuffer = [];
 
-    final streamInfo = StreamInfoFactory.createDoubleStreamInfo(
-        deviceId, "Accelerometer", Double64ChannelFormat(),
-        channelCount: 3,
-        nominalSRate: intervalToFrequency(SensorInterval.normalInterval));
-
-    final result = await worker?.addStream(streamInfo);
+    final result = await worker?.addStream(
+        _createDoubleStreamInfo(config), _getConfig(config));
 
     if (result == null || !result) {
       return;
@@ -151,17 +160,23 @@ class OutletProvider extends ChangeNotifier {
         timestampBuffer.add(DartTimestamp(event.timestamp));
 
         if (buffer.length >= batchSize) {
-          worker?.pushChunkWithTimestamp(deviceId, buffer, timestampBuffer);
+          if (config.useLslTimestamps) {
+            worker?.pushChunk(config.name, buffer);
+          } else {
+            worker?.pushChunkWithTimestamps(
+                config.name, buffer, timestampBuffer);
+          }
           buffer.clear();
           timestampBuffer.clear();
         }
       },
     );
 
-    streams[deviceId] = (subscription, StreamType.device);
+    streams[config.name] = (subscription, StreamType.accelerometer);
   }
 
-  void addPolarStream(String deviceId) async {
+  /// Creates and subscribes to a Polar data stream
+  void addPolarStream(String deviceId, OutletConfigDto config) async {
     List<List<int>> buffer = [];
     List<Timestamp> timestampBuffer = [];
 
@@ -172,20 +187,11 @@ class OutletProvider extends ChangeNotifier {
           e.identifier == deviceId &&
           e.feature == PolarSdkFeature.onlineStreaming);
     } catch (e) {
-      log("$e");
+      developer.log("$e");
     }
 
-    final name = "Polar $deviceId";
-
-    final streamInfo = StreamInfoFactory.createIntStreamInfo(
-        name, "PPG", Int64ChannelFormat(),
-        channelCount: 4, nominalSRate: 135, sourceId: deviceId);
-
-    // The Polar Verity Sense's internal clock has drifted requiring some preprocessing
-    final config =
-        OutletConfig.fromOffsetConfig(mode: OffsetMode.applyFirstToSamples);
-
-    final result = await worker?.addStream(streamInfo, config);
+    final result = await worker?.addStream(
+        _createIntStreamInfo(config), _getConfig(config));
 
     if (result == null || !result) {
       return;
@@ -198,7 +204,12 @@ class OutletProvider extends ChangeNotifier {
             event.samples.map((item) => DartTimestamp(item.timeStamp.toUtc())));
 
         if (buffer.length >= batchSize) {
-          worker?.pushChunkWithTimestamp(name, buffer, timestampBuffer);
+          if (config.useLslTimestamps) {
+            worker?.pushChunk(config.name, buffer);
+          } else {
+            worker?.pushChunkWithTimestamps(
+                config.name, buffer, timestampBuffer);
+          }
           buffer.clear();
           timestampBuffer.clear();
         }
@@ -208,19 +219,15 @@ class OutletProvider extends ChangeNotifier {
     streams[deviceId] = (subscription, StreamType.polar);
   }
 
-  void addMuseStream(String deviceId) async {
+  /// Creates and subscribes to a Muse data stream
+  void addMuseStream(String deviceId, OutletConfigDto config) async {
     List<List<double>> buffer = [];
     List<Timestamp> timestampBuffer = [];
 
     await _museSdkPlugin.connect(_muses.indexOf(deviceId));
 
-    final name = deviceId;
-
-    final streamInfo = StreamInfoFactory.createDoubleStreamInfo(
-        name, "PPG", Double64ChannelFormat(),
-        channelCount: 3, nominalSRate: 64, sourceId: deviceId);
-
-    final result = await worker?.addStream(streamInfo);
+    final result = await worker?.addStream(
+        _createDoubleStreamInfo(config), _getConfig(config));
 
     if (result == null || !result) {
       return;
@@ -234,7 +241,12 @@ class OutletProvider extends ChangeNotifier {
         timestampBuffer.addAll(event.map((item) => DartTimestamp(item.$1)));
 
         if (buffer.length >= batchSize) {
-          worker?.pushChunkWithTimestamp(name, buffer, timestampBuffer);
+          if (config.useLslTimestamps) {
+            worker?.pushChunk(config.name, buffer);
+          } else {
+            worker?.pushChunkWithTimestamps(
+                config.name, buffer, timestampBuffer);
+          }
           buffer.clear();
           timestampBuffer.clear();
         }
@@ -242,6 +254,30 @@ class OutletProvider extends ChangeNotifier {
     );
 
     streams[deviceId] = (subscription, StreamType.muse);
+  }
+
+  void stopStream(String name) {
+    final stream = streams[name];
+    if (stream == null) return;
+
+    stream.$1.cancel();
+    if (stream.$2 == StreamType.polar) {
+      polar.disconnectFromDevice(name);
+    }
+
+    if (stream.$2 == StreamType.muse) {
+      // Disconnects all Muse devices
+      _museSdkPlugin.disconnect();
+    }
+
+    streams.remove(name);
+    if (streams.isEmpty) {
+      worker?.close();
+      worker = null;
+      _audioStop();
+    }
+
+    notifyListeners();
   }
 
   void stopStreams() {
@@ -262,5 +298,34 @@ class OutletProvider extends ChangeNotifier {
   void toggleDeviceSelection(String? device) {
     selectedDevice = device;
     notifyListeners();
+  }
+
+  OutletConfig _getConfig(OutletConfigDto configDto) {
+    return OutletConfig(configDto.chunkSize, configDto.maxBuffered,
+        configDto.mode, configDto.offsetCalculationInterval);
+  }
+
+  void _activate(int deviceId) {
+    test(Device device) => device.$1 == deviceId;
+
+    var oldDevice = devices.firstWhere(test);
+    devices.removeWhere(test);
+    devices.insert(0, (oldDevice.$1, oldDevice.$2, oldDevice.$3, true));
+  }
+
+  StreamInfo<double> _createDoubleStreamInfo(OutletConfigDto config) {
+    return StreamInfoFactory.createDoubleStreamInfo(
+        config.name, config.type, config.channelFormat as ChannelFormat<double>,
+        channelCount: config.channelCount,
+        nominalSRate: config.nominalSRate,
+        sourceId: config.sourceId);
+  }
+
+  StreamInfo<int> _createIntStreamInfo(OutletConfigDto config) {
+    return StreamInfoFactory.createIntStreamInfo(
+        config.name, config.type, config.channelFormat as ChannelFormat<int>,
+        channelCount: config.channelCount,
+        nominalSRate: config.nominalSRate,
+        sourceId: config.sourceId);
   }
 }
