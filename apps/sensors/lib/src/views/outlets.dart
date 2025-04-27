@@ -33,6 +33,15 @@ class _OutletScreenState extends State<OutletScreen>
                     await appState.findDevices();
                   },
                   icon: const Icon(Icons.refresh)),
+              IconButton(
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => OutletFormScreen(
+                                defaultConfig:
+                                    getConfig("Marker", StreamType.marker),
+                              ))),
+                  icon: const Icon(Icons.add)),
             ],
           ),
           body: AvailableDevices());

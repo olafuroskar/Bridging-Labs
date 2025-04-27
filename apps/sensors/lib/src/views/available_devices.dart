@@ -33,8 +33,8 @@ class AvailableDevices extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                   builder: (_) => OutletFormScreen(
-                                        defaultConfig: getConfig(
-                                            device.$1, "PPG", device.$2),
+                                        defaultConfig:
+                                            getConfig(device.$1, device.$2),
                                       ))),
                           icon: Icon(Icons.wifi_tethering)),
                 );

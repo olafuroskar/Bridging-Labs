@@ -89,8 +89,8 @@ class OutletWorker {
   /// [name] The name of the stream
   /// [sample] Data to be pushed to the stream
   /// [timestamp] Optional user provided timestamp
-  Future<bool> pushSample(
-      String name, List<Object?> sample, Timestamp? timestamp) async {
+  Future<bool> pushSample(String name, List<Object?> sample,
+      [Timestamp? timestamp]) async {
     if (_closed) throw StateError('Closed');
     if (!streams.containsKey(name)) {
       throw Exception("Stream with name $name does not exists");

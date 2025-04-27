@@ -1,6 +1,7 @@
 part of '../../main.dart';
 
 enum StreamType {
+  marker,
   gyroscope,
   accelerometer,
   polar,
@@ -15,7 +16,7 @@ class OutletProvider extends ChangeNotifier {
   Map<String, Device> devices = {};
 
   String? selectedDevice;
-  Map<String, (StreamSubscription<Object?>, StreamType)> streams = {};
+  Map<String, (StreamSubscription<Object?>?, StreamType)> streams = {};
   bool isWorkerListenedTo = false;
   OutletWorker? worker;
   final _museSdkPlugin = MuseSdk();
@@ -73,6 +74,8 @@ class OutletProvider extends ChangeNotifier {
     _audioPlay();
 
     switch (config.streamType) {
+      case StreamType.marker:
+        addMarkerStream(config);
       case StreamType.gyroscope:
         addGyroscopeStream(config);
       case StreamType.accelerometer:
@@ -83,7 +86,7 @@ class OutletProvider extends ChangeNotifier {
         addMuseStream(config.name, config);
     }
 
-    _activate(config.name);
+    _activate(config);
     notifyListeners();
   }
 
@@ -198,7 +201,7 @@ class OutletProvider extends ChangeNotifier {
       },
     );
 
-    streams[deviceId] = (subscription, StreamType.polar);
+    streams[config.name] = (subscription, StreamType.polar);
   }
 
   /// Creates and subscribes to a Muse data stream
@@ -235,14 +238,37 @@ class OutletProvider extends ChangeNotifier {
       },
     );
 
-    streams[deviceId] = (subscription, StreamType.muse);
+    streams[config.name] = (subscription, StreamType.muse);
+  }
+
+  void pushMarkers(List<String> markers) async {
+    final markerName = devices.entries
+        .firstWhere((entry) => entry.value.$2 == StreamType.marker)
+        .value
+        .$1;
+
+    await worker?.pushSample(markerName, markers);
+  }
+
+  void addMarkerStream(OutletConfigDto config) async {
+    final result = await worker?.addStream(
+        _createStringStreamInfo(config), _getConfig(config));
+
+    if (result == null || !result) {
+      return;
+    }
+
+    streams[config.name] = (null, StreamType.marker);
   }
 
   void stopStream(String name) {
+    // Called before stream is removed as markers don't have Dart streams.
+    _deactivate(name);
+
     final stream = streams[name];
     if (stream == null) return;
 
-    stream.$1.cancel();
+    stream.$1?.cancel();
     if (stream.$2 == StreamType.polar) {
       polar.disconnectFromDevice(name);
     }
@@ -268,7 +294,7 @@ class OutletProvider extends ChangeNotifier {
     _audioStop();
 
     for (var stream in streams.entries) {
-      stream.value.$1.cancel();
+      stream.value.$1?.cancel();
       if (stream.value.$2 == StreamType.polar) {
         polar.disconnectFromDevice(stream.key);
       }
@@ -314,11 +340,13 @@ class OutletProvider extends ChangeNotifier {
         configDto.mode, configDto.offsetCalculationInterval);
   }
 
-  void _activate(String name) {
-    var oldDevice = devices[name];
-    if (oldDevice == null) return;
-
-    devices[name] = (oldDevice.$1, oldDevice.$2, true);
+  void _activate(OutletConfigDto config) {
+    var oldDevice = devices[config.name];
+    if (oldDevice == null) {
+      devices[config.name] = (config.name, config.streamType, true);
+    } else {
+      devices[config.name] = (oldDevice.$1, oldDevice.$2, true);
+    }
   }
 
   void _deactivate(String name) {
@@ -339,6 +367,14 @@ class OutletProvider extends ChangeNotifier {
   StreamInfo<int> _createIntStreamInfo(OutletConfigDto config) {
     return StreamInfoFactory.createIntStreamInfo(
         config.name, config.type, config.channelFormat as ChannelFormat<int>,
+        channelCount: config.channelCount,
+        nominalSRate: config.nominalSRate,
+        sourceId: config.sourceId);
+  }
+
+  StreamInfo<String> _createStringStreamInfo(OutletConfigDto config) {
+    return StreamInfoFactory.createStringStreamInfo(
+        config.name, config.type, config.channelFormat as ChannelFormat<String>,
         channelCount: config.channelCount,
         nominalSRate: config.nominalSRate,
         sourceId: config.sourceId);

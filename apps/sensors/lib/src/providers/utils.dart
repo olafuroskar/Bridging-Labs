@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:lsl_flutter/lsl_flutter.dart';
 import 'package:sensors/main.dart';
 import 'package:sensors/src/models/outlet_config_dto.dart';
@@ -14,7 +12,7 @@ OutletConfigDto polarConfig(String name, String type) {
     channelCount: 4,
     useLslTimestamps: false,
     nominalSRate: 135,
-    sourceId: "Polar $name",
+    sourceId: name,
     mode: OffsetMode.applyFirstToSamples,
   );
 }
@@ -28,7 +26,7 @@ OutletConfigDto museConfig(String name, String type) {
     channelCount: 3,
     useLslTimestamps: false,
     nominalSRate: 64,
-    sourceId: "Muse $name",
+    sourceId: name,
   );
 }
 
@@ -41,19 +39,34 @@ OutletConfigDto sensorsConfig(String name, String type, StreamType streamType) {
     channelCount: 3,
     useLslTimestamps: false,
     nominalSRate: intervalToFrequency(SensorInterval.normalInterval),
-    sourceId: name + Platform.operatingSystem,
+    sourceId: name,
   );
 }
 
-OutletConfigDto getConfig(String name, String type, StreamType streamType) {
+OutletConfigDto markerConfig(String name, String type, StreamType streamType) {
+  return OutletConfigDto(
+    name: name,
+    channelFormat: CftStringChannelFormat(),
+    type: type,
+    streamType: streamType,
+    channelCount: 1,
+    useLslTimestamps: true,
+    nominalSRate: 0,
+    sourceId: name,
+  );
+}
+
+OutletConfigDto getConfig(String name, StreamType streamType) {
   switch (streamType) {
+    case StreamType.marker:
+      return markerConfig(name, "Marker", StreamType.marker);
     case StreamType.gyroscope:
-      return sensorsConfig(name, type, StreamType.gyroscope);
+      return sensorsConfig(name, "Gyroscope", StreamType.gyroscope);
     case StreamType.accelerometer:
-      return sensorsConfig(name, type, StreamType.accelerometer);
+      return sensorsConfig(name, "Accelerometer", StreamType.accelerometer);
     case StreamType.muse:
-      return museConfig(name, type);
+      return museConfig(name, "PPG");
     case StreamType.polar:
-      return polarConfig(name, type);
+      return polarConfig(name, "PPG");
   }
 }
