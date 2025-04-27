@@ -27,31 +27,6 @@ class OutletProvider extends ChangeNotifier {
     _init();
   }
 
-  _init() async {
-    service = await AudioService.init(
-        builder: () => MyAudioHandler(),
-        config: AudioServiceConfig(
-          androidNotificationChannelId: 'dk.dtu.sensors.audio',
-          androidNotificationChannelName: 'Audio Playback',
-          androidNotificationOngoing: true,
-          // androidStopForegroundOnPause: false,
-        ));
-  }
-
-  _audioPlay() {
-    if (Platform.isIOS) service.play();
-  }
-
-  _audioStop() {
-    if (Platform.isIOS) service.stop();
-  }
-
-  _addDevice(String name, StreamType streamType) {
-    if (devices.containsKey(name)) return;
-
-    devices[name] = ((name, streamType, false));
-  }
-
   Future<void> findDevices() async {
     if (Platform.isIOS || Platform.isAndroid) {
       _addDevice("Gyroscope ${Platform.operatingSystem}", StreamType.gyroscope);
@@ -307,6 +282,31 @@ class OutletProvider extends ChangeNotifier {
   void toggleDeviceSelection(String? device) {
     selectedDevice = device;
     notifyListeners();
+  }
+
+  _init() async {
+    service = await AudioService.init(
+        builder: () => MyAudioHandler(),
+        config: AudioServiceConfig(
+          androidNotificationChannelId: 'dk.dtu.sensors.audio',
+          androidNotificationChannelName: 'Audio Playback',
+          androidNotificationOngoing: true,
+          // androidStopForegroundOnPause: false,
+        ));
+  }
+
+  _audioPlay() {
+    if (Platform.isIOS) service.play();
+  }
+
+  _audioStop() {
+    if (Platform.isIOS) service.stop();
+  }
+
+  _addDevice(String name, StreamType streamType) {
+    if (devices.containsKey(name)) return;
+
+    devices[name] = ((name, streamType, false));
   }
 
   OutletConfig _getConfig(OutletConfigDto configDto) {
