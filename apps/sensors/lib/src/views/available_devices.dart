@@ -17,7 +17,10 @@ class AvailableDevices extends StatelessWidget {
               children: appState.devices.values.map((device) {
                 return ListTile(
                   title: Text(device.$1),
-                  // onTap: () => appState.toggleDeviceSelection(device.$1),
+                  onTap: () => device.$2 == StreamType.marker
+                      ? Navigator.push(context,
+                          MaterialPageRoute(builder: (_) => MarkerScreen()))
+                      : null,
                   trailing: device.$3
                       ? IconButton(
                           onPressed: () async {

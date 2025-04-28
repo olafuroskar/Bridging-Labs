@@ -99,7 +99,7 @@ class OutletWorker {
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    sendCommand(id, OutletCommandType.pushChunk,
+    sendCommand(id, OutletCommandType.pushSample,
         name: name, sample: sample, timestamp: timestamp);
     return await completer.future;
   }

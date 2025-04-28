@@ -25,6 +25,7 @@ part 'src/views/inlets.dart';
 part 'src/views/inlet_results.dart';
 part 'src/views/available_devices.dart';
 part 'src/views/active_outlets.dart';
+part 'src/views/marker_screen.dart';
 
 part 'src/providers/outlets.dart';
 part 'src/providers/inlets.dart';
