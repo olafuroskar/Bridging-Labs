@@ -2,7 +2,7 @@ part of '../lsl_bindings.dart';
 
 const String _libName = 'lsl_bindings';
 
-/// The dynamic library in which the symbols for [LslBindingsBindings] can be found.
+/// The dynamic library in which the symbols for [LslBindings] can be found.
 final DynamicLibrary _dylib = () {
   if (Platform.isMacOS || Platform.isIOS) {
     return DynamicLibrary.open('$_libName.framework/$_libName');
@@ -17,4 +17,4 @@ final DynamicLibrary _dylib = () {
 }();
 
 /// The bindings to the native functions in [_dylib].
-final LslBindingsBindings lslBindings = LslBindingsBindings(_dylib);
+final LslBindings lslBindings = LslBindings(_dylib);

@@ -25,11 +25,10 @@ import 'package:multicast_lock/multicast_lock.dart' as _i5;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-/// A class which mocks [LslBindingsBindings].
+/// A class which mocks [LslBindings].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockLslBindingsBindings extends _i1.Mock
-    implements _i2.LslBindingsBindings {
+class MockLslBindings extends _i1.Mock implements _i2.LslBindings {
   @override
   _i3.Pointer<_i2.lsl_outlet_struct_> lsl_create_outlet(
     _i3.Pointer<_i2.lsl_streaminfo_struct_>? info,
