@@ -12,17 +12,17 @@ import 'dart:ffi' as ffi;
 ///
 /// Regenerate bindings with `dart run ffigen --config ffigen.yaml`.
 ///
-class LslBindingsBindings {
+class LslBindings {
   /// Holds the symbol lookup function.
   final ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName)
       _lookup;
 
   /// The symbols are looked up in [dynamicLibrary].
-  LslBindingsBindings(ffi.DynamicLibrary dynamicLibrary)
+  LslBindings(ffi.DynamicLibrary dynamicLibrary)
       : _lookup = dynamicLibrary.lookup;
 
   /// The symbols are looked up with [lookup].
-  LslBindingsBindings.fromLookup(
+  LslBindings.fromLookup(
       ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName)
           lookup)
       : _lookup = lookup;
