@@ -11,7 +11,7 @@ final DynamicLibrary _dylib = () {
     return DynamicLibrary.open('liblsl.so');
   }
   if (Platform.isWindows) {
-    return DynamicLibrary.open('$_libName.dll');
+    return DynamicLibrary.open('lsl.dll');
   }
   throw UnsupportedError('Unknown platform: ${Platform.operatingSystem}');
 }();
