@@ -11,8 +11,7 @@ jobs:
 
     defaults:
       run:
-        # working-directory: apps/sensors
-        working-directory: plugins/lsl_bindings/example
+        working-directory: apps/sensors
 
     steps:
       - name: 🧾 Checkout repository
