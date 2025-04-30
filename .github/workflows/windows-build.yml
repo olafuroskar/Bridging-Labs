@@ -36,4 +36,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: sensors-windows-build
-          path: apps/sensors/build/windows/x64/runner/Release/sensors.exe
+          path: apps/sensors/build/windows/x64/runner/Release/
