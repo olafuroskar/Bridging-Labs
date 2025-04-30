@@ -3,19 +3,17 @@ part of 'managers.dart';
 class InletManager<S> {
   late final InletAdapter<S> _inletAdapter;
   final UtilsAdapter _utilsAdapter = UtilsAdapter();
-  bool isClosed = true;
+  bool _isStreaming = false;
 
   InletManager._(this._inletAdapter);
 
   /// {@macro open_stream}
   Future<void> openStream([double timeout = double.infinity]) async {
     _inletAdapter.openStream();
-    isClosed = false;
   }
 
   /// {@macro close_stream}
   void closeStream() {
-    isClosed = true;
     _inletAdapter.closeStream();
   }
 
@@ -53,51 +51,75 @@ class InletManager<S> {
     return _inletAdapter.setPostProcessing(flags);
   }
 
+  Duration _delay(double nominalSRate) {
+    if ((1000 / nominalSRate).isInfinite) return Duration(seconds: 1);
+    return Duration(milliseconds: (1000 / nominalSRate).toInt());
+  }
+
+  stopStream() {
+    _isStreaming = false;
+  }
+
   Stream<Sample<S>> startSampleStream() async* {
-    if (isClosed) return;
+    // Early return if manager is already streaming.
+    if (_isStreaming) return;
+    _isStreaming = true;
     final nominalSRate = getStreamInfo().nominalSRate;
-    final delay = Duration(milliseconds: (1000 / nominalSRate).toInt());
+    final delay = _delay(nominalSRate);
 
     while (true) {
       await Future.delayed(delay);
 
-      final sample = pullSample();
-      if (sample != null && sample.$1.isNotEmpty) {
-        yield sample;
+      if (!_isStreaming) break;
+
+      try {
+        final sample = pullSample();
+        if (sample != null && sample.$1.isNotEmpty) {
+          yield sample;
+        }
+      } catch (e) {
+        break;
       }
-      if (isClosed) break;
     }
   }
 
   Stream<Chunk<S>> startChunkStream() async* {
-    if (isClosed) return;
+    // Early return if manager is already streaming.
+    if (_isStreaming) return;
+    _isStreaming = true;
     final nominalSRate = getStreamInfo().nominalSRate;
-    final delay = Duration(milliseconds: (1000 / nominalSRate).toInt());
+    final delay = _delay(nominalSRate);
 
     while (true) {
       await Future.delayed(delay);
 
-      final chunk = pullChunk();
-      if (chunk != null && chunk.isNotEmpty) {
-        yield chunk;
+      if (!_isStreaming) break;
+
+      try {
+        final chunk = pullChunk();
+        if (chunk != null && chunk.isNotEmpty) {
+          yield chunk;
+        }
+      } catch (e) {
+        break;
       }
-      if (isClosed) break;
     }
   }
 
   Stream<TimeOffset> startTimeCorrectionStream(
       {Duration interval = const Duration(seconds: 5),
       double timeout = double.infinity}) async* {
-    if (isClosed) return;
+    if (_isStreaming) return;
+    _isStreaming = true;
 
     while (true) {
       await Future.delayed(interval);
 
+      if (!_isStreaming) break;
+
       final offset = timeCorrection(timeout);
       final now = _utilsAdapter.localClock();
       yield (now, offset);
-
-      if (isClosed) break;
     }
   }
 }

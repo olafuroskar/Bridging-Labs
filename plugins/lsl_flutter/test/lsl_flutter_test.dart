@@ -12,10 +12,10 @@ import 'package:test/test.dart';
 import 'lsl_flutter_test.mocks.dart';
 
 // Use the mock native bindings and mock mutlicast lock
-final LslBindingsBindings _mockBindings = MockLslBindingsBindings();
+final LslBindings _mockBindings = MockLslBindings();
 final MockMulticastLock _mockMulticastLock = MockMulticastLock();
 
-@GenerateNiceMocks([MockSpec<LslBindingsBindings>(), MockSpec<MulticastLock>()])
+@GenerateNiceMocks([MockSpec<LslBindings>(), MockSpec<MulticastLock>()])
 void main() {
   late Pointer<lsl_streaminfo_struct_> streamInfoPointer;
   late Pointer<lsl_outlet_struct_> outletPointer;

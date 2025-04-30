@@ -10,8 +10,7 @@ class InletProvider extends ChangeNotifier {
 
   List<String> selectedInlets = [];
   StreamManager streamManager = StreamManager();
-  final Map<String, (InletManager<Object?>, StreamSubscription<Chunk<Object?>>)>
-      inlets = {};
+  final Map<String, StreamSubscription<Chunk<Object?>>?> inlets = {};
 
   List<String> get streams =>
       handles.map((handle) => handle.info.name).toList();
@@ -38,7 +37,7 @@ class InletProvider extends ChangeNotifier {
   }
 
   void clearInlets() {
-    worker?.close();
+    worker?.shutdown();
   }
 
   Future<void> resolveStreams(double waitTime) async {
@@ -50,7 +49,8 @@ class InletProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void closeInlet(String key) {
+  void closeInlet(String key) async {
+    await inlets[key]?.cancel();
     worker?.stop(key);
   }
 
@@ -67,8 +67,10 @@ class InletProvider extends ChangeNotifier {
     for (var inlet in selectedInlets) {
       final handle = handles.firstWhere((handle) => handle.id == inlet);
       final sink = await openCsvFile(inlet);
-      writeRow(
-          sink, [List.generate(handle.info.channelCount, (index) => index)]);
+      writeRow(sink, [
+        ['timestamp'] +
+            List.generate(handle.info.channelCount, (index) => index.toString())
+      ]);
 
       final offsetSink = await openCsvFile("$inlet-offset");
       writeRow(offsetSink, [
@@ -82,8 +84,16 @@ class InletProvider extends ChangeNotifier {
           await worker?.open(inlet, synchronize: synchronize ?? false);
 
       if (opened ?? false) {
-        final chunkStream = await worker?.startChunkStream(inlet);
-        chunkStream?.listen((chunk) {
+        final chunkStream = await worker?.startChunkStream(inlet, onCancel: () {
+          if (buffer.isNotEmpty) {
+            writeRow(sink, buffer);
+            writtenLines[inlet] = writtenLines[inlet]! + buffer.length;
+            buffer.clear();
+          }
+          sink.close();
+        });
+
+        inlets[inlet] = chunkStream?.listen((chunk) {
           buffer.addAll(chunk.map((item) =>
               [item.$2.toString()] +
               item.$1.map((x) => x.toString()).toList()));
@@ -94,23 +104,25 @@ class InletProvider extends ChangeNotifier {
             writtenLines[inlet] = writtenLines[inlet]! + maxBufferSize;
             notifyListeners();
           }
-        }, onDone: () {
+        }, onError: (e) {
           if (buffer.isNotEmpty) {
             writeRow(sink, buffer);
+            buffer.clear();
           }
           sink.close();
         });
 
         if (synchronize == null || !synchronize!) {
-          final offsetStream = await worker?.startTimeCorrectionStream(inlet);
+          final offsetStream =
+              await worker?.startTimeCorrectionStream(inlet, onCancel: () {
+            sink.close();
+          });
           offsetStream?.listen((offset) {
             writeRow(offsetSink, [
               [offset.$1, offset.$2]
             ]);
 
             notifyListeners();
-          }, onDone: () {
-            sink.close();
           });
         }
       }
@@ -122,7 +134,12 @@ class InletProvider extends ChangeNotifier {
   Future<IOSink> openCsvFile(String fileName) async {
     final directory = await getApplicationDocumentsDirectory();
     final filePath = '${directory.path}/$fileName.csv';
-    final file = File(filePath);
+    File file = File(filePath);
+
+    int i = 2;
+    while (await file.exists() && i < 100) {
+      file = File("$filePath-${i++}");
+    }
 
     return file.openWrite(mode: FileMode.append);
   }

@@ -8,7 +8,7 @@ class Lsl {
   /// {@macro bindings}
   static final Lsl _singleton = Lsl._internal();
 
-  static LslBindingsBindings _bindings = lslBindings;
+  static LslBindings _bindings = lslBindings;
   static MulticastLock _multicastLock = MulticastLock();
 
   static Set<String> activeOutlets = {};
@@ -17,7 +17,7 @@ class Lsl {
     return _singleton;
   }
 
-  static void setBindings(LslBindingsBindings bindings) {
+  static void setBindings(LslBindings bindings) {
     _bindings = bindings;
   }
 
@@ -54,7 +54,7 @@ class Lsl {
     }
   }
 
-  LslBindingsBindings get bindings => _bindings;
+  LslBindings get bindings => _bindings;
 
   Lsl._internal();
 }

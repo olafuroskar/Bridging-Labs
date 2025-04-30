@@ -1,4 +1,4 @@
-import 'package:lsl_bindings/src/lsl_bindings_generated.dart';
+part of '../../lsl_flutter.dart';
 
 abstract class ChannelFormat<T> {
   lsl_channel_format_t get nativeChannelFormat;

@@ -6,6 +6,7 @@ enum InletCommandType {
   startSampleStream("START_SAMPLE_STREAM"),
   startChunkStream("START_CHUNK_STREAM"),
   startTimeCorrection("START_TIME_CORRECTION"),
+  close("CLOSE_STREAM"),
   stop("STOP");
 
   const InletCommandType(this.value);
@@ -161,11 +162,13 @@ class InletWorker {
   /// Starts a (Dart) stream which yields samples from the specified LSL stream.
   ///
   /// [streamId] The id of the LSL stream to pull samples from.
+  /// [onCancel] Cleanup function for when the stream is cancelled.
   ///
   /// The method creates a stream controller on the main isolate and the handler on the
   /// worker isolate also creates a stream which yields samples back to main isolate
   /// which further pushes them to the listener.
-  Future<Stream<Sample<Object?>>> startSampleStream(String streamId) async {
+  Future<Stream<Sample<Object?>>> startSampleStream(String streamId,
+      {required Function() onCancel}) async {
     if (_closed) throw StateError('Closed');
 
     final completer = Completer<bool>.sync();
@@ -181,6 +184,7 @@ class InletWorker {
     final success = await completer.future;
 
     if (success) {
+      streamController.onCancel = onCancel;
       _activeSampleRequests[streamId] = streamController;
     }
 
@@ -190,11 +194,13 @@ class InletWorker {
   /// Starts a (Dart) stream which yields chunks from the specified LSL stream.
   ///
   /// [streamId] The id of the LSL stream to pull chunks from.
+  /// [onCancel] Cleanup function for when the stream is cancelled.
   ///
   /// The method creates a stream controller on the main isolate and the handler on the
   /// worker isolate also creates a stream which yields chunks back to main isolate
   /// which further pushes them to the listener.
-  Future<Stream<Chunk<Object?>>> startChunkStream(String streamId) async {
+  Future<Stream<Chunk<Object?>>> startChunkStream(String streamId,
+      {required Function() onCancel}) async {
     if (_closed) throw StateError('Closed');
 
     final completer = Completer<bool>.sync();
@@ -210,6 +216,7 @@ class InletWorker {
     final success = await completer.future;
 
     if (success) {
+      streamController.onCancel = onCancel;
       _activeChunkRequests[streamId] = streamController;
     }
 
@@ -219,11 +226,13 @@ class InletWorker {
   /// Starts a (Dart) stream which yields time correction offsets from the specified LSL stream.
   ///
   /// [streamId] The id of the LSL stream to pull chunks from.
+  /// [onCancel] Cleanup function for when the stream is cancelled.
   ///
   /// The method creates a stream controller on the main isolate and the handler on the
   /// worker isolate also creates a stream which yields time correction offsets back to main isolate
   /// which further pushes them to the listener.
-  Future<Stream<TimeOffset>> startTimeCorrectionStream(String streamId) async {
+  Future<Stream<TimeOffset>> startTimeCorrectionStream(String streamId,
+      {required Function() onCancel}) async {
     if (_closed) throw StateError('Closed');
     if (_isAutoSync) {
       throw StateError('Automatic synchronization has already been set');
@@ -242,12 +251,18 @@ class InletWorker {
     final success = await completer.future;
 
     if (success) {
+      streamController.onCancel = onCancel;
       _activeTimeCorrectionRequests[streamId] = streamController;
     }
 
     return streamController.stream;
   }
 
+  /// Stop pulling data from a given inlet
+  ///
+  /// [streamId] Id of the stream.
+  ///
+  /// After stop has been called, calling [close] is also recommended to clean up the inlet
   Future<bool> stop(String streamId) async {
     if (_closed) throw StateError('Closed');
 
@@ -259,8 +274,23 @@ class InletWorker {
 
     // Add the stream to active inlets
     if (success) {
-      activeInlets.add(streamId);
+      activeInlets.remove(streamId);
     }
+
+    return success;
+  }
+
+  /// Close the inlet associated to the stream.
+  ///
+  /// [streamId] Id of the stream.
+  Future<bool> close(String streamId) async {
+    if (_closed) throw StateError('Closed');
+
+    final completer = Completer<bool>.sync();
+    final id = _idCounter++;
+    _activeRequests[id] = completer;
+    sendCommand(id, InletCommandType.close, streamId: streamId);
+    final success = await completer.future;
 
     return success;
   }
@@ -330,7 +360,9 @@ class InletWorker {
       _handleResponse(completer, response);
     } else {
       if (stopping ?? false) {
+        _activeSampleRequests[streamId]?.close();
         _activeSampleRequests.remove(streamId);
+        _activeChunkRequests[streamId]?.close();
         _activeChunkRequests.remove(streamId);
       }
       final completer = _activeRequests.remove(id)!;
@@ -432,6 +464,10 @@ class InletWorker {
             sendMessageFromWorker(id, subscription != null, streamId: streamId);
             break;
           case InletCommandType.stop:
+            inlets[streamId]?.stopStream();
+            sendMessageFromWorker(id, true, streamId: streamId, stopping: true);
+            break;
+          case InletCommandType.close:
             inlets[streamId]?.closeStream();
             inlets.remove(streamId);
             sendMessageFromWorker(id, true, streamId: streamId);
@@ -455,7 +491,8 @@ class InletWorker {
     _handleCommandsToIsolate(receivePort, sendPort);
   }
 
-  void close() {
+  /// Shuts down the worker
+  void shutdown() {
     if (!_closed) {
       _closed = true;
       _commands.send('shutdown');

@@ -1,5 +1,5 @@
 # Run with `dart run ffigen --config ffigen.yaml`.
-name: LslBindingsBindings
+name: LslBindings
 description: |
   Bindings for `src/lsl_bindings.h`.
 

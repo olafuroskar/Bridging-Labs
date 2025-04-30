@@ -38,7 +38,8 @@ class OutletWorker {
       List<T>? sample,
       Timestamp? timestamp,
       List<List<T>>? chunk,
-      List<Timestamp>? timestamps}) {
+      List<Timestamp>? timestamps,
+      OutletConfig? config}) {
     _commands.send((
       id,
       command,
@@ -53,7 +54,8 @@ class OutletWorker {
       chunk is List<List<int>> ? chunk : null,
       chunk is List<List<double>> ? chunk : null,
       chunk is List<List<String>> ? chunk : null,
-      timestamps
+      timestamps,
+      config
     ));
   }
 
@@ -61,7 +63,7 @@ class OutletWorker {
   ///
   /// [streamInfo] contains the necessary information about the stream.
   /// [streamInfo.name] must be unique
-  Future<bool> addStream(StreamInfo streamInfo) async {
+  Future<bool> addStream(StreamInfo streamInfo, [OutletConfig? config]) async {
     if (_closed) throw StateError('Closed');
     if (streams.containsKey(streamInfo.name)) {
       throw Exception("Stream with name ${streamInfo.name} already exists");
@@ -71,7 +73,7 @@ class OutletWorker {
     final id = _idCounter++;
     _activeRequests[id] = completer;
     sendCommand(id, OutletCommandType.start,
-        name: streamInfo.name, streamInfo: streamInfo);
+        name: streamInfo.name, streamInfo: streamInfo, config: config);
     final success = await completer.future;
 
     // If outlet is created successfully the stream is added to the current state
@@ -87,8 +89,8 @@ class OutletWorker {
   /// [name] The name of the stream
   /// [sample] Data to be pushed to the stream
   /// [timestamp] Optional user provided timestamp
-  Future<bool> pushSample(
-      String name, List<Object?> sample, Timestamp? timestamp) async {
+  Future<bool> pushSample(String name, List<Object?> sample,
+      [Timestamp? timestamp]) async {
     if (_closed) throw StateError('Closed');
     if (!streams.containsKey(name)) {
       throw Exception("Stream with name $name does not exists");
@@ -97,7 +99,7 @@ class OutletWorker {
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    sendCommand(id, OutletCommandType.pushChunk,
+    sendCommand(id, OutletCommandType.pushSample,
         name: name, sample: sample, timestamp: timestamp);
     return await completer.future;
   }
@@ -124,7 +126,7 @@ class OutletWorker {
   /// [name] The name of the stream
   /// [chunk] Data to be pushed to the stream
   /// [timestamps] Timestamps per sample
-  Future<bool> pushChunkWithTimestamp(String name, List<List<Object?>> chunk,
+  Future<bool> pushChunkWithTimestamps(String name, List<List<Object?>> chunk,
       List<Timestamp> timestamps) async {
     if (_closed) throw StateError('Closed');
     if (!streams.containsKey(name)) {
@@ -242,7 +244,8 @@ class OutletWorker {
         intChunk,
         doubleChunk,
         stringChunk,
-        timestamps
+        timestamps,
+        config
       ) = message as (
         int,
         OutletCommandType,
@@ -257,18 +260,19 @@ class OutletWorker {
         List<List<int>>?,
         List<List<double>>?,
         List<List<String>>?,
-        List<Timestamp>?
+        List<Timestamp>?,
+        OutletConfig?
       );
       try {
         switch (command) {
           case OutletCommandType.start:
             OutletManager? manager;
             if (intStreamInfo != null) {
-              manager = _addStream<int>(intStreamInfo);
+              manager = _addStream<int>(intStreamInfo, config);
             } else if (doubleStreamInfo != null) {
-              manager = _addStream<double>(doubleStreamInfo);
+              manager = _addStream<double>(doubleStreamInfo, config);
             } else if (stringStreamInfo != null) {
-              manager = _addStream<String>(stringStreamInfo);
+              manager = _addStream<String>(stringStreamInfo, config);
             }
 
             if (manager != null) {
@@ -352,9 +356,10 @@ class OutletWorker {
   }
 
   /// Creates an outlet manager
-  static OutletManager<T>? _addStream<T>(StreamInfo<T> streamInfo) {
+  static OutletManager<T>? _addStream<T>(StreamInfo<T> streamInfo,
+      [OutletConfig? config]) {
     try {
-      return OutletManager(streamInfo);
+      return OutletManager(streamInfo, config);
     } catch (e) {
       log("Stream creation failed: $e");
       return null;
