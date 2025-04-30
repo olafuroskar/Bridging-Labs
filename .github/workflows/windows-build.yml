@@ -1,0 +1,39 @@
+name: Windows Flutter Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        working-directory: apps/sensors
+
+    steps:
+      - name: 🧾 Checkout repository
+        uses: actions/checkout@v3
+
+      - name: 🧰 Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "stable"
+          channel: "stable"
+
+      - name: 📦 Install dependencies
+        run: flutter pub get
+
+      - name: 🧪 Run analyzer
+        run: flutter analyze
+
+      - name: 🛠️ Build Windows app
+        run: flutter build windows
+
+      - name: 📤 Upload Windows build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sensors-windows-build
+          path: apps/sensors/build/windows/runner/Release/
