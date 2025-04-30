@@ -1,38 +1,34 @@
 part of 'managers.dart';
 
 class StreamManager {
-  final StreamAdapter _streamAdapter = AsyncStreamAdapter();
+  final StreamAdapter _streamAdapter = StreamAdapter();
 
   StreamManager();
 
+  /// {@macro resolve_all}
   void resolveStreams(double waitTime) {
-    return _streamAdapter.resolveStreams(waitTime);
+    return _streamAdapter.resolveAllStreams(waitTime);
   }
 
-  List<ResolvedStreamHandle<int>> getIntStreamHandles() {
-    return _streamAdapter.getIntStreamHandles();
+  /// {@macro resolve_prop}
+  void resolveStreamsByPred(double timeout, String pred, int minimum) {
+    return _streamAdapter.resolveStreamsByPred(timeout, pred, minimum);
   }
 
-  List<ResolvedStreamHandle<double>> getDoubleStreamHandles() {
-    return _streamAdapter.getDoubleStreamHandles();
+  /// {@macro resolve_pred}
+  void resolveStreamsByProp(
+      double timeout, String prop, String value, int minimum) {
+    return _streamAdapter.resolveStreamsByProp(timeout, prop, value, minimum);
   }
 
-  List<ResolvedStreamHandle<String>> getStringStreamHandles() {
-    return _streamAdapter.getStringStreamHandles();
-  }
-
+  /// {@macro get_stream_handles}
   List<ResolvedStreamHandle<Object?>> getStreamHandles() {
-    return getIntStreamHandles()
-            .map<ResolvedStreamHandle<Object?>>((item) => item)
-            .toList() +
-        getDoubleStreamHandles()
-            .map<ResolvedStreamHandle<Object?>>((item) => item)
-            .toList() +
-        getStringStreamHandles()
-            .map<ResolvedStreamHandle<Object?>>((item) => item)
-            .toList();
+    return _streamAdapter.getStreamHandles();
   }
 
+  /// Gets a resolved stream handle from a stream id
+  ///
+  /// [streamId] Id of a resolved stream
   ResolvedStreamHandle<Object?>? getStreamHandle(String streamId) {
     final handles = getStreamHandles();
     if (handles.isEmpty) return null;
@@ -43,6 +39,9 @@ class StreamManager {
     return handles[index];
   }
 
+  /// Creates an inlet from a given stream handle
+  ///
+  /// [handle] A resolved stream handle
   InletManager<S> createInlet<S>(ResolvedStreamHandle<S> handle) {
     final inletAdapter = _streamAdapter.createInlet<S>(handle);
     final inletManager = InletManager<S>._(inletAdapter);
@@ -50,6 +49,9 @@ class StreamManager {
     return inletManager;
   }
 
+  /// Creates an inlet from a stream id
+  ///
+  /// [streamId] Id of a resolved stream
   InletManager<Object?>? createInletFromId(String streamId) {
     final handle = getStreamHandle(streamId);
 
@@ -63,6 +65,7 @@ class StreamManager {
     return null;
   }
 
+  /// {@macro destroy_streams}
   void destroyStreams() {
     return _streamAdapter.destroyStreams();
   }
