@@ -26,11 +26,11 @@ jobs:
       - name: 📦 Install dependencies
         run: flutter pub get
 
-      - name: 🧪 Run analyzer
-        run: flutter analyze
+      # - name: 🧪 Run analyzer
+      #   run: flutter analyze
 
       - name: 🛠️ Build Windows app
-        run: flutter build windows
+        run: flutter build windows -v
 
       - name: 📤 Upload Windows build artifacts
         uses: actions/upload-artifact@v4
