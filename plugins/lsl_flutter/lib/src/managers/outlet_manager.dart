@@ -113,7 +113,9 @@ class OutletManager<S> {
   /// Pushes a chunk of samples with explicit timestamps.
   void pushChunkWithTimestamps(List<List<S>> chunk, List<Timestamp> timestamps,
       [bool pushthrough = true]) {
-    _updateOffset(timestamps.first);
+    // The last sample of a chunk should be the latest sample and therefore the closest in time
+    // to the local clock of the streaming device.
+    _updateOffset(timestamps.last);
 
     _outletAdapter.pushChunkWithTimestamps(
       chunk,
