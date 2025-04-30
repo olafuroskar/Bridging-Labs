@@ -6,7 +6,6 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 import 'package:lsl_bindings/lsl_bindings.dart';
 import 'package:lsl_flutter/lsl_flutter.dart';
-import 'package:lsl_flutter/src/channel_formats/channel_format.dart';
 import 'package:lsl_flutter/src/liblsl.dart';
 import 'package:lsl_flutter/src/utils/stream_info.dart' as stream_utils;
 

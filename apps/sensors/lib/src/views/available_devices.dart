@@ -8,34 +8,41 @@ class AvailableDevices extends StatelessWidget {
     final appState = Provider.of<OutletProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Available devices'),
-        actions: [
-          IconButton(
-              onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AddDeviceScreen()),
-                  ),
-              icon: const Icon(Icons.add)),
-          IconButton(
-              onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => const CreateOutletScreen()),
-                  ),
-              icon: const Icon(Icons.play_arrow)),
-        ],
-      ),
-      body: ListView(
-        children: appState.devices.map((device) {
-          final selected = appState.selectedDevice == device.$1;
-          return CheckboxListTile(
-            value: selected,
-            title: Text(device.$1),
-            onChanged: (_) => appState.toggleDeviceSelection(device.$1),
-          );
-        }).toList(),
-      ),
+      body: appState.devices.isEmpty
+          ? Container(
+              margin: EdgeInsets.all(16),
+              child: Text("No available sources"),
+            )
+          : ListView(
+              children: appState.devices.values.map((device) {
+                return ListTile(
+                  title: Text(device.$1),
+                  onTap: () => device.$2 == StreamType.marker
+                      ? Navigator.push(context,
+                          MaterialPageRoute(builder: (_) => MarkerScreen()))
+                      : null,
+                  trailing: device.$3
+                      ? IconButton(
+                          onPressed: () async {
+                            final confirmed =
+                                await showConfirmationDialog(context);
+                            if (confirmed ?? false) {
+                              appState.stopStream(device.$1);
+                            }
+                          },
+                          icon: Icon(Icons.stop, color: Colors.red))
+                      : IconButton(
+                          onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => OutletFormScreen(
+                                        defaultConfig:
+                                            getConfig(device.$1, device.$2),
+                                      ))),
+                          icon: Icon(Icons.wifi_tethering)),
+                );
+              }).toList(),
+            ),
     );
   }
 }

@@ -89,8 +89,8 @@ class OutletWorker {
   /// [name] The name of the stream
   /// [sample] Data to be pushed to the stream
   /// [timestamp] Optional user provided timestamp
-  Future<bool> pushSample(
-      String name, List<Object?> sample, Timestamp? timestamp) async {
+  Future<bool> pushSample(String name, List<Object?> sample,
+      [Timestamp? timestamp]) async {
     if (_closed) throw StateError('Closed');
     if (!streams.containsKey(name)) {
       throw Exception("Stream with name $name does not exists");
@@ -99,7 +99,7 @@ class OutletWorker {
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    sendCommand(id, OutletCommandType.pushChunk,
+    sendCommand(id, OutletCommandType.pushSample,
         name: name, sample: sample, timestamp: timestamp);
     return await completer.future;
   }
@@ -126,7 +126,7 @@ class OutletWorker {
   /// [name] The name of the stream
   /// [chunk] Data to be pushed to the stream
   /// [timestamps] Timestamps per sample
-  Future<bool> pushChunkWithTimestamp(String name, List<List<Object?>> chunk,
+  Future<bool> pushChunkWithTimestamps(String name, List<List<Object?>> chunk,
       List<Timestamp> timestamps) async {
     if (_closed) throw StateError('Closed');
     if (!streams.containsKey(name)) {
