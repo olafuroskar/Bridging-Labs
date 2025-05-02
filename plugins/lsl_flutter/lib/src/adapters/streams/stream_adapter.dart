@@ -11,7 +11,7 @@ import 'package:lsl_flutter/src/utils/stream_info.dart';
 
 class StreamAdapter {
   /// A map of the currently resolved streams
-  final Map<String, ResolvedStream<Object?>> _resolvedStreams = {};
+  final Map<String, ResolvedStream> _resolvedStreams = {};
 
   /// Arbitrary buffer size for stream resolving
   final bufferSize = 1024;
@@ -137,7 +137,7 @@ class StreamAdapter {
   /// {@template get_stream_handles}
   /// Gets all resolved stream handles
   /// {@endtemplate}
-  List<ResolvedStreamHandle<Object?>> getStreamHandles() {
+  List<ResolvedStreamHandle> getStreamHandles() {
     return _resolvedStreams.entries.map((entry) {
       return ResolvedStreamHandle(entry.key, entry.value.info);
     }).toList();
@@ -146,33 +146,33 @@ class StreamAdapter {
   /// Creates an inlet from a given handle
   ///
   /// [handle] Handle containing the needed stream information to create an inlet.
-  InletAdapter<S> createInlet<S>(ResolvedStreamHandle<S> handle) {
+  InletAdapter<S> createInlet<S>(ResolvedStreamHandle handle) {
     InletAdapter<S> inletAdapter;
 
     final stream = _resolvedStreams[handle.id];
     if (stream == null) throw Exception("Stream not found");
 
     if (S == int) {
-      if (stream is! ResolvedStream<int>) {
+      if (stream.info.channelFormat is! ChannelFormat<int>) {
         return throw Exception("The resolved stream is not of type int");
       }
 
       inletAdapter = InletAdapterFactory.createIntAdapterFromStream(
-          Inlet(stream.info), stream) as InletAdapter<S>;
+          Inlet(stream.info as StreamInfo<int>), stream) as InletAdapter<S>;
     } else if (S == double) {
-      if (stream is! ResolvedStream<double>) {
+      if (stream.info.channelFormat is! ChannelFormat<double>) {
         return throw Exception("The resolved stream is not of type double");
       }
 
       inletAdapter = InletAdapterFactory.createDoubleAdapterFromStream(
-          Inlet(stream.info), stream) as InletAdapter<S>;
+          Inlet(stream.info as StreamInfo<double>), stream) as InletAdapter<S>;
     } else if (S == String) {
-      if (stream is! ResolvedStream<String>) {
+      if (stream.info.channelFormat is! ChannelFormat<String>) {
         return throw Exception("The resolved stream is not of type String");
       }
 
       inletAdapter = InletAdapterFactory.createStringAdapterFromStream(
-          Inlet(stream.info), stream) as InletAdapter<S>;
+          Inlet(stream.info as StreamInfo<String>), stream) as InletAdapter<S>;
     } else {
       throw Exception("Unsupported type");
     }
@@ -198,21 +198,18 @@ class StreamAdapter {
         case Int16ChannelFormat():
         case Int32ChannelFormat():
         case Int64ChannelFormat():
-          final stream =
-              ResolvedStream<int>(buffer[i], info as StreamInfo<int>);
+          final stream = ResolvedStream(buffer[i], info as StreamInfo<int>);
 
           _storeStream(stream);
           break;
         case Double64ChannelFormat():
         case Float32ChannelFormat():
-          final stream =
-              ResolvedStream<double>(buffer[i], info as StreamInfo<double>);
+          final stream = ResolvedStream(buffer[i], info as StreamInfo<double>);
 
           _storeStream(stream);
           break;
         case CftStringChannelFormat():
-          final stream =
-              ResolvedStream<String>(buffer[i], info as StreamInfo<String>);
+          final stream = ResolvedStream(buffer[i], info as StreamInfo<String>);
 
           _storeStream(stream);
           break;
@@ -220,7 +217,7 @@ class StreamAdapter {
     }
   }
 
-  void _storeStream<T>(ResolvedStream<T> stream) {
+  void _storeStream(ResolvedStream stream) {
     final uid = stream.info.uid;
     if (uid != null && uid != "") {
       _resolvedStreams[uid] = stream;

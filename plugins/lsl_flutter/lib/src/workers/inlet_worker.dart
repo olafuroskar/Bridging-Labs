@@ -24,8 +24,8 @@ class InletWorker {
 
   // Active requests maps
   final Map<int, Completer<bool>> _activeRequests = {};
-  final Map<int, Completer<List<ResolvedStreamHandle<Object?>>>>
-      _activeHandleRequests = {};
+  final Map<int, Completer<List<ResolvedStreamHandle>>> _activeHandleRequests =
+      {};
 
   /// Keeps track of (Dart) streams which yield LSL samples
   final Map<String, StreamController<Sample<Object?>>> _activeSampleRequests =
@@ -44,7 +44,7 @@ class InletWorker {
   /// Has the post processing option of the inlet been set to automatically synchronise the stream?
   bool _isAutoSync = false;
 
-  Map<String, ResolvedStreamHandle<Object?>> streams = {};
+  Map<String, ResolvedStreamHandle> streams = {};
   Set<String> activeInlets = {};
 
   /// Are there any active requests
@@ -69,11 +69,11 @@ class InletWorker {
   /// Discover streams on the network
   ///
   /// [waitTime] Maximum wait time in seconds
-  Future<List<ResolvedStreamHandle<Object?>>> resolveStreams(
+  Future<List<ResolvedStreamHandle>> resolveStreams(
       {double waitTime = 2}) async {
     if (_closed) throw StateError('Closed');
 
-    final completer = Completer<List<ResolvedStreamHandle<Object?>>>.sync();
+    final completer = Completer<List<ResolvedStreamHandle>>.sync();
     final id = _idCounter++;
     _activeHandleRequests[id] = completer;
     sendCommand(id, InletCommandType.resolve, waitTime: waitTime);
@@ -92,12 +92,12 @@ class InletWorker {
   /// Discover streams on the network by stream property
   ///
   /// [waitTime] Maximum wait time in seconds
-  Future<List<ResolvedStreamHandle<Object?>>> resolveStreamsByProp(
+  Future<List<ResolvedStreamHandle>> resolveStreamsByProp(
       String prop, String value,
       {double waitTime = 2}) async {
     if (_closed) throw StateError('Closed');
 
-    final completer = Completer<List<ResolvedStreamHandle<Object?>>>.sync();
+    final completer = Completer<List<ResolvedStreamHandle>>.sync();
     final id = _idCounter++;
     _activeHandleRequests[id] = completer;
     sendCommand(id, InletCommandType.resolve,
@@ -117,11 +117,11 @@ class InletWorker {
   /// Discover streams on the network that match a given predicate
   ///
   /// [waitTime] Maximum wait time in seconds
-  Future<List<ResolvedStreamHandle<Object?>>> resolveStreamsByPred(String pred,
+  Future<List<ResolvedStreamHandle>> resolveStreamsByPred(String pred,
       {double waitTime = 2}) async {
     if (_closed) throw StateError('Closed');
 
-    final completer = Completer<List<ResolvedStreamHandle<Object?>>>.sync();
+    final completer = Completer<List<ResolvedStreamHandle>>.sync();
     final id = _idCounter++;
     _activeHandleRequests[id] = completer;
     sendCommand(id, InletCommandType.resolve, waitTime: waitTime, pred: pred);
@@ -355,7 +355,7 @@ class InletWorker {
     } else if (response is TimeOffset) {
       final controller = _activeTimeCorrectionRequests[streamId]!;
       _handleStreamResponse<TimeOffset>(controller, response);
-    } else if (response is List<ResolvedStreamHandle<Object?>>) {
+    } else if (response is List<ResolvedStreamHandle>) {
       final completer = _activeHandleRequests.remove(id)!;
       _handleResponse(completer, response);
     } else {
@@ -409,7 +409,7 @@ class InletWorker {
       try {
         switch (command) {
           case InletCommandType.resolve:
-            List<ResolvedStreamHandle<Object?>> resolvedStreams = [];
+            List<ResolvedStreamHandle> resolvedStreams = [];
             if (prop != null && value != null) {
               streamManager.resolveStreamsByProp(waitTime ?? 2, prop, value, 0);
             } else if (pred != null) {
