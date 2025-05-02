@@ -39,21 +39,18 @@ class OutletConfigDto {
   /// The interval in which offsets are calculated.
   final double offsetCalculationInterval;
 
-  /// Whether an accompanying marker stream should be created with the main data stream.
-  final bool createMarkerStream;
-
-  const OutletConfigDto(
-      {required this.name,
-      required this.type,
-      required this.streamType,
-      required this.channelFormat,
-      required this.channelCount,
-      required this.nominalSRate,
-      required this.sourceId,
-      this.chunkSize = 0,
-      this.maxBuffered = 360,
-      required this.useLslTimestamps,
-      this.mode = OffsetMode.none,
-      this.offsetCalculationInterval = 5,
-      this.createMarkerStream = false});
+  const OutletConfigDto({
+    required this.name,
+    required this.type,
+    required this.streamType,
+    required this.channelFormat,
+    required this.channelCount,
+    required this.nominalSRate,
+    required this.sourceId,
+    this.chunkSize = 0,
+    this.maxBuffered = 360,
+    required this.useLslTimestamps,
+    this.mode = OffsetMode.none,
+    this.offsetCalculationInterval = 5,
+  });
 }

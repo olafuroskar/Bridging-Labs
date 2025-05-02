@@ -36,7 +36,6 @@ class _OutletFormScreenState extends State<OutletFormScreen> {
           text: widget.defaultConfig?.offsetCalculationInterval.toString());
 
   late bool? _useLslTimestamps = widget.defaultConfig?.useLslTimestamps;
-  bool? _createMarkerStream = false;
 
   late ChannelFormat _channelFormat =
       widget.defaultConfig?.channelFormat ?? Int32ChannelFormat();
@@ -71,6 +70,10 @@ class _OutletFormScreenState extends State<OutletFormScreen> {
           key: _formKey,
           child: ListView(
             children: [
+              Text(
+                "Stream Information",
+                style: TextStyle(fontSize: 20),
+              ),
               // Name
               const FieldLabel(
                 label: 'Name',
@@ -137,7 +140,7 @@ class _OutletFormScreenState extends State<OutletFormScreen> {
               TextFormField(
                 controller: _channelCountController,
                 decoration: const InputDecoration(
-                  labelText: 'Enter channel count',
+                  hintText: 'Enter channel count',
                   border: OutlineInputBorder(), // optional, for better visuals
                   isDense: true, // tighter vertical spacing
                   contentPadding:
@@ -154,7 +157,7 @@ class _OutletFormScreenState extends State<OutletFormScreen> {
               TextFormField(
                 controller: _samplingRateController,
                 decoration: const InputDecoration(
-                  labelText: 'Enter nominal sampling rate',
+                  hintText: 'Enter nominal sampling rate',
                   border: OutlineInputBorder(), // optional, for better visuals
                   isDense: true, // tighter vertical spacing
                   contentPadding:
@@ -169,6 +172,10 @@ class _OutletFormScreenState extends State<OutletFormScreen> {
               const Divider(),
               const SizedBox(height: 16),
 
+              Text(
+                "Outlet Information",
+                style: TextStyle(fontSize: 20),
+              ),
               // Additional config
               // Chunk size
               const FieldLabel(
@@ -179,7 +186,7 @@ class _OutletFormScreenState extends State<OutletFormScreen> {
               TextFormField(
                 controller: _chunkSizeController,
                 decoration: const InputDecoration(
-                  labelText: 'Enter chunk size',
+                  hintText: 'Enter chunk size',
                   border: OutlineInputBorder(), // optional, for better visuals
                   isDense: true, // tighter vertical spacing
                   contentPadding:
@@ -197,7 +204,7 @@ class _OutletFormScreenState extends State<OutletFormScreen> {
               TextFormField(
                 controller: _maxBufferedController,
                 decoration: const InputDecoration(
-                  labelText: 'Enter max buffered',
+                  hintText: 'Enter max buffered',
                   border: OutlineInputBorder(), // optional, for better visuals
                   isDense: true, // tighter vertical spacing
                   contentPadding:
@@ -205,15 +212,26 @@ class _OutletFormScreenState extends State<OutletFormScreen> {
                 ),
                 keyboardType: TextInputType.number,
               ),
-              const SizedBox(height: 12),
-              // Use LSL timestamps
-              const FieldLabel(
-                label: 'Use LSL timestamps',
-                tooltip: 'Whether LSL should generate timestamps for you.',
+              // Separation
+              const SizedBox(height: 24),
+              const Divider(),
+              const SizedBox(height: 16),
+
+              Text(
+                "Timestamp processing",
+                style: TextStyle(fontSize: 20),
               ),
-              Checkbox(
-                  value: _useLslTimestamps,
-                  onChanged: (val) => setState(() => _useLslTimestamps = val)),
+              Row(children: [
+                // Use LSL timestamps
+                Checkbox(
+                    value: _useLslTimestamps,
+                    onChanged: (val) =>
+                        setState(() => _useLslTimestamps = val)),
+                const FieldLabel(
+                  label: 'Use LSL timestamps',
+                  tooltip: 'Whether LSL should generate timestamps for you.',
+                ),
+              ]),
               // Offset mode
               const SizedBox(height: 12),
               const FieldLabel(
@@ -227,12 +245,14 @@ class _OutletFormScreenState extends State<OutletFormScreen> {
                     .map((mode) => DropdownMenuItem(
                         value: mode.value, child: Text(mode.value)))
                     .toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() => _mode =
-                        _modes.firstWhere((mode) => mode.value == value));
-                  }
-                },
+                onChanged: (_useLslTimestamps ?? false)
+                    ? null
+                    : (value) {
+                        if (value != null) {
+                          setState(() => _mode =
+                              _modes.firstWhere((mode) => mode.value == value));
+                        }
+                      },
                 decoration: const InputDecoration(
                   hintText: 'Pick offset mode',
                   border: OutlineInputBorder(), // optional, for better visuals
@@ -250,8 +270,9 @@ class _OutletFormScreenState extends State<OutletFormScreen> {
               ),
               TextFormField(
                 controller: _offsetCalculationIntervalController,
+                enabled: !(_useLslTimestamps ?? false),
                 decoration: const InputDecoration(
-                  labelText: 'Enter offset calculation interval',
+                  hintText: 'Enter offset calculation interval',
                   border: OutlineInputBorder(), // optional, for better visuals
                   isDense: true, // tighter vertical spacing
                   contentPadding:
@@ -259,17 +280,6 @@ class _OutletFormScreenState extends State<OutletFormScreen> {
                 ),
                 keyboardType: TextInputType.number,
               ),
-              // Use LSL timestamps
-              const SizedBox(height: 12),
-              const FieldLabel(
-                label: 'Create marker stream',
-                tooltip:
-                    'Whether an accompanying marker stream should be created',
-              ),
-              Checkbox(
-                  value: _createMarkerStream,
-                  onChanged: (val) =>
-                      setState(() => _createMarkerStream = val)),
               const SizedBox(height: 24),
 
               // Submit button
@@ -287,7 +297,6 @@ class _OutletFormScreenState extends State<OutletFormScreen> {
                         streamType: widget.defaultConfig?.streamType ??
                             StreamType.gyroscope,
                         channelFormat: _channelFormat,
-                        createMarkerStream: _createMarkerStream ?? false,
                         offsetCalculationInterval: double.parse(
                             _offsetCalculationIntervalController.text),
                         mode: _mode,
