@@ -36,14 +36,17 @@ class _MarkerScreenState extends State<MarkerScreen>
             children: [
               ..._buttons.map((text) => Padding(
                     padding: const EdgeInsets.fromLTRB(4, 12, 4, 12),
-                    child: ElevatedButton(
-                      onPressed: () {
+                    child: GestureDetector(
+                      onTapDown: (e) {
                         appState.pushMarkers([text]);
                       },
-                      style: ButtonStyle(
-                          fixedSize:
-                              WidgetStatePropertyAll(Size.fromHeight(64))),
-                      child: Text(text, style: TextStyle(fontSize: 24)),
+                      child: ElevatedButton(
+                        onPressed: () {},
+                        style: ButtonStyle(
+                            fixedSize:
+                                WidgetStatePropertyAll(Size.fromHeight(256))),
+                        child: Text(text, style: TextStyle(fontSize: 24)),
+                      ),
                     ),
                   )),
               const Spacer(),
