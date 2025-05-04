@@ -22,14 +22,14 @@ class StreamManager {
   }
 
   /// {@macro get_stream_handles}
-  List<ResolvedStreamHandle<Object?>> getStreamHandles() {
+  List<ResolvedStreamHandle> getStreamHandles() {
     return _streamAdapter.getStreamHandles();
   }
 
   /// Gets a resolved stream handle from a stream id
   ///
   /// [streamId] Id of a resolved stream
-  ResolvedStreamHandle<Object?>? getStreamHandle(String streamId) {
+  ResolvedStreamHandle? getStreamHandle(String streamId) {
     final handles = getStreamHandles();
     if (handles.isEmpty) return null;
 
@@ -42,7 +42,7 @@ class StreamManager {
   /// Creates an inlet from a given stream handle
   ///
   /// [handle] A resolved stream handle
-  InletManager<S> createInlet<S>(ResolvedStreamHandle<S> handle) {
+  InletManager<S> createInlet<S>(ResolvedStreamHandle handle) {
     final inletAdapter = _streamAdapter.createInlet<S>(handle);
     final inletManager = InletManager<S>._(inletAdapter);
 
@@ -53,16 +53,22 @@ class StreamManager {
   ///
   /// [streamId] Id of a resolved stream
   InletManager<Object?>? createInletFromId(String streamId) {
-    final handle = getStreamHandle(streamId);
+    try {
+      final handle = getStreamHandle(streamId);
 
-    if (handle is ResolvedStreamHandle<int>) {
-      return createInlet<int>(handle);
-    } else if (handle is ResolvedStreamHandle<double>) {
-      return createInlet<double>(handle);
-    } else if (handle is ResolvedStreamHandle<String>) {
-      return createInlet<String>(handle);
+      if (handle == null) return null;
+
+      if (handle.info is StreamInfo<int>) {
+        return createInlet<int>(handle);
+      } else if (handle.info is StreamInfo<double>) {
+        return createInlet<double>(handle);
+      } else if (handle.info is StreamInfo<String>) {
+        return createInlet<String>(handle);
+      }
+      return null;
+    } catch (e) {
+      return null;
     }
-    return null;
   }
 
   /// {@macro destroy_streams}

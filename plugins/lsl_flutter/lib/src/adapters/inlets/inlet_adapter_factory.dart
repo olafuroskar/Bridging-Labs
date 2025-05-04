@@ -2,7 +2,7 @@ part of 'inlets.dart';
 
 class InletAdapterFactory {
   static InletAdapter<int> createIntAdapterFromStream(
-      Inlet<int> inlet, ResolvedStream<int> stream) {
+      Inlet<int> inlet, ResolvedStream stream) {
     switch (stream.info.channelFormat) {
       case Int8ChannelFormat():
       case Int16ChannelFormat():
@@ -17,7 +17,7 @@ class InletAdapterFactory {
   }
 
   static InletAdapter<double> createDoubleAdapterFromStream(
-      Inlet<double> inlet, ResolvedStream<double> stream) {
+      Inlet<double> inlet, ResolvedStream stream) {
     switch (stream.info.channelFormat) {
       case Float32ChannelFormat():
         return FloatInletAdapter._(inlet, stream);
@@ -29,7 +29,7 @@ class InletAdapterFactory {
   }
 
   static InletAdapter<String> createStringAdapterFromStream(
-      Inlet<String> inlet, ResolvedStream<String> stream) {
+      Inlet<String> inlet, ResolvedStream stream) {
     switch (stream.info.channelFormat) {
       case CftStringChannelFormat():
         return StringInletAdapter._(inlet, stream);

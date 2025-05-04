@@ -6,7 +6,7 @@ class InletProvider extends ChangeNotifier {
 
   Map<String, int> writtenLines = {};
 
-  List<ResolvedStreamHandle<Object?>> handles = [];
+  List<ResolvedStreamHandle> handles = [];
 
   List<String> selectedInlets = [];
   StreamManager streamManager = StreamManager();
