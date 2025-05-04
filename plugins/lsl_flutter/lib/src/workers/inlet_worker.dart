@@ -342,6 +342,13 @@ class InletWorker {
     controller.add(data);
   }
 
+  void handleRemoteErrorResponse(
+      Completer<Object?>? completer, Object response) {
+    if (completer != null) {
+      completer.completeError(response);
+    }
+  }
+
   void _handleResponsesFromIsolate(message) {
     final (id, response, streamId, stopping) =
         message as (int, Object?, String?, bool?);
@@ -358,6 +365,12 @@ class InletWorker {
     } else if (response is List<ResolvedStreamHandle>) {
       final completer = _activeHandleRequests.remove(id)!;
       _handleResponse(completer, response);
+    } else if (response is RemoteError) {
+      handleRemoteErrorResponse(_activeRequests.remove(id), response);
+      handleRemoteErrorResponse(_activeHandleRequests.remove(id), response);
+      _activeTimeCorrectionRequests[streamId]?.addError(response);
+      _activeChunkRequests[streamId]?.addError(response);
+      _activeTimeCorrectionRequests[streamId]?.addError(response);
     } else {
       if (stopping ?? false) {
         _activeSampleRequests[streamId]?.close();
