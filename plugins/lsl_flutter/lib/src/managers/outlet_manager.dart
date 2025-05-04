@@ -34,8 +34,8 @@ class OutletConfig {
   /// value here to avoid  running out of RAM.
   /// [mode] The mode to use for processing host/device time offsets.
   /// [offsetCalculationInterval] - Interval (in seconds) for computing new offsets.
-  const OutletConfig(this.chunkSize, this.maxBuffered, this.mode,
-      this.offsetCalculationInterval);
+  const OutletConfig(this.chunkSize, this.maxBuffered,
+      [this.mode = OffsetMode.none, this.offsetCalculationInterval = 5.0]);
 
   OutletConfig.fromOffsetConfig(
       {OffsetMode mode = OffsetMode.none, double offsetCalculationInterval = 5})
