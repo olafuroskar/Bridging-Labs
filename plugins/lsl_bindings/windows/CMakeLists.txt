@@ -13,7 +13,6 @@ set(LSL_SLIMARCHIVE ON CACHE BOOL "" FORCE)
 # Invoke the build for native code shared with the other target platforms.
 # This can be changed to accommodate different builds.
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../src" "${CMAKE_CURRENT_BINARY_DIR}/shared")
-# target_link_libraries(lslobj PRIVATE lsl.lib)
 
 # List of absolute paths to libraries that should be bundled with the plugin.
 # This list could contain prebuilt libraries, or libraries created by an
