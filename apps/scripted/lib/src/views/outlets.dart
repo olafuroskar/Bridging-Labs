@@ -27,7 +27,7 @@ class _OutletScreenState extends State<OutletScreen>
                       MaterialPageRoute(
                           builder: (_) => OutletFormScreen(
                                 defaultConfig:
-                                    getConfig("White noise", StreamType.sine),
+                                    getConfig("Sine wave", StreamType.sine),
                               ))),
                   icon: const Icon(Icons.add)),
             ],

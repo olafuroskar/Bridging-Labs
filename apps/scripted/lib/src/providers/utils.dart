@@ -17,7 +17,7 @@ OutletConfigDto randomConfig(String name, String type, StreamType streamType) {
 OutletConfigDto sineConfig(String name, String type, StreamType streamType) {
   return OutletConfigDto(
     name: name,
-    channelFormat: CftStringChannelFormat(),
+    channelFormat: Double64ChannelFormat(),
     type: type,
     streamType: streamType,
     channelCount: 1,
