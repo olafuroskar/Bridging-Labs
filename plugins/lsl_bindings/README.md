@@ -34,6 +34,15 @@ final streamInfo = lslBindings.lsl_create_streaminfo(
   "Source id".toNativeUtf8().cast<Char>());
 ```
 
+## iOS
+
+Minimum deployment target must be set to at least 14
+
+```ruby
+# Uncomment this line to define a global platform for your project
+platform :ios, '14.0'
+```
+
 <!--
 # lsl_bindings
 

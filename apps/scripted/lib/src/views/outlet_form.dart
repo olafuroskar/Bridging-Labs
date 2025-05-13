@@ -223,7 +223,7 @@ class _OutletFormScreenState extends State<OutletFormScreen> {
                 tooltip: 'Whether to stream random data or sine wave data',
               ),
               DropdownButtonFormField<String>(
-                value: _streamTypes.toString(),
+                value: _streamType.toString(),
                 items: _streamTypes
                     .map((type) => DropdownMenuItem(
                         value: type.toString(), child: Text(type.toString())))
