@@ -30,9 +30,9 @@ class OutletWorker {
   int _idCounter = 0;
   bool _closed = false;
 
-  Map<String, StreamInfo> streams = {};
+  final Map<String, StreamInfo> _streams = {};
 
-  void sendCommand<T extends Object?>(int id, OutletCommandType command,
+  void _sendCommand<T extends Object?>(int id, OutletCommandType command,
       {String? name,
       StreamInfo<Object?>? streamInfo,
       List<T>? sample,
@@ -65,20 +65,20 @@ class OutletWorker {
   /// [streamInfo.name] must be unique
   Future<bool> addStream(StreamInfo streamInfo, [OutletConfig? config]) async {
     if (_closed) throw StateError('Closed');
-    if (streams.containsKey(streamInfo.name)) {
+    if (_streams.containsKey(streamInfo.name)) {
       throw Exception("Stream with name ${streamInfo.name} already exists");
     }
 
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    sendCommand(id, OutletCommandType.start,
+    _sendCommand(id, OutletCommandType.start,
         name: streamInfo.name, streamInfo: streamInfo, config: config);
     final success = await completer.future;
 
     // If outlet is created successfully the stream is added to the current state
     if (success) {
-      streams[streamInfo.name] = streamInfo;
+      _streams[streamInfo.name] = streamInfo;
     }
 
     return success;
@@ -92,14 +92,14 @@ class OutletWorker {
   Future<bool> pushSample(String name, List<Object?> sample,
       [Timestamp? timestamp]) async {
     if (_closed) throw StateError('Closed');
-    if (!streams.containsKey(name)) {
+    if (!_streams.containsKey(name)) {
       throw Exception("Stream with name $name does not exists");
     }
 
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    sendCommand(id, OutletCommandType.pushSample,
+    _sendCommand(id, OutletCommandType.pushSample,
         name: name, sample: sample, timestamp: timestamp);
     return await completer.future;
   }
@@ -110,14 +110,14 @@ class OutletWorker {
   /// [chunk] Data to be pushed to the stream
   Future<bool> pushChunk(String name, List<List<Object?>> chunk) async {
     if (_closed) throw StateError('Closed');
-    if (!streams.containsKey(name)) {
+    if (!_streams.containsKey(name)) {
       throw Exception("Stream with name $name does not exists");
     }
 
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    sendCommand(id, OutletCommandType.pushChunk, name: name, chunk: chunk);
+    _sendCommand(id, OutletCommandType.pushChunk, name: name, chunk: chunk);
     return await completer.future;
   }
 
@@ -129,14 +129,14 @@ class OutletWorker {
   Future<bool> pushChunkWithTimestamps(String name, List<List<Object?>> chunk,
       List<Timestamp> timestamps) async {
     if (_closed) throw StateError('Closed');
-    if (!streams.containsKey(name)) {
+    if (!_streams.containsKey(name)) {
       throw Exception("Stream with name $name does not exists");
     }
 
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    sendCommand(id, OutletCommandType.pushChunkWithTimestamp,
+    _sendCommand(id, OutletCommandType.pushChunkWithTimestamp,
         name: name, chunk: chunk, timestamps: timestamps);
     return await completer.future;
   }
@@ -146,18 +146,18 @@ class OutletWorker {
   /// [name] The name of the stream to be removed
   Future<bool> removeStream(String name) async {
     if (_closed) throw StateError('Closed');
-    if (!streams.containsKey(name)) {
+    if (!_streams.containsKey(name)) {
       throw Exception("Stream with name $name does not exists");
     }
 
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    sendCommand(id, OutletCommandType.stop, name: name);
+    _sendCommand(id, OutletCommandType.stop, name: name);
 
     final result = await completer.future;
     if (result) {
-      streams.remove(name);
+      _streams.remove(name);
     }
     return result;
   }

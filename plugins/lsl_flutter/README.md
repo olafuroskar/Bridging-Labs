@@ -15,11 +15,13 @@ Powered by native bindings via [`lsl_ffi`](https://pub.dev/packages/lsl_ffi) and
 
 ## Platform Support
 
-| Android | iOS | MacOS | Web | Linux | Windows |
-| :-----: | :-: | :---: | :-: | :---: | :-----: |
-|   ✅    | ✅  | ⚠️ \* | ❌  |  ❓   |   ❓    |
+| Android | iOS | MacOS | Windows | Web | Linux |
+| :-----: | :-: | :---: | :-----: | :-: | :---: |
+|   ✅    | ✅  | ⚠️ \* | ⚠️\*\*  | ❌  |  ❓   |
 
 \* For production grade development special permission is required from Apple to use multicast capabilities that has not been tested. [macOS](macos) However, if not meant for distribution on App Store, un-sandboxing the Mac app will allow multicast usage.
+
+\*\* Usage on Windows has not been tested extensively.
 
 ## 🚀 Getting started
 

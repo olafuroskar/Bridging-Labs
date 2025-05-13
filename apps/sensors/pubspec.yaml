@@ -32,12 +32,6 @@ dependencies:
     sdk: flutter
   lsl_flutter:
     path: ../../plugins/lsl_flutter
-  # self_science_station:
-  #   git:
-  #     url: git@gitlab.com:spooksmus_/self-science.git
-  #     ref: 272344bef283d5e2d6bbdda278b8acc964f04084
-  #     path: self_science_station
-
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8

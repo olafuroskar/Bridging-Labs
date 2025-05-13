@@ -1,21 +1,23 @@
-Low-level Dart bindings to the [Lab Streaming Layer (LSL)](https://github.com/sccn/labstreaminglayer) C API, generated and maintained for use with Dart FFI.
+Low-level Dart bindings to the [Lab Streaming Layer (LSL)](https://github.com/sccn/labstreaminglayer) C API.
 
-This package is intended for advanced users who want fine-grained control over native LSL interop in their own Dart or Flutter applications.
+This package provides direct access to the native LSL interface via Dart FFI and is intended for advanced users who require fine-grained control over streaming or receiving LSL data in Dart or Flutter applications.
 
-If you're looking for a higher-level abstraction for streaming or receiving LSL data in Flutter, consider using [`lsl_flutter`](https://pub.dev/packages/lsl_flutter), which builds on top of these bindings.
+If you're looking for a higher-level, idiomatic Flutter API for working with LSL, consider using [`lsl_flutter`](https://pub.dev/packages/lsl_flutter), which builds on top of this package.
 
 ## Features
 
-- Direct access to LSL’s C API through Dart FFI
+- Direct Dart FFI bindings to the LSL C API
 - Cross-platform support: macOS, iOS (via `.xcframework`), Windows, and Android
 
 ## Getting started
 
 1. Add `dart:ffi` as a dependency, as it is needed for memory management and type conversion.
 
-2. Add this package to your `pubspec.yaml`:
+2. Add the plugin to your `pubspec.yaml` (or `flutter pub add lsl_bindings`):
 
 ```yaml
+dev_dependencies:
+  ffi: ^2.1.3
 dependencies:
   lsl_bindings: ^1.0.0
 ```
@@ -33,6 +35,21 @@ final streamInfo = lslBindings.lsl_create_streaminfo(
   lsl_channel_format_t.cft_double64,
   "Source id".toNativeUtf8().cast<Char>());
 ```
+
+## iOS
+
+Minimum deployment target must be set to at least 14
+
+```ruby
+# Uncomment this line to define a global platform for your project
+platform :ios, '14.0'
+```
+
+## macOS
+
+To develop an application that utilises UDP multicast, special permission is required from Apple. Therefore, when developing within a sandbox for macOS applications LSL will not be able to discovers streams on the network. So it is best to simply remove the sandbox from the app.
+
+![image](https://github.com/user-attachments/assets/6ccc2e9c-485a-4b77-88c3-3b9a220314fc)
 
 <!--
 # lsl_bindings

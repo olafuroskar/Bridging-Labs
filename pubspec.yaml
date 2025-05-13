@@ -16,3 +16,4 @@ workspace:
   - plugins/multicast_lock
   - plugins/muse_sdk
   - apps/sensors
+  - apps/scripted
