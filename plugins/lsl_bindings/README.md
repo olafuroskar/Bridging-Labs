@@ -43,6 +43,12 @@ Minimum deployment target must be set to at least 14
 platform :ios, '14.0'
 ```
 
+## macOS
+
+To develop an application that utilises UDP multicast, special permission is required from Apple. Therefore, when developing within a sandbox for macOS applications LSL will not be able to discovers streams on the network. So it is best to simply remove the sandbox from the app.
+
+![image](https://github.com/user-attachments/assets/bc86af93-0f37-4215-9cc9-64264c955dc1)
+
 <!--
 # lsl_bindings
 
