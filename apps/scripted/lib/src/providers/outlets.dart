@@ -17,15 +17,6 @@ class OutletProvider extends ChangeNotifier {
   bool isWorkerListenedTo = false;
   OutletWorker? worker;
 
-  updateDeviceName(String? oldName, String newName) {
-    if (oldName == null) return;
-    final oldDevice = devices[oldName];
-    if (oldDevice == null) return;
-
-    devices[newName] = (newName, oldDevice.$2, oldDevice.$3);
-    devices.remove(oldName);
-  }
-
   Future<void> addStream(OutletConfigDto config) async {
     worker ??= await OutletWorker.spawn();
 
@@ -118,12 +109,6 @@ class OutletProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // _addDevice(String name, StreamType streamType) {
-  //   if (devices.containsKey(name)) return;
-  //
-  //   devices[name] = ((name, streamType, false));
-  // }
-
   OutletConfig _getConfig(OutletConfigDto configDto) {
     return OutletConfig(configDto.chunkSize, configDto.maxBuffered);
   }
@@ -151,12 +136,4 @@ class OutletProvider extends ChangeNotifier {
         nominalSRate: config.nominalSRate,
         sourceId: config.sourceId);
   }
-
-  // StreamInfo<String> _createStringStreamInfo(OutletConfigDto config) {
-  //   return StreamInfoFactory.createStringStreamInfo(
-  //       config.name, config.type, config.channelFormat as ChannelFormat<String>,
-  //       channelCount: config.channelCount,
-  //       nominalSRate: config.nominalSRate,
-  //       sourceId: config.sourceId);
-  // }
 }

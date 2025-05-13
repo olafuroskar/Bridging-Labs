@@ -284,8 +284,6 @@ class _OutletFormScreenState extends State<OutletFormScreen> {
                     setState(() {
                       _isLoading = true;
                     });
-                    appState.updateDeviceName(
-                        widget.defaultConfig?.name, _nameController.text);
                     appState.addStream(OutletConfigDto(
                         name: _nameController.text,
                         type: _typeController.text,
