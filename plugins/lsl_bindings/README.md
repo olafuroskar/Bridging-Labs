@@ -47,7 +47,7 @@ platform :ios, '14.0'
 
 To develop an application that utilises UDP multicast, special permission is required from Apple. Therefore, when developing within a sandbox for macOS applications LSL will not be able to discovers streams on the network. So it is best to simply remove the sandbox from the app.
 
-![image](https://github.com/user-attachments/assets/bc86af93-0f37-4215-9cc9-64264c955dc1)
+![image](https://github.com/user-attachments/assets/6ccc2e9c-485a-4b77-88c3-3b9a220314fc)
 
 <!--
 # lsl_bindings
