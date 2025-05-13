@@ -53,14 +53,14 @@ class _InletResultScreenState extends State<InletResultScreen> {
                     value: InletAction.stop,
                     child: Text('Stop'),
                   ),
-                  const PopupMenuItem<InletAction>(
-                    value: InletAction.share,
-                    child: Text('Share'),
-                  ),
-                  const PopupMenuItem<InletAction>(
-                    value: InletAction.shareOffset,
-                    child: Text('Share offset'),
-                  ),
+                  // const PopupMenuItem<InletAction>(
+                  //   value: InletAction.share,
+                  //   child: Text('Share'),
+                  // ),
+                  // const PopupMenuItem<InletAction>(
+                  //   value: InletAction.shareOffset,
+                  //   child: Text('Share offset'),
+                  // ),
                 ],
               ),
             );
