@@ -37,7 +37,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: dk.dtu.muse_sdk
+        package: dk.carp.muse_sdk
         pluginClass: MuseSdkPlugin
       ios:
         pluginClass: MuseSdkPlugin

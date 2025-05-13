@@ -37,7 +37,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: dk.dtu.multicast_lock
+        package: dk.carp.multicast_lock
         pluginClass: MulticastLockPlugin
 
   # To add assets to your plugin package, add an assets section, like this:

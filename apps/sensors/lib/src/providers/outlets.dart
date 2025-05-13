@@ -314,7 +314,7 @@ class OutletProvider extends ChangeNotifier {
     service = await AudioService.init(
         builder: () => MyAudioHandler(),
         config: AudioServiceConfig(
-          androidNotificationChannelId: 'dk.dtu.sensors.audio',
+          androidNotificationChannelId: 'dk.carp.sensors.audio',
           androidNotificationChannelName: 'Audio Playback',
           androidNotificationOngoing: true,
           // androidStopForegroundOnPause: false,

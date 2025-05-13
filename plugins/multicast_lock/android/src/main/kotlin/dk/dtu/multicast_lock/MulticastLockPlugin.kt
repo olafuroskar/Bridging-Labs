@@ -1,4 +1,4 @@
-package dk.dtu.multicast_lock
+package dk.carp.multicast_lock
 
 import android.content.Context
 import android.net.wifi.WifiManager

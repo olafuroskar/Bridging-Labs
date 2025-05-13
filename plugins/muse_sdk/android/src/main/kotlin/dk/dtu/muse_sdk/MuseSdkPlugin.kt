@@ -1,4 +1,4 @@
-package dk.dtu.muse_sdk
+package dk.carp.muse_sdk
 
 import android.content.Context
 import com.choosemuse.libmuse.MuseManagerAndroid

@@ -1,4 +1,4 @@
-package dk.dtu.muse_sdk
+package dk.carp.muse_sdk
 
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel

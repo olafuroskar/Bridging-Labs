@@ -1,4 +1,4 @@
-package dk.dtu.scripted
+package dk.carp.scripted
 
 import io.flutter.embedding.android.FlutterActivity
 

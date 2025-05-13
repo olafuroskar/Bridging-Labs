@@ -1,4 +1,4 @@
-package dk.dtu.multicast_lock_example
+package dk.carp.multicast_lock_example
 
 import io.flutter.embedding.android.FlutterActivity
 

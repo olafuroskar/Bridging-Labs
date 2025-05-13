@@ -1,4 +1,4 @@
-package dk.dtu.muse_sdk
+package dk.carp.muse_sdk
 
 import android.bluetooth.BluetoothManager
 import android.content.Context
