@@ -36,6 +36,30 @@ final streamInfo = lslBindings.lsl_create_streaminfo(
   "Source id".toNativeUtf8().cast<Char>());
 ```
 
+## Android
+
+The minimum SDK version must be set to 26 in `app/build.gradle`. This is due to the logging library used by LSL, Loguru.
+
+```java
+// app/build.gradle
+minSdk = 26
+```
+
+Although not due to this plugin, users may encounter the problem mentioned [here](https://github.com/flutter/flutter-intellij/issues/7152#issuecomment-2132853632) when creating a new project for Android. To avoid, make the following change in your `settings.gradle` file:
+
+```diff
+- includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
++ includeBuild(file("$flutterSdkPath/packages/flutter_tools/gradle").toPath().toRealPath().toAbsolutePath().toString())
+```
+
+The `AndroidManifest.xml` must contain
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+```
+
 ## iOS
 
 Minimum deployment target must be set to at least 14
