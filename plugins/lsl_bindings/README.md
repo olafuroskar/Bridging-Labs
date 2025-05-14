@@ -45,6 +45,13 @@ Minimum deployment target must be set to at least 14
 platform :ios, '14.0'
 ```
 
+The `Info.plist` for applications using the plugin must specify a reason for accessing the local network
+
+```xml
+<key>NSLocalNetworkUsageDescription</key>
+<string>This app needs local network access to discover data streams.</string>
+```
+
 ## macOS
 
 To develop an application that utilises UDP multicast, special permission is required from Apple. Therefore, when developing within a sandbox for macOS applications LSL will not be able to discovers streams on the network. So it is best to simply remove the sandbox from the app.
