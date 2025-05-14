@@ -7,9 +7,28 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:726069236415:android:20d5688f2d23f0a8edac0a",
+        "mobilesdk_app_id": "1:726069236415:android:f888d70a0a78d463edac0a",
         "android_client_info": {
           "package_name": "dk.carp.sensors"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdss6ClpFNjvLo9__jotkrIzCBqlcn3KM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:726069236415:android:20d5688f2d23f0a8edac0a",
+        "android_client_info": {
+          "package_name": "dk.dtu.sensors"
         }
       },
       "oauth_client": [],
