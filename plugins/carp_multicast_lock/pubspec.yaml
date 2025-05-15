@@ -1,6 +1,6 @@
 name: carp_multicast_lock
 description: "Multicast lock plugin for Android"
-version: 0.0.2
+version: 0.0.3
 homepage: https://github.com/olafuroskar/Bridging-Labs/tree/main/plugins/carp_multicast_lock#readme
 repository: https://github.com/olafuroskar/Bridging-Labs/tree/main/plugins/carp_multicast_lock
 issue_tracker: https://github.com/olafuroskar/Bridging-Labs/issues
