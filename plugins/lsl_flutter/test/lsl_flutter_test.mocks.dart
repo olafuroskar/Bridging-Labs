@@ -9,7 +9,7 @@ import 'dart:ffi' as _i3;
 import 'package:lsl_bindings/src/lsl_bindings_generated.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i4;
-import 'package:multicast_lock/multicast_lock.dart' as _i5;
+import 'package:carp_multicast_lock/carp_multicast_lock.dart' as _i5;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values

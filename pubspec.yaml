@@ -13,7 +13,7 @@ environment:
 workspace:
   - plugins/lsl_bindings
   - plugins/lsl_flutter
-  - plugins/multicast_lock
+  - plugins/carp_multicast_lock
   - plugins/muse_sdk
   - apps/sensors
   - apps/scripted

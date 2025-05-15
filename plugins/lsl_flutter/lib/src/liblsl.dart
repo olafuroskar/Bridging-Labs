@@ -1,4 +1,4 @@
-import 'package:multicast_lock/multicast_lock.dart';
+import 'package:carp_multicast_lock/carp_multicast_lock.dart';
 import 'package:lsl_bindings/lsl_bindings.dart';
 
 /// A class encapsulating the bindings to the native functions in [_dylib], as well as multicast lock for Android
