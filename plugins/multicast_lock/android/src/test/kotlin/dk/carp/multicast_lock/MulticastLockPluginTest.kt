@@ -18,7 +18,7 @@ internal class MulticastLockPluginTest {
   fun onMethodCall_getPlatformVersion_returnsExpectedValue() {
     val plugin = MulticastLockPlugin()
 
-    val call = MethodCall("getPlatformVersion", null)
+    val call = MethodCall("acquireMulticastLock", null)
     val mockResult: MethodChannel.Result = Mockito.mock(MethodChannel.Result::class.java)
     plugin.onMethodCall(call, mockResult)
 

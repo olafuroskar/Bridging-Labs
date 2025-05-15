@@ -1,15 +1,54 @@
-# multicast_lock
+````markdown
+# Mutlicast Lock Plugin
 
-A new Flutter plugin project.
+A minimal Flutter plugin for acquiring and releasing the Android [WifiManager MulticastLock](https://developer.android.com/reference/android/net/wifi/WifiManager.MulticastLock). This is useful for apps that need to receive multicast packets, such as when using protocols like mDNS or Lab Streaming Layer (LSL).
 
-## Getting Started
+> ⚠️ This plugin **only supports Android**. On other platforms, calls will have no effect.
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/to/develop-plugins),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+## Features
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Acquire the Android multicast lock
+- Release the multicast lock
 
+## Getting started
+
+Add this plugin to your `pubspec.yaml`:
+
+```yaml
+dependencies:
+  multicast_lock: ^0.0.1
+```
+````
+
+Then run:
+
+```bash
+flutter pub get
+```
+
+## Usage
+
+```dart
+import 'package:multicast_lock/multicast_lock.dart';
+
+void enableMulticast() async {
+  await MulticastLock.acquire();
+}
+
+void disableMulticast() async {
+  await MulticastLock.release();
+}
+```
+
+## Permissions
+
+Make sure your app has `ACCESS_WIFI_STATE` and `CHANGE_WIFI_MULTICAST_STATE` permissions.
+
+```xml
+<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+<uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+```
+
+## License
+
+[MIT](LICENSE)
