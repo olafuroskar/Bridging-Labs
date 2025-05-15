@@ -16,8 +16,8 @@ dependencies:
   lsl_bindings:
     path: ../lsl_bindings
   # This package is required for using multicast UDP packets on Android, as LSL uses multicast UDP packets.
-  multicast_lock:
-    path: ../multicast_lock
+  carp_multicast_lock:
+    path: ../carp_carp_multicast_lock
   mockito: ^5.4.5
 
 dev_dependencies:

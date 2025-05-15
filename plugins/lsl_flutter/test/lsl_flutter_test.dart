@@ -6,7 +6,7 @@ import 'package:lsl_flutter/lsl_flutter.dart';
 import 'package:lsl_flutter/src/liblsl.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:multicast_lock/multicast_lock.dart';
+import 'package:carp_multicast_lock/carp_multicast_lock.dart';
 import 'package:test/test.dart';
 
 import 'lsl_flutter_test.mocks.dart';
