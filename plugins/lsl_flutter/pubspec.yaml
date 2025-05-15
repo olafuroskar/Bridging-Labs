@@ -1,6 +1,6 @@
 name: lsl_flutter
 description: "A Flutter package to interact with the Lab Streaming Layer"
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/olafuroskar/Bridging-Labs/tree/main/plugins/lsl_flutter#readme
 repository: https://github.com/olafuroskar/Bridging-Labs/tree/main/plugins/lsl_flutter
 issue_tracker: https://github.com/olafuroskar/Bridging-Labs/issues
