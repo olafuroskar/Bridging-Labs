@@ -16,7 +16,7 @@ Add this plugin to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  multicast_lock: ^0.0.1
+  carp_multicast_lock: ^0.0.1
 ```
 ````
 
@@ -29,7 +29,7 @@ flutter pub get
 ## Usage
 
 ```dart
-import 'package:multicast_lock/multicast_lock.dart';
+import 'package:carp_multicast_lock/carp_multicast_lock.dart';
 
 void enableMulticast() async {
   await MulticastLock.acquire();

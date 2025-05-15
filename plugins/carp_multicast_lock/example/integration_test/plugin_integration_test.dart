@@ -9,7 +9,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
-import 'package:multicast_lock/multicast_lock.dart';
+import 'package:carp_multicast_lock/carp_multicast_lock.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

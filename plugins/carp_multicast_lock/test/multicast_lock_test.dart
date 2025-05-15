@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:multicast_lock/multicast_lock.dart';
-import 'package:multicast_lock/multicast_lock_platform_interface.dart';
-import 'package:multicast_lock/multicast_lock_method_channel.dart';
+import 'package:carp_multicast_lock/carp_multicast_lock.dart';
+import 'package:carp_multicast_lock/carp_multicast_lock_platform_interface.dart';
+import 'package:carp_multicast_lock/carp_multicast_lock_method_channel.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 class MockMulticastLockPlatform

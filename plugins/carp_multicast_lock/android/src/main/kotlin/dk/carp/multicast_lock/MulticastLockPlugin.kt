@@ -1,4 +1,4 @@
-package dk.carp.multicast_lock
+package dk.carp.carp_multicast_lock
 
 import android.content.Context
 import android.net.wifi.WifiManager
@@ -22,7 +22,7 @@ class MulticastLockPlugin: FlutterPlugin, MethodCallHandler {
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         context = flutterPluginBinding.applicationContext
-        channel = MethodChannel(flutterPluginBinding.binaryMessenger, "multicast_lock")
+        channel = MethodChannel(flutterPluginBinding.binaryMessenger, "carp_multicast_lock")
         channel.setMethodCallHandler(this)
     }
 

@@ -1,12 +1,12 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:multicast_lock/multicast_lock_method_channel.dart';
+import 'package:carp_multicast_lock/carp_multicast_lock_method_channel.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   MethodChannelMulticastLock platform = MethodChannelMulticastLock();
-  const MethodChannel channel = MethodChannel('multicast_lock');
+  const MethodChannel channel = MethodChannel('carp_multicast_lock');
 
   setUp(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger

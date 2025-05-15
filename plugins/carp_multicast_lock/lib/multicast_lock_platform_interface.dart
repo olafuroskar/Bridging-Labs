@@ -1,6 +1,6 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
-import 'multicast_lock_method_channel.dart';
+import 'carp_multicast_lock_method_channel.dart';
 
 abstract class MulticastLockPlatform extends PlatformInterface {
   /// Constructs a MulticastLockPlatform.

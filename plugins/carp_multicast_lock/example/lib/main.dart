@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:multicast_lock/multicast_lock.dart';
+import 'package:carp_multicast_lock/carp_multicast_lock.dart';
 
 void main() {
   runApp(const MyApp());

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'multicast_lock_platform_interface.dart';
+import 'carp_multicast_lock_platform_interface.dart';
 
 class MulticastLock {
   FutureOr<void> acquireMulticastLock() {

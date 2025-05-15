@@ -37,3 +37,6 @@ build/
 
 # Ignore Java KeyStore files
 *.jks
+
+# Temp rename
+**/rename.sh

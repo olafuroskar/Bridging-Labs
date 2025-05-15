@@ -1,8 +1,8 @@
-name: multicast_lock
+name: carp_multicast_lock
 description: "Multicast lock plugin for Android"
 version: 0.0.1
-homepage: https://github.com/olafuroskar/Bridging-Labs/tree/main/plugins/multicast_lock#readme
-repository: https://github.com/olafuroskar/Bridging-Labs/tree/main/plugins/multicast_lock
+homepage: https://github.com/olafuroskar/Bridging-Labs/tree/main/plugins/carp_multicast_lock#readme
+repository: https://github.com/olafuroskar/Bridging-Labs/tree/main/plugins/carp_multicast_lock
 issue_tracker: https://github.com/olafuroskar/Bridging-Labs/issues
 
 environment:
@@ -25,5 +25,5 @@ flutter:
   plugin:
     platforms:
       android:
-        package: dk.carp.multicast_lock
+        package: dk.carp.carp_multicast_lock
         pluginClass: MulticastLockPlugin

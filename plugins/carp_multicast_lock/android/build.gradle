@@ -1,4 +1,4 @@
-group = "dk.carp.multicast_lock"
+group = "dk.carp.carp_multicast_lock"
 version = "1.0-SNAPSHOT"
 
 buildscript {
@@ -25,7 +25,7 @@ apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 
 android {
-    namespace = "dk.carp.multicast_lock"
+    namespace = "dk.carp.carp_multicast_lock"
 
     compileSdk = 35
 

@@ -1,4 +1,4 @@
-package dk.carp.multicast_lock
+package dk.carp.carp_multicast_lock
 
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
