@@ -9,7 +9,6 @@ import 'package:flutter/services.dart';
 import 'package:lsl_bindings/lsl_bindings.dart';
 import 'package:lsl_flutter/lsl_flutter.dart';
 import 'package:lsl_flutter/src/adapters/inlets/processing_options.dart';
-// TODO: Ekki gott
 import 'package:lsl_flutter/src/liblsl.dart';
 
 // Managers
