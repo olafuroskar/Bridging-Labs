@@ -5,3 +5,7 @@ Initial release
 ## 0.0.2
 
 Fix markdown in readme
+
+## 0.0.3
+
+Fix title typo

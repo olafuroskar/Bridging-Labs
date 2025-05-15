@@ -1,4 +1,4 @@
-# Mutlicast Lock Plugin
+# Multicast Lock Plugin
 
 A minimal Flutter plugin for acquiring and releasing the Android [WifiManager MulticastLock](https://developer.android.com/reference/android/net/wifi/WifiManager.MulticastLock). This is useful for apps that need to receive multicast packets, such as when using protocols like mDNS or Lab Streaming Layer (LSL).
 
