@@ -1,3 +1,5 @@
+# LSL Bindings
+
 Low-level Dart bindings to the [Lab Streaming Layer (LSL)](https://github.com/sccn/labstreaminglayer) C API.
 
 This package provides direct access to the native LSL interface via Dart FFI and is intended for advanced users who require fine-grained control over streaming or receiving LSL data in Dart or Flutter applications.
