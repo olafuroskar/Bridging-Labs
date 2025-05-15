@@ -1,6 +1,6 @@
 A high-level Flutter plugin for working with the [Lab Streaming Layer (LSL)](https://github.com/sccn/labstreaminglayer), designed to make real-time data streaming easy and accessible in Flutter apps.
 
-This package wraps the low-level [`lsl_ffi`](https://pub.dev/packages/lsl_ffi) bindings to provide a simplified and idiomatic Flutter/Dart API for developers who want to stream or record physiological signals (like EEG, EMG, ECG), behavioral data, or any custom time-series streams using LSL.
+This package wraps the low-level [`lsl_bindings`](https://pub.dev/packages/lsl_bindings) bindings to provide a simplified and idiomatic Flutter/Dart API for developers who want to stream or record physiological signals (like EEG, PPG, ECG), behavioral data, or any custom time-series streams using LSL.
 
 ## ✨ Features
 
