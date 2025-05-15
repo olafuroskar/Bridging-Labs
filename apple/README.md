@@ -96,7 +96,15 @@ cmake -G "Xcode" -B build/ios-sim \
 cmake -G "Xcode" -B build/macos -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
 ```
 
-2. Then create an xcframework by running
+2. Build Release configuration. Run
+
+```sh
+cmake --build build/ios --config Release
+cmake --build build/ios-sim --config Release
+cmake --build build/macos --config Release
+```
+
+3. Then create an xcframework by running
 
 ```bash
 xcodebuild -create-xcframework \

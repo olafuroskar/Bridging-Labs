@@ -1,4 +1,4 @@
-group = "dk.dtu.multicast_lock"
+group = "dk.carp.multicast_lock"
 version = "1.0-SNAPSHOT"
 
 buildscript {
@@ -25,7 +25,7 @@ apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 
 android {
-    namespace = "dk.dtu.multicast_lock"
+    namespace = "dk.carp.multicast_lock"
 
     compileSdk = 35
 

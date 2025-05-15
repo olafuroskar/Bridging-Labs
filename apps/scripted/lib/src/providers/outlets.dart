@@ -44,8 +44,9 @@ class OutletProvider extends ChangeNotifier {
         samplingRate: config.nominalSRate, amplitude: config.amplitude);
 
     final subscription = random.stream.listen(
-      (sample) {
-        worker?.pushSample(config.name, [sample]);
+      (datum) {
+        List<double> sample = [datum];
+        worker?.pushSample(config.name, sample);
       },
     );
 
@@ -67,8 +68,9 @@ class OutletProvider extends ChangeNotifier {
         wavelength: config.wavelength);
 
     final subscription = sineWave.stream.listen(
-      (sample) {
-        worker?.pushSample(config.name, [sample]);
+      (datum) {
+        List<double> sample = [datum];
+        worker?.pushSample(config.name, sample);
       },
     );
 

@@ -10,13 +10,6 @@ class MethodChannelMulticastLock extends MulticastLockPlatform {
   final methodChannel = const MethodChannel('multicast_lock');
 
   @override
-  Future<String?> getPlatformVersion() async {
-    final version =
-        await methodChannel.invokeMethod<String>('getPlatformVersion');
-    return version;
-  }
-
-  @override
   Future<void> acquireMulticastLock() async {
     await methodChannel.invokeMethod<void>('acquireMulticastLock');
   }

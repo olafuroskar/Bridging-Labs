@@ -8,7 +8,7 @@
 PRODUCT_NAME = scripted
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = dk.dtu.scripted
+PRODUCT_BUNDLE_IDENTIFIER = dk.carp.scripted
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2025 dk.dtu. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2025 dk.carp. All rights reserved.

@@ -9,7 +9,6 @@ class InletProvider extends ChangeNotifier {
   Map<String, Sample<double>> latestSamples = {};
 
   List<String> selectedInlets = [];
-  StreamManager streamManager = StreamManager();
   final Map<String, StreamSubscription<Sample<Object?>>?> inlets = {};
 
   List<String> get streams =>

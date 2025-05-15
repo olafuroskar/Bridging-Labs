@@ -30,6 +30,8 @@
     <string>Used to connect to Polar devices</string>
     <key>NSBluetoothPeripheralUsageDescription</key>
     <string>Used to connect to Polar devices</string>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>This app needs local network access to discover data streams.</string>
     <key>UIApplicationSupportsIndirectInputEvents</key>
     <true />
     <key>UIBackgroundModes</key>

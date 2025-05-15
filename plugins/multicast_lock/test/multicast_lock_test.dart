@@ -8,18 +8,13 @@ class MockMulticastLockPlatform
     with MockPlatformInterfaceMixin
     implements MulticastLockPlatform {
   @override
-  Future<String?> getPlatformVersion() => Future.value('42');
-
-  @override
   Future<void> acquireMulticastLock() {
-    // TODO: implement acquireMulticastLock
-    throw UnimplementedError();
+    return Future.value();
   }
 
   @override
   Future<void> releaseMulticastLock() {
-    // TODO: implement releaseMulticastLock
-    throw UnimplementedError();
+    return Future.value();
   }
 }
 
@@ -30,11 +25,18 @@ void main() {
     expect(initialPlatform, isInstanceOf<MethodChannelMulticastLock>());
   });
 
-  test('getPlatformVersion', () async {
+  test('acquireMulticastLock', () async {
     MulticastLock multicastLockPlugin = MulticastLock();
     MockMulticastLockPlatform fakePlatform = MockMulticastLockPlatform();
     MulticastLockPlatform.instance = fakePlatform;
 
-    expect(await multicastLockPlugin.getPlatformVersion(), '42');
+    bool success;
+    try {
+      await multicastLockPlugin.acquireMulticastLock();
+      success = true;
+    } catch (e) {
+      success = false;
+    }
+    expect(success, true);
   });
 }

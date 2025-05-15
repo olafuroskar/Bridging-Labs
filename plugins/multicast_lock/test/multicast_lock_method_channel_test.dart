@@ -9,7 +9,8 @@ void main() {
   const MethodChannel channel = MethodChannel('multicast_lock');
 
   setUp(() {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
       channel,
       (MethodCall methodCall) async {
         return '42';
@@ -18,10 +19,18 @@ void main() {
   });
 
   tearDown(() {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, null);
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, null);
   });
 
-  test('getPlatformVersion', () async {
-    expect(await platform.getPlatformVersion(), '42');
+  test('acquireMulticastLock', () async {
+    bool success;
+    try {
+      await platform.acquireMulticastLock();
+      success = true;
+    } catch (e) {
+      success = false;
+    }
+    expect(success, true);
   });
 }

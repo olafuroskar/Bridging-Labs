@@ -1,4 +1,4 @@
-group = "dk.dtu.muse_sdk"
+group = "dk.carp.muse_sdk"
 version = "1.0-SNAPSHOT"
 
 buildscript {
@@ -25,7 +25,7 @@ apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 
 android {
-    namespace = "dk.dtu.muse_sdk"
+    namespace = "dk.carp.muse_sdk"
 
     compileSdk = 35
 

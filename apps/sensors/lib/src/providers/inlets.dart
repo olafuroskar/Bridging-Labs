@@ -9,7 +9,6 @@ class InletProvider extends ChangeNotifier {
   List<ResolvedStreamHandle> handles = [];
 
   List<String> selectedInlets = [];
-  StreamManager streamManager = StreamManager();
   final Map<String, StreamSubscription<Chunk<Object?>>?> inlets = {};
 
   List<String> get streams =>
