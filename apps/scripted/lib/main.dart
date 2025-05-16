@@ -26,9 +26,12 @@ void main() {
       ChangeNotifierProvider(
         create: (_) => OutletProvider(),
       ),
-      ChangeNotifierProvider(
-        create: (_) => InletProvider(),
-      ),
+      ChangeNotifierProxyProvider0<InletProvider>(
+          create: (BuildContext context) => InletProvider(
+              Provider.of<OutletProvider>(context, listen: false)),
+          update: (BuildContext context, InletProvider? secondModel) =>
+              InletProvider(
+                  Provider.of<OutletProvider>(context, listen: false))),
     ],
     child: MyApp(),
   ));

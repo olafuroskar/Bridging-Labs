@@ -1,9 +1,6 @@
 part of '../../main.dart';
 
-enum StreamType {
-  random,
-  sine,
-}
+enum StreamType { random, sine, marker }
 
 const batchSize = 20;
 
@@ -25,6 +22,8 @@ class OutletProvider extends ChangeNotifier {
         addRandomStream(config);
       case StreamType.sine:
         addSineWaveStream(config);
+      case StreamType.marker:
+        addMarkerStream(config);
     }
 
     _activate(config);
@@ -75,6 +74,21 @@ class OutletProvider extends ChangeNotifier {
     );
 
     streams[config.name] = (subscription, StreamType.sine);
+  }
+
+  void addMarkerStream(OutletConfigDto config) async {
+    final result = await worker?.addStream(
+        _createStringStreamInfo(config), _getConfig(config));
+
+    if (result == null || !result) {
+      return;
+    }
+
+    streams[config.name] = (null, StreamType.marker);
+  }
+
+  void pushMarkers(String markerName, List<String> markers) async {
+    await worker?.pushSample(markerName, markers);
   }
 
   void stopStream(String name) {
@@ -134,6 +148,14 @@ class OutletProvider extends ChangeNotifier {
   StreamInfo<double> _createDoubleStreamInfo(OutletConfigDto config) {
     return StreamInfoFactory.createDoubleStreamInfo(
         config.name, config.type, config.channelFormat as ChannelFormat<double>,
+        channelCount: config.channelCount,
+        nominalSRate: config.nominalSRate,
+        sourceId: config.sourceId);
+  }
+
+  StreamInfo<String> _createStringStreamInfo(OutletConfigDto config) {
+    return StreamInfoFactory.createStringStreamInfo(
+        config.name, config.type, config.channelFormat as ChannelFormat<String>,
         channelCount: config.channelCount,
         nominalSRate: config.nominalSRate,
         sourceId: config.sourceId);

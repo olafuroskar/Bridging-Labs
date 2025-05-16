@@ -26,11 +26,49 @@ OutletConfigDto sineConfig(String name, String type, StreamType streamType) {
   );
 }
 
+OutletConfigDto markerConfig(String name, String type, StreamType streamType) {
+  return OutletConfigDto(
+    name: name,
+    channelFormat: CftStringChannelFormat(),
+    type: type,
+    streamType: streamType,
+    channelCount: 1,
+    nominalSRate: 0,
+    sourceId: name,
+  );
+}
+
 OutletConfigDto getConfig(String name, StreamType streamType) {
   switch (streamType) {
     case StreamType.random:
       return randomConfig(name, "White noise", StreamType.random);
     case StreamType.sine:
       return sineConfig(name, "Sine wave", StreamType.sine);
+    case StreamType.marker:
+      return markerConfig(name, "Marker", StreamType.marker);
   }
+}
+
+final timeToleranceInSeconds = Duration(milliseconds: 1000).inSeconds;
+
+// Find matching samples within tolerance
+(Sample<double>? sample, int index) findMathcingSample(
+  List<Sample<double>> buffer,
+  double targetTimestamp,
+) {
+  Sample<double>? closest;
+  var minDiff = double.infinity;
+  int index = -1;
+  int i = -1;
+
+  for (final (sample, timestamp) in buffer) {
+    i++;
+    final diff = (timestamp - targetTimestamp).abs();
+    if (diff < timeToleranceInSeconds && diff < minDiff) {
+      closest = (sample, timestamp);
+      minDiff = diff;
+      index = i;
+    }
+  }
+  return (closest, index);
 }

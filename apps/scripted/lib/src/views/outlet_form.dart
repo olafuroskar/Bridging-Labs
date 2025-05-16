@@ -287,8 +287,7 @@ class _OutletFormScreenState extends State<OutletFormScreen> {
                     appState.addStream(OutletConfigDto(
                         name: _nameController.text,
                         type: _typeController.text,
-                        streamType: widget.defaultConfig?.streamType ??
-                            StreamType.random,
+                        streamType: _streamType,
                         channelFormat: _channelFormat,
                         amplitude: double.parse(_amplitudeController.text),
                         wavelength: double.parse(_wavelengthController.text),
