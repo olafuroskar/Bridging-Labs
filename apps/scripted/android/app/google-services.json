@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "726069236415",
+    "project_id": "lab-streaming-layer",
+    "storage_bucket": "lab-streaming-layer.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:726069236415:android:761e2efad012e809edac0a",
+        "android_client_info": {
+          "package_name": "dk.carp.scripted"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdss6ClpFNjvLo9__jotkrIzCBqlcn3KM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:726069236415:android:f888d70a0a78d463edac0a",
+        "android_client_info": {
+          "package_name": "dk.carp.sensors"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdss6ClpFNjvLo9__jotkrIzCBqlcn3KM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:726069236415:android:20d5688f2d23f0a8edac0a",
+        "android_client_info": {
+          "package_name": "dk.dtu.sensors"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdss6ClpFNjvLo9__jotkrIzCBqlcn3KM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
