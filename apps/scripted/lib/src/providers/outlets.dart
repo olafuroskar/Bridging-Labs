@@ -44,7 +44,7 @@ class OutletProvider extends ChangeNotifier {
 
     final subscription = random.stream.listen(
       (datum) {
-        List<double> sample = [datum];
+        List<double> sample = [datum.$1, datum.$2];
         worker?.pushSample(config.name, sample);
       },
     );
@@ -68,7 +68,7 @@ class OutletProvider extends ChangeNotifier {
 
     final subscription = sineWave.stream.listen(
       (datum) {
-        List<double> sample = [datum];
+        List<double> sample = [datum.$1, datum.$2];
         worker?.pushSample(config.name, sample);
       },
     );
