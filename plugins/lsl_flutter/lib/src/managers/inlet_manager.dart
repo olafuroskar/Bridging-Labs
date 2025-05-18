@@ -60,12 +60,12 @@ class InletManager<S> {
     _isStreaming = false;
   }
 
-  Stream<Sample<S>> startSampleStream() async* {
+  Stream<Sample<S>> startSampleStream(double? samplingRate) async* {
     // Early return if manager is already streaming.
     if (_isStreaming) return;
     _isStreaming = true;
     final nominalSRate = getStreamInfo().nominalSRate;
-    final delay = _delay(nominalSRate);
+    final delay = _delay(samplingRate ?? nominalSRate);
 
     while (true) {
       await Future.delayed(delay);
@@ -83,12 +83,12 @@ class InletManager<S> {
     }
   }
 
-  Stream<Chunk<S>> startChunkStream() async* {
+  Stream<Chunk<S>> startChunkStream(double? samplingRate) async* {
     // Early return if manager is already streaming.
     if (_isStreaming) return;
     _isStreaming = true;
     final nominalSRate = getStreamInfo().nominalSRate;
-    final delay = _delay(nominalSRate);
+    final delay = _delay(samplingRate ?? nominalSRate);
 
     while (true) {
       await Future.delayed(delay);
