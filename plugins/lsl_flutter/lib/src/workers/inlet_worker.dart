@@ -441,11 +441,6 @@ class InletWorker {
 
       try {
         switch (command) {
-          // case InletCommandType.getInfo:
-          //   final inlet = inlets[streamId];
-          //   final info = inlet?.getStreamInfo() as StreamInfo<Object?>;
-          //   sendMessageFromWorker(id, info);
-          //   break;
           case InletCommandType.resolve:
             List<ResolvedStreamHandle> resolvedStreams = [];
 
