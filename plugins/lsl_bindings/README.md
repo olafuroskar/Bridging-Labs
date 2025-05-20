@@ -78,6 +78,24 @@ The `Info.plist` for applications using the plugin must specify a reason for acc
 <string>This app needs local network access to discover data streams.</string>
 ```
 
+Furthermore, the entitlement `com.apple.developer.networking.multicast` must be applied for from Apple with a justification in order to discover streams on iOS devices. This can take several working days.
+
+`Runner*.entitlements` must therefore include the following
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <!--...-->
+    <key>com.apple.developer.networking.multicast</key>
+    <true />
+    <!--...-->
+  </dict>
+</plist>
+
+```
+
 ## macOS
 
 To develop an application that utilises UDP multicast, special permission is required from Apple. Therefore, when developing within a sandbox for macOS applications LSL will not be able to discovers streams on the network. So it is best to simply remove the sandbox from the app.

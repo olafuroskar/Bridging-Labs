@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:scripted/src/models/outlet_config_dto.dart';
 import 'package:scripted/src/providers/random_stream.dart';
 import 'package:scripted/src/providers/sine_wave_stream.dart';
+import 'package:scripted/src/providers/stream_synchronizer.dart';
 import 'package:scripted/src/providers/utils.dart';
 import 'package:scripted/src/views/outlet_form.dart';
 import 'package:scripted/src/widgets/input_dialog.dart';

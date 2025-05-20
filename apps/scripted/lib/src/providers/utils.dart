@@ -26,26 +26,28 @@ OutletConfigDto sineConfig(String name, String type, StreamType streamType) {
   );
 }
 
-OutletConfigDto markerConfig(String name, String type, StreamType streamType) {
+OutletConfigDto markerConfig(String name, String type, StreamType streamType,
+    [int? channelCount]) {
   return OutletConfigDto(
     name: name,
     channelFormat: CftStringChannelFormat(),
     type: type,
     streamType: streamType,
-    channelCount: 1,
+    channelCount: channelCount ?? 1,
     nominalSRate: 0,
     sourceId: name,
   );
 }
 
-OutletConfigDto getConfig(String name, StreamType streamType) {
+OutletConfigDto getConfig(String name, StreamType streamType,
+    {int? channelCount}) {
   switch (streamType) {
     case StreamType.random:
       return randomConfig(name, "White noise", StreamType.random);
     case StreamType.sine:
       return sineConfig(name, "Sine wave", StreamType.sine);
     case StreamType.marker:
-      return markerConfig(name, "Marker", StreamType.marker);
+      return markerConfig(name, "Marker", StreamType.marker, channelCount);
   }
 }
 

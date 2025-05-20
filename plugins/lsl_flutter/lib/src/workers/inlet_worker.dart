@@ -55,15 +55,28 @@ class InletWorker {
       _activeChunkRequests.isEmpty &&
       _activeTimeCorrectionRequests.isEmpty;
 
-  void _sendCommand<T extends Object?>(int id, InletCommandType command,
-      {String? streamId,
-      double? waitTime,
-      bool? synchronize,
-      String? prop,
-      String? value,
-      String? pred}) {
-    _commands.send(
-        (id, command, streamId, waitTime, synchronize, prop, value, pred));
+  void _sendCommand<T extends Object?>(
+    int id,
+    InletCommandType command, {
+    String? streamId,
+    double? waitTime,
+    bool? synchronize,
+    String? prop,
+    String? value,
+    String? pred,
+    double? samplingRate,
+  }) {
+    _commands.send((
+      id,
+      command,
+      streamId,
+      waitTime,
+      synchronize,
+      prop,
+      value,
+      pred,
+      samplingRate
+    ));
   }
 
   /// Discover streams on the network
@@ -168,7 +181,7 @@ class InletWorker {
   /// worker isolate also creates a stream which yields samples back to main isolate
   /// which further pushes them to the listener.
   Future<Stream<Sample<Object?>>> startSampleStream(String streamId,
-      {required Function() onCancel}) async {
+      {required Function() onCancel, double? samplingRate}) async {
     if (_closed) throw StateError('Closed');
 
     final completer = Completer<bool>.sync();
@@ -180,7 +193,12 @@ class InletWorker {
     final streamController = StreamController<Sample<Object?>>();
 
     /// Initialise a sample stream on the inlet worker
-    _sendCommand(id, InletCommandType.startSampleStream, streamId: streamId);
+    _sendCommand(
+      id,
+      InletCommandType.startSampleStream,
+      streamId: streamId,
+      samplingRate: samplingRate,
+    );
     final success = await completer.future;
 
     if (success) {
@@ -200,7 +218,7 @@ class InletWorker {
   /// worker isolate also creates a stream which yields chunks back to main isolate
   /// which further pushes them to the listener.
   Future<Stream<Chunk<Object?>>> startChunkStream(String streamId,
-      {required Function() onCancel}) async {
+      {required Function() onCancel, double? samplingRate}) async {
     if (_closed) throw StateError('Closed');
 
     final completer = Completer<bool>.sync();
@@ -212,7 +230,12 @@ class InletWorker {
     final streamController = StreamController<Chunk<Object?>>();
 
     /// Initialise a chunk stream on the inlet worker
-    _sendCommand(id, InletCommandType.startChunkStream, streamId: streamId);
+    _sendCommand(
+      id,
+      InletCommandType.startChunkStream,
+      streamId: streamId,
+      samplingRate: samplingRate,
+    );
     final success = await completer.future;
 
     if (success) {
@@ -394,8 +417,17 @@ class InletWorker {
         return;
       }
 
-      final (id, command, streamId, waitTime, synchronize, prop, value, pred) =
-          message as (
+      final (
+        id,
+        command,
+        streamId,
+        waitTime,
+        synchronize,
+        prop,
+        value,
+        pred,
+        samplingRate,
+      ) = message as (
         int,
         InletCommandType,
         String?,
@@ -403,13 +435,15 @@ class InletWorker {
         bool?,
         String?,
         String?,
-        String?
+        String?,
+        double?
       );
 
       try {
         switch (command) {
           case InletCommandType.resolve:
             List<ResolvedStreamHandle> resolvedStreams = [];
+
             if (prop != null && value != null) {
               streamManager.resolveStreamsByProp(waitTime ?? 2, prop, value, 0);
             } else if (pred != null) {
@@ -441,7 +475,8 @@ class InletWorker {
           case InletCommandType.startSampleStream:
             final inlet = inlets[streamId];
 
-            final subscription = inlet?.startSampleStream().listen((sample) {
+            final subscription =
+                inlet?.startSampleStream(samplingRate).listen((sample) {
               sendMessageFromWorker(id, sample, streamId: streamId);
             });
             sendMessageFromWorker(id, subscription != null, streamId: streamId);
@@ -449,7 +484,8 @@ class InletWorker {
           case InletCommandType.startChunkStream:
             final inlet = inlets[streamId];
 
-            final subscription = inlet?.startChunkStream().listen((chunk) {
+            final subscription =
+                inlet?.startChunkStream(samplingRate).listen((chunk) {
               sendMessageFromWorker(id, chunk, streamId: streamId);
             });
             sendMessageFromWorker(id, subscription != null, streamId: streamId);
