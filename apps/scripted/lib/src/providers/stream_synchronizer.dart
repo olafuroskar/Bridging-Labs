@@ -17,7 +17,6 @@ class StreamSynchronizer {
   final double slowThreshold;
 
   double? _firstTimestamp;
-  double _lastTimestamp = 0;
   final double cooldownInSeconds;
   double? windowEndTimestamp;
   bool slowWindowEndReached = false;
@@ -41,25 +40,17 @@ class StreamSynchronizer {
     windowEndTimestamp = timestamp + bufferIntervalInSeconds;
   }
 
-  void addSample(String streamId, Sample<double> sample) {
+  void addSample(String streamId, Chunk<double> chunk) {
     final isFast = isFastSampleStream[streamId];
     if (isFast == null) return;
 
-    _setFirstTimestamp(sample.$2);
+    _setFirstTimestamp(chunk.first.$2);
 
     if (isFast) {
-      addFastSample(sample);
+      addFastSample(chunk);
     } else {
-      addSlowSample(sample);
+      addSlowSample(chunk);
     }
-  }
-
-  bool _cooldown(double now) {
-    if (now - _lastTimestamp < cooldownInSeconds) {
-      _lastTimestamp = now;
-      return true;
-    }
-    return false;
   }
 
   void bothWindowsEndReached() {
@@ -73,10 +64,23 @@ class StreamSynchronizer {
     }
   }
 
-  void addSlowSample(Sample<double> sample) {
-    _slowBuffer.add(sample);
-    if (_cooldown(sample.$2)) return;
-    _pruneOldSlowSamples(sample.$2);
+  void addSlowSample(Chunk<double> chunk) {
+    _slowBuffer.addAll(chunk);
+    // if (_cooldown(chunk.$2)) return;
+
+    for (final slow in _slowBuffer) {
+      for (final fast in _fastBuffer) {
+        if ((fast.$2 - slow.$2).abs() <= toleranceInSeconds) {
+          if (_checkCriteria(slow, fast)) {
+            onSynchronized(fast, slow);
+            _slowBuffer.remove(slow);
+            break;
+          }
+        }
+      }
+    }
+
+    _pruneOldSlowSamples(chunk.last.$2);
   }
 
   void _pruneOldSlowSamples(double now) {
@@ -88,23 +92,10 @@ class StreamSynchronizer {
     }
   }
 
-  void addFastSample(Sample<double> fast) {
-    _fastBuffer.addLast(fast);
+  void addFastSample(Chunk<double> fast) {
+    _fastBuffer.addAll(fast);
 
-    if (_cooldown(fast.$2)) return;
-
-    // Try to match each pending slow sample
-    for (final slow in _slowBuffer) {
-      if ((fast.$2 - slow.$2).abs() <= toleranceInSeconds) {
-        if (_checkCriteria(slow, fast)) {
-          onSynchronized(fast, slow);
-          _slowBuffer.remove(slow);
-          break;
-        }
-      }
-    }
-
-    _pruneOldFastSamples(fast.$2);
+    _pruneOldFastSamples(fast.last.$2);
   }
 
   void _pruneOldFastSamples(double now) {

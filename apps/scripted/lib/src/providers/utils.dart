@@ -51,6 +51,26 @@ OutletConfigDto getConfig(String name, StreamType streamType,
   }
 }
 
+StreamInfo<double> createDoubleStreamInfo(OutletConfigDto config) {
+  return StreamInfoFactory.createDoubleStreamInfo(
+      config.name, config.type, config.channelFormat as ChannelFormat<double>,
+      channelCount: config.channelCount,
+      nominalSRate: config.nominalSRate,
+      sourceId: config.sourceId);
+}
+
+StreamInfo<String> createStringStreamInfo(OutletConfigDto config) {
+  return StreamInfoFactory.createStringStreamInfo(
+      config.name, config.type, config.channelFormat as ChannelFormat<String>,
+      channelCount: config.channelCount,
+      nominalSRate: config.nominalSRate,
+      sourceId: config.sourceId);
+}
+
+OutletConfig getOutletConfig(OutletConfigDto configDto) {
+  return OutletConfig(configDto.chunkSize, configDto.maxBuffered);
+}
+
 final timeToleranceInSeconds = Duration(milliseconds: 1000).inSeconds;
 
 // Find matching samples within tolerance

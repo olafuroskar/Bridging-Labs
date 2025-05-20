@@ -33,7 +33,7 @@ class OutletProvider extends ChangeNotifier {
   /// Creates and subscribes to a sine wave data stream
   void addRandomStream(OutletConfigDto config) async {
     final result = await worker?.addStream(
-        _createDoubleStreamInfo(config), _getConfig(config));
+        createDoubleStreamInfo(config), getOutletConfig(config));
 
     if (result == null || !result) {
       return;
@@ -55,7 +55,7 @@ class OutletProvider extends ChangeNotifier {
   /// Creates and subscribes to a sine wave data stream
   void addSineWaveStream(OutletConfigDto config) async {
     final result = await worker?.addStream(
-        _createDoubleStreamInfo(config), _getConfig(config));
+        createDoubleStreamInfo(config), getOutletConfig(config));
 
     if (result == null || !result) {
       return;
@@ -78,7 +78,7 @@ class OutletProvider extends ChangeNotifier {
 
   void addMarkerStream(OutletConfigDto config) async {
     final result = await worker?.addStream(
-        _createStringStreamInfo(config), _getConfig(config));
+        createStringStreamInfo(config), getOutletConfig(config));
 
     if (result == null || !result) {
       return;
@@ -125,10 +125,6 @@ class OutletProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  OutletConfig _getConfig(OutletConfigDto configDto) {
-    return OutletConfig(configDto.chunkSize, configDto.maxBuffered);
-  }
-
   void _activate(OutletConfigDto config) {
     var oldDevice = devices[config.name];
     if (oldDevice == null) {
@@ -143,21 +139,5 @@ class OutletProvider extends ChangeNotifier {
     if (oldDevice == null) return;
 
     devices[name] = (oldDevice.$1, oldDevice.$2, false);
-  }
-
-  StreamInfo<double> _createDoubleStreamInfo(OutletConfigDto config) {
-    return StreamInfoFactory.createDoubleStreamInfo(
-        config.name, config.type, config.channelFormat as ChannelFormat<double>,
-        channelCount: config.channelCount,
-        nominalSRate: config.nominalSRate,
-        sourceId: config.sourceId);
-  }
-
-  StreamInfo<String> _createStringStreamInfo(OutletConfigDto config) {
-    return StreamInfoFactory.createStringStreamInfo(
-        config.name, config.type, config.channelFormat as ChannelFormat<String>,
-        channelCount: config.channelCount,
-        nominalSRate: config.nominalSRate,
-        sourceId: config.sourceId);
   }
 }

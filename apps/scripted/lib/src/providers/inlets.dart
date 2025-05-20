@@ -3,22 +3,25 @@ part of '../../main.dart';
 class InletProvider extends ChangeNotifier {
   int maxBufferSize = 150;
   bool? synchronize = false;
-
-  Map<String, (ResolvedStreamHandle handle, double threshold)> handles = {};
-
-  String? firstInlet;
-  Map<String, List<Sample<double>>> sampleBuffer = {};
   final markerStreamName = "Trigger markers";
   final OutletProvider outletProvider;
-  StreamSynchronizer? streamSynchronizer;
+  String? firstInlet;
+  double lastTimestampFast = 0;
+  double bufferLengthInSeconds = 2;
 
+  final Chunk<double> slowBuffer = [];
+  final Chunk<double> fastBuffer = [];
   List<String> selectedInlets = [];
-  final Map<String, StreamSubscription<Sample<Object?>>?> inlets = {};
-
   List<String> get streams =>
       handles.values.map((handle) => handle.$1.info.name).toList();
 
+  Map<String, List<Sample<double>>> sampleBuffer = {};
+  Map<String, (ResolvedStreamHandle handle, double threshold)> handles = {};
+  final Map<String, StreamSubscription<Chunk<Object?>>?> inlets = {};
+
+  StreamSynchronizer? streamSynchronizer;
   InletWorker? worker;
+  StreamProcessor? streamProcessor;
 
   InletProvider(this.outletProvider);
 
@@ -83,37 +86,76 @@ class InletProvider extends ChangeNotifier {
           channelCount: selectedInlets.length));
     }
 
-    // final slowThreshold = handles.values
-    //     .firstWhere((value) => value.$1.info.nominalSRate <= 5)
-    //     .$2;
-    // final fastThreshold =
-    //     handles.values.firstWhere((value) => value.$1.info.nominalSRate > 5).$2;
+    final slowThreshold = handles.values
+        .firstWhere((value) => value.$1.info.nominalSRate <= 5)
+        .$2;
+    final fastThreshold =
+        handles.values.firstWhere((value) => value.$1.info.nominalSRate > 5).$2;
 
-    streamSynchronizer = StreamSynchronizer(
-      buffers: Map.fromEntries(selectedInlets.map((s) => MapEntry(s, []))),
-      thresholds: Map.fromEntries(
-          handles.entries.map((entry) => MapEntry(entry.key, entry.value.$2))),
-      toleranceInSeconds: 0.1,
-      onSynchronized: criteriaMet,
-      isFastSampleStream: Map.fromEntries(handles.entries.map((entry) =>
-          MapEntry(entry.key, entry.value.$1.info.nominalSRate > 5))),
-      // slowThreshold: slowThreshold,
-      // fastThreshold: fastThreshold,
-    );
+    streamProcessor ??= await StreamProcessor.spawn();
+    StreamProcessor.setThresholds(slowThreshold, fastThreshold, 0.25);
+
+    final subscriber =
+        await streamProcessor?.startMarkerStream(onCancel: () {});
+    subscriber?.listen((samples) {
+      criteriaMet(samples.$2, samples.$1);
+    });
+
+    // streamSynchronizer = StreamSynchronizer(
+    //   buffers: Map.fromEntries(selectedInlets.map((s) => MapEntry(s, []))),
+    //   thresholds: Map.fromEntries(
+    //       handles.entries.map((entry) => MapEntry(entry.key, entry.value.$2))),
+    //   toleranceInSeconds: 0.1,
+    //   onSynchronized: criteriaMet,
+    //   isFastSampleStream: Map.fromEntries(handles.entries.map((entry) =>
+    //       MapEntry(entry.key, entry.value.$1.info.nominalSRate > 5))),
+    //   // slowThreshold: slowThreshold,
+    //   // fastThreshold: fastThreshold,
+    // );
 
     for (var inlet in selectedInlets) {
       final opened =
           await worker?.open(inlet, synchronize: synchronize ?? false);
 
+      final handle =
+          handles.entries.firstWhere((handle) => handle.value.$1.id == inlet);
+      final isSlow = handle.value.$1.info.nominalSRate < 5;
+
       if (opened ?? false) {
-        final sampleStream =
-            await worker?.startSampleStream(inlet, onCancel: () {
+        final sampleStream = await worker
+            // Explicit sampling rate
+            ?.startChunkStream(inlet, samplingRate: 2, onCancel: () {
           notifyListeners();
         });
 
-        inlets[inlet] = sampleStream?.listen((sample) {
-          if (sample is! Sample<double>) return;
-          streamSynchronizer?.addSample(inlet, sample);
+        inlets[inlet] = sampleStream?.listen((chunk) {
+          if (chunk is! Chunk<double>) return;
+          if (isSlow) {
+            slowBuffer.addAll(chunk);
+          } else {
+            fastBuffer.addAll(chunk);
+          }
+
+          print("✈️ ${slowBuffer.length} ${fastBuffer.length}");
+          if (fastBuffer.isNotEmpty) {
+            final fastBufferLastTimestamp = fastBuffer.last.$2;
+
+            if (fastBufferLastTimestamp - lastTimestampFast >
+                    bufferLengthInSeconds &&
+                slowBuffer.isNotEmpty &&
+                slowBuffer.first.$2 + 0.5 < fastBufferLastTimestamp) {
+              streamProcessor?.process(slowBuffer, fastBuffer);
+              fastBuffer.clear();
+              lastTimestampFast = fastBufferLastTimestamp;
+            }
+          }
+
+          if (slowBuffer.isNotEmpty) {
+            if (slowBuffer.last.$2 - slowBuffer.first.$2 > 3) {
+              slowBuffer.clear();
+            }
+          }
+          // streamSynchronizer?.addSample(inlet, chunk);
         });
       }
 
