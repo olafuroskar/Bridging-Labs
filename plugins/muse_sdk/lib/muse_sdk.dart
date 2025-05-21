@@ -36,7 +36,6 @@ class MuseSdk {
 
   Stream<List<String>?> getConnectionStream() {
     return _eventChannel.receiveBroadcastStream().map<List<String>?>((event) {
-      print("Connection stream 🌗");
       if (event['type'] == 'museListChanged') {
         return List<String>.from(event['muses']);
       }

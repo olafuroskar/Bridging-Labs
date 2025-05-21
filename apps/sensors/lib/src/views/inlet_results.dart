@@ -35,7 +35,7 @@ class _InletResultScreenState extends State<InletResultScreen> {
                 .info
                 .name;
             return ListTile(
-              title: Text(name),
+              title: Text("$name: ${entry.value}"),
               trailing: PopupMenuButton<InletAction>(
                 onSelected: (InletAction? value) {
                   switch (value) {
