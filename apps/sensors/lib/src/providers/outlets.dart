@@ -21,11 +21,17 @@ class OutletProvider extends ChangeNotifier {
   OutletWorker? worker;
   final _museSdkPlugin = MuseSdk();
   List<String> _muses = [];
+  final List<String> markerButtons = [];
 
   late MyAudioHandler service;
 
   OutletProvider() {
     _init();
+  }
+
+  void addButton(String text) {
+    markerButtons.add(text);
+    notifyListeners();
   }
 
   Future<void> findDevices() async {
