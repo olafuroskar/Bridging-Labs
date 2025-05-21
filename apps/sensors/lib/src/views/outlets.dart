@@ -29,6 +29,11 @@ class _OutletScreenState extends State<OutletScreen>
             title: const Text('Sources'),
             actions: [
               IconButton(
+                  onPressed: () {
+                    appState.errorMsg = null;
+                  },
+                  icon: const Icon(Icons.clear)),
+              IconButton(
                   onPressed: () async {
                     await appState.findDevices();
                   },

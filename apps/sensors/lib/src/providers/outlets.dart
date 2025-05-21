@@ -14,6 +14,7 @@ typedef Device = (String name, StreamType streamType, bool active);
 
 class OutletProvider extends ChangeNotifier {
   Map<String, Device> devices = {};
+  String? errorMsg;
 
   String? selectedDevice;
   Map<String, (StreamSubscription<Object?>?, StreamType)> streams = {};
@@ -26,7 +27,7 @@ class OutletProvider extends ChangeNotifier {
   late MyAudioHandler service;
 
   OutletProvider() {
-    _init();
+    if (Platform.isIOS) _init();
   }
 
   void addButton(String text) {
@@ -41,27 +42,30 @@ class OutletProvider extends ChangeNotifier {
           StreamType.accelerometer);
     }
 
-    polar.searchForDevice().listen((event) {
-      _addDevice(event.deviceId, StreamType.polar);
-      notifyListeners();
-    });
-
-    final granted = (await Permission.bluetoothScan.request().isGranted) &&
-        (await Permission.bluetoothConnect.request().isGranted);
-
-    if (granted &&
-        Platform.isAndroid &&
-        await Permission.location.request().isGranted) {
-      // Only supports Android for now
-      _museSdkPlugin.initialize();
-      _museSdkPlugin.getConnectionStream().listen((muses) {
-        if (muses == null) return;
-
-        for (var muse in muses) {
-          _addDevice(muse, StreamType.muse);
-          _muses = muses;
-        }
+    final scanGranted = await Permission.bluetoothScan.request().isGranted;
+    final connectGranted =
+        await Permission.bluetoothConnect.request().isGranted;
+    if (scanGranted && connectGranted) {
+      polar.searchForDevice().listen((event) {
+        _addDevice(event.deviceId, StreamType.polar);
+        notifyListeners();
       });
+      if (Platform.isAndroid) {
+        try {
+          // Only supports Android for now
+          _museSdkPlugin.initialize();
+          _museSdkPlugin.getConnectionStream().listen((muses) {
+            if (muses == null) return;
+
+            for (var muse in muses) {
+              _addDevice(muse, StreamType.muse);
+              _muses = muses;
+            }
+          });
+        } catch (e) {
+          errorMsg = e.toString();
+        }
+      }
     }
 
     notifyListeners();
@@ -77,6 +81,7 @@ class OutletProvider extends ChangeNotifier {
   }
 
   Future<void> addStream(OutletConfigDto config) async {
+    WakelockPlus.enable();
     worker ??= await OutletWorker.spawn();
 
     _audioPlay();
@@ -293,6 +298,7 @@ class OutletProvider extends ChangeNotifier {
       worker?.close();
       worker = null;
       _audioStop();
+      WakelockPlus.disable();
     }
 
     notifyListeners();
