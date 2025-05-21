@@ -49,7 +49,9 @@ class OutletProvider extends ChangeNotifier {
     final granted = (await Permission.bluetoothScan.request().isGranted) &&
         (await Permission.bluetoothConnect.request().isGranted);
 
-    if (granted && Platform.isAndroid) {
+    if (granted &&
+        Platform.isAndroid &&
+        await Permission.location.request().isGranted) {
       // Only supports Android for now
       _museSdkPlugin.initialize();
       _museSdkPlugin.getConnectionStream().listen((muses) {
