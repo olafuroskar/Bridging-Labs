@@ -45,12 +45,16 @@ class OutletProvider extends ChangeNotifier {
     final scanGranted = await Permission.bluetoothScan.request().isGranted;
     final connectGranted =
         await Permission.bluetoothConnect.request().isGranted;
-    if (scanGranted && connectGranted) {
+
+    if (Platform.isIOS) {
       polar.searchForDevice().listen((event) {
         _addDevice(event.deviceId, StreamType.polar);
         notifyListeners();
       });
-      if (Platform.isAndroid) {
+    }
+
+    if (scanGranted) {
+      if (Platform.isAndroid && connectGranted) {
         try {
           // Only supports Android for now
           _museSdkPlugin.initialize();

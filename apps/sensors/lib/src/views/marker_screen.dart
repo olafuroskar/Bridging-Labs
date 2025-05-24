@@ -20,14 +20,7 @@ class _MarkerScreenState extends State<MarkerScreen>
           actions: [
             IconButton(
                 onPressed: () async {
-                  final emos = [
-                    "EMBARRASS",
-                    "SAD",
-                    "FEAR",
-                    "CALMNESS",
-                    "ROMANCE",
-                    "END"
-                  ];
+                  final emos = ["1", "2", "3", "4", "5", "END"];
                   for (final emo in emos) {
                     appState.addButton(emo);
                   }
