@@ -8,7 +8,8 @@ class InletScreen extends StatelessWidget {
     return Consumer<InletProvider>(builder: (context, appState, child) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Inlets'),
+          title: Text(
+              'Inlets ${appState.resolutionTime == 0 || appState.resolutionTime == null ? "" : appState.resolutionTime}'),
           actions: [
             IconButton(
               icon: const Icon(Icons.check),
@@ -39,17 +40,19 @@ class InletScreen extends StatelessWidget {
                 onChanged: (val) => appState.setSynchronization(val))
           ],
         ),
-        body: ListView(
-          children: appState.handles.map((handle) {
-            final selected = appState.selectedInlets.contains(handle.id);
-            return CheckboxListTile(
-              value: selected,
-              title: Text(
-                  "${handle.info.name}: ${appState.writtenLines[handle.id]}"),
-              onChanged: (_) => appState.toggleInletSelection(handle.id),
-            );
-          }).toList(),
-        ),
+        body: appState.resolutionTime == null
+            ? CircularProgressIndicator()
+            : ListView(
+                children: appState.handles.map((handle) {
+                  final selected = appState.selectedInlets.contains(handle.id);
+                  return CheckboxListTile(
+                    value: selected,
+                    title: Text(
+                        "${handle.info.name}: ${appState.writtenLines[handle.id]}"),
+                    onChanged: (_) => appState.toggleInletSelection(handle.id),
+                  );
+                }).toList(),
+              ),
       );
     });
   }

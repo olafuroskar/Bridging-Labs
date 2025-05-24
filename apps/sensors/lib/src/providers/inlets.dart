@@ -3,6 +3,7 @@ part of '../../main.dart';
 class InletProvider extends ChangeNotifier {
   int maxBufferSize = 150;
   bool? synchronize = false;
+  double? resolutionTime = 0;
 
   Map<String, int> writtenLines = {};
 
@@ -42,9 +43,13 @@ class InletProvider extends ChangeNotifier {
   Future<void> resolveStreams(double waitTime) async {
     worker ??= await InletWorker.spawn();
 
+    resolutionTime = null;
+    notifyListeners();
+    final start = DateTime.now();
+
     handles = await worker?.resolveStreams() ?? [];
 
-    // This call tells the widgets that are listening to this model to rebuild.
+    resolutionTime = DateTime.now().difference(start).inMilliseconds / 1000;
     notifyListeners();
   }
 
