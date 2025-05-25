@@ -60,11 +60,12 @@ class InletProvider extends ChangeNotifier {
 
   void shareResult(String key, String name) async {
     final directory = await getApplicationDocumentsDirectory();
-    final filePath = '${directory.path}/$key.csv';
+    final filePath =
+        '${directory.path}${Platform.isWindows ? "\\" : '/'}$key.csv';
 
     List<XFile> files = [XFile(filePath)];
 
-    await Share.shareXFiles(files);
+    await Share.shareXFiles(files, text: "File", subject: "CSV file");
   }
 
   void createInlet() async {
