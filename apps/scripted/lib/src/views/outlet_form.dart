@@ -296,7 +296,9 @@ class _OutletFormScreenState extends State<OutletFormScreen> {
                         sourceId: _nameController.text,
                         nominalSRate:
                             double.parse(_samplingRateController.text),
-                        channelCount: int.parse(_channelCountController.text)));
+                        channelCount:
+                            // WARN: 1 added for index channel
+                            int.parse(_channelCountController.text) + 1));
                     // Go back
                     Navigator.pop(context);
                   }

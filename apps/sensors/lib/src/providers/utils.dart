@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:lsl_flutter/lsl_flutter.dart';
 import 'package:sensors/main.dart';
 import 'package:sensors/src/models/outlet_config_dto.dart';
@@ -20,7 +22,7 @@ OutletConfigDto polarConfig(String name, String type) {
 OutletConfigDto museConfig(String name, String type) {
   return OutletConfigDto(
     name: name,
-    channelFormat: Int64ChannelFormat(),
+    channelFormat: Double64ChannelFormat(),
     type: type,
     streamType: StreamType.muse,
     channelCount: 3,
@@ -45,7 +47,7 @@ OutletConfigDto sensorsConfig(String name, String type, StreamType streamType) {
 
 OutletConfigDto markerConfig(String name, String type, StreamType streamType) {
   return OutletConfigDto(
-    name: name,
+    name: "$name ${Platform.operatingSystem}",
     channelFormat: CftStringChannelFormat(),
     type: type,
     streamType: streamType,

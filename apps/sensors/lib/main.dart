@@ -18,6 +18,7 @@ import 'package:sensors/src/views/outlet_form.dart';
 import 'package:sensors/src/widgets/show_confirmation_dialog.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 part 'src/views/home.dart';
 part 'src/views/outlets.dart';

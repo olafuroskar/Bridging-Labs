@@ -14,8 +14,35 @@ class OutletProvider extends ChangeNotifier {
   bool isWorkerListenedTo = false;
   OutletWorker? worker;
 
+  late MyAudioHandler service;
+
+  OutletProvider() {
+    _init();
+  }
+
+  void _init() async {
+    service = await AudioService.init(
+        builder: () => MyAudioHandler(),
+        config: AudioServiceConfig(
+          androidNotificationChannelId: 'dk.carp.scripted.audio',
+          androidNotificationChannelName: 'Audio Playback',
+          androidNotificationOngoing: true,
+          // androidStopForegroundOnPause: false,
+        ));
+  }
+
+  _audioPlay() {
+    service.play();
+  }
+
+  _audioStop() {
+    service.stop();
+  }
+
   Future<void> addStream(OutletConfigDto config) async {
     worker ??= await OutletWorker.spawn();
+
+    _audioPlay();
 
     switch (config.streamType) {
       case StreamType.random:
@@ -44,7 +71,7 @@ class OutletProvider extends ChangeNotifier {
 
     final subscription = random.stream.listen(
       (datum) {
-        List<double> sample = [datum];
+        List<double> sample = [datum.$1, datum.$2];
         worker?.pushSample(config.name, sample);
       },
     );
@@ -68,7 +95,7 @@ class OutletProvider extends ChangeNotifier {
 
     final subscription = sineWave.stream.listen(
       (datum) {
-        List<double> sample = [datum];
+        List<double> sample = [datum.$1, datum.$2];
         worker?.pushSample(config.name, sample);
       },
     );
@@ -106,12 +133,15 @@ class OutletProvider extends ChangeNotifier {
     if (streams.isEmpty) {
       worker?.close();
       worker = null;
+      _audioStop();
     }
 
     notifyListeners();
   }
 
   void stopStreams() {
+    _audioStop();
+
     for (var stream in streams.entries) {
       stream.value.$1?.cancel();
     }

@@ -3,11 +3,19 @@ import 'dart:math';
 
 /// A class that provides a sine wave stream.
 class SineWaveStream {
-  final double samplingRate; // samples per second
-  final double amplitude; // peak amplitude
-  final double wavelength; // period length in seconds
+  /// samples per second
+  final double samplingRate;
 
-  StreamController<double>? _controller;
+  /// peak amplitude
+  final double amplitude;
+
+  /// period length in seconds
+  final double wavelength;
+
+  /// Index for validation, double to match the channel format
+  double index = 0;
+
+  StreamController<(double, double)>? _controller;
   Timer? _timer;
 
   SineWaveStream({
@@ -16,8 +24,8 @@ class SineWaveStream {
     required this.wavelength,
   });
 
-  Stream<double> get stream {
-    _controller ??= StreamController<double>(
+  Stream<(double, double)> get stream {
+    _controller ??= StreamController<(double, double)>(
       onListen: _start,
       onCancel: _stop,
     );
@@ -33,7 +41,8 @@ class SineWaveStream {
 
     _timer = Timer.periodic(period, (_) {
       final sample = amplitude * sin(2 * pi * frequency * time);
-      _controller?.add(sample);
+      _controller?.add((sample, index));
+      index += 1;
       time += increment;
     });
   }

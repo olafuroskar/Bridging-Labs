@@ -10,17 +10,6 @@ class MarkerScreen extends StatefulWidget {
 class _MarkerScreenState extends State<MarkerScreen>
     with SingleTickerProviderStateMixin {
   final TextEditingController _controller = TextEditingController();
-  final List<String> _buttons = [];
-
-  void _addButton() {
-    final text = _controller.text.trim();
-    if (text.isNotEmpty) {
-      setState(() {
-        _buttons.add(text);
-        _controller.clear();
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,27 +17,49 @@ class _MarkerScreenState extends State<MarkerScreen>
       return Scaffold(
         appBar: AppBar(
           title: const Text('Marker stream'),
+          actions: [
+            IconButton(
+                onPressed: () async {
+                  final emos = ["1", "2", "3", "4", "5", "END"];
+                  for (final emo in emos) {
+                    appState.addButton(emo);
+                  }
+                },
+                icon: const Icon(Icons.touch_app)),
+          ],
         ),
         body: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ..._buttons.map((text) => Padding(
+              ...appState.markerButtons.map((text) => Padding(
                     padding: const EdgeInsets.fromLTRB(4, 12, 4, 12),
-                    child: GestureDetector(
-                      onTapDown: (e) {
+                    child: ElevatedButton(
+                      onPressed: () {
                         appState.pushMarkers([text]);
                       },
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        style: ButtonStyle(
-                            fixedSize:
-                                WidgetStatePropertyAll(Size.fromHeight(256))),
-                        child: Text(text, style: TextStyle(fontSize: 24)),
-                      ),
+                      style: ButtonStyle(
+                          fixedSize:
+                              WidgetStatePropertyAll(Size.fromHeight(64))),
+                      child: Text(text, style: TextStyle(fontSize: 24)),
                     ),
                   )),
+              // ...appState.markerButtons.map((text) => Padding(
+              //       padding: const EdgeInsets.fromLTRB(4, 12, 4, 12),
+              //       child: GestureDetector(
+              //         onTapDown: (e) {
+              //           appState.pushMarkers([text]);
+              //         },
+              //         child: ElevatedButton(
+              //           onPressed: () {},
+              //           style: ButtonStyle(
+              //               fixedSize:
+              //                   WidgetStatePropertyAll(Size.fromHeight(64))),
+              //           child: Text(text, style: TextStyle(fontSize: 24)),
+              //         ),
+              //       ),
+              //     )),
               const Spacer(),
               Row(
                 children: [
@@ -62,7 +73,15 @@ class _MarkerScreenState extends State<MarkerScreen>
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
-                    onPressed: _addButton,
+                    onPressed: () {
+                      final text = _controller.text.trim();
+                      if (text.isNotEmpty) {
+                        appState.addButton(text);
+                        setState(() {
+                          _controller.clear();
+                        });
+                      }
+                    },
                     child: const Text('Okay'),
                   ),
                 ],
