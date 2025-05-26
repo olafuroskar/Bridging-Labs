@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:lsl_flutter/lsl_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:scripted/src/models/outlet_config_dto.dart';
+import 'package:scripted/src/providers/audio_handler.dart';
 import 'package:scripted/src/providers/random_stream.dart';
 import 'package:scripted/src/providers/sine_wave_stream.dart';
 import 'package:scripted/src/providers/stream_synchronizer.dart';
