@@ -11,6 +11,7 @@ class OutletAdapterFactory {
       Outlet<int> outlet) {
     switch (outlet.streamInfo.channelFormat) {
       case Int8ChannelFormat():
+        return CharOutletAdapter._(outlet);
       case Int16ChannelFormat():
         return ShortOutletAdapter._(outlet);
       case Int32ChannelFormat():

@@ -14,6 +14,7 @@ part 'outlet_adapter_factory.dart';
 part 'outlet_container.dart';
 part 'utils.dart';
 
+part 'implementations/char_outlet_adapter.dart';
 part 'implementations/int_outlet_adapter.dart';
 part 'implementations/short_outlet_adapter.dart';
 part 'implementations/long_outlet_adapter.dart';

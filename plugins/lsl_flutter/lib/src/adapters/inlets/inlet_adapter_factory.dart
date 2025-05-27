@@ -5,6 +5,7 @@ class InletAdapterFactory {
       Inlet<int> inlet, ResolvedStream stream) {
     switch (stream.info.channelFormat) {
       case Int8ChannelFormat():
+        return CharInletAdapter._(inlet, stream);
       case Int16ChannelFormat():
         return ShortInletAdapter._(inlet, stream);
       case Int32ChannelFormat():
