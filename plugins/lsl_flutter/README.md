@@ -15,15 +15,11 @@ Powered by native bindings via [`lsl_ffi`](https://pub.dev/packages/lsl_ffi) and
 
 ## Platform Support
 
-| Android | iOS  |  MacOS  | Windows  | Web | Linux |
-| :-----: | :--: | :-----: | :------: | :-: | :---: |
-|   ✅    | ⚠️\* | ⚠️ \*\* | ⚠️\*\*\* | ❌  |  ❓   |
+| Android | iOS | MacOS | Windows |
+| :-----: | :-: | :---: | :-----: |
+|   ✅    | ✅  |  ✅   |  ⚠️\*   |
 
-\* Streams can be published from an iPhone and discovered on other devices. Discovering stream on an iPhone however seems to be inconsistent.
-
-\*\* For production grade development special permission is required from Apple to use multicast capabilities that has not been tested. [macOS](macos) However, if not meant for distribution on App Store, un-sandboxing the Mac app will allow multicast usage.
-
-\*\*\* Usage on Windows has not been tested extensively.
+\* Usage on Windows has not been tested extensively.
 
 ## 🚀 Getting started
 
@@ -36,20 +32,13 @@ dependencies:
   lsl_flutter: ^1.0.0
 ```
 
-### Android
+## Android
 
 The minimum SDK version must be set to 26 in `app/build.gradle`. This is due to the logging library used by LSL, Loguru.
 
 ```java
 // app/build.gradle
 minSdk = 26
-```
-
-Although not due to this plugin, users may encounter the problem mentioned [here](https://github.com/flutter/flutter-intellij/issues/7152#issuecomment-2132853632) when creating a new project for Android. To avoid, make the following change in your `settings.gradle` file:
-
-```diff
-- includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
-+ includeBuild(file("$flutterSdkPath/packages/flutter_tools/gradle").toPath().toRealPath().toAbsolutePath().toString())
 ```
 
 The `AndroidManifest.xml` must contain
@@ -60,11 +49,47 @@ The `AndroidManifest.xml` must contain
 <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
 ```
 
-### iOS
+This package uses the [carp_multicast_lock](rttps://pub.dev/packages/carp_multicast_lock) plugin to acquire and release multicast locks on Android.
 
-### macOS
+## iOS
 
-### Windows
+Minimum deployment target must be set to at least 14
+
+```ruby
+# Uncomment this line to define a global platform for your project
+platform :ios, '14.0'
+```
+
+The `Info.plist` for applications using the plugin must specify a reason for accessing the local network
+
+```xml
+<key>NSLocalNetworkUsageDescription</key>
+<string>This app needs local network access to discover data streams.</string>
+```
+
+Furthermore, the entitlement `com.apple.developer.networking.multicast` must be applied for from Apple with a justification in order to discover streams on iOS devices. This can take several working days.
+
+`Runner*.entitlements` must therefore include the following
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <!--...-->
+    <key>com.apple.developer.networking.multicast</key>
+    <true />
+    <!--...-->
+  </dict>
+</plist>
+
+```
+
+## macOS
+
+The same entitlement as in [iOS](#iOS) must be granted or the app can be de-sandboxed as illustrated in the image below.
+
+![image](https://github.com/user-attachments/assets/6ccc2e9c-485a-4b77-88c3-3b9a220314fc)
 
 ## 📦 Usage
 

@@ -29,6 +29,7 @@ dependencies:
 ```dart
 import 'package:lsl_bindings/lsl_bindings.dart';
 
+/// Create a stream info object
 final streamInfo = lslBindings.lsl_create_streaminfo(
   "Test stream".toNativeUtf8().cast<Char>(),
   "EEG".toNativeUtf8().cast<Char>(),
