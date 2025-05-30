@@ -47,13 +47,6 @@ The minimum SDK version must be set to 26 in `app/build.gradle`. This is due to 
 minSdk = 26
 ```
 
-Although not due to this plugin, users may encounter the problem mentioned [here](https://github.com/flutter/flutter-intellij/issues/7152#issuecomment-2132853632) when creating a new project for Android. To avoid, make the following change in your `settings.gradle` file:
-
-```diff
-- includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
-+ includeBuild(file("$flutterSdkPath/packages/flutter_tools/gradle").toPath().toRealPath().toAbsolutePath().toString())
-```
-
 The `AndroidManifest.xml` must contain
 
 ```xml
@@ -61,6 +54,8 @@ The `AndroidManifest.xml` must contain
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
 ```
+
+Also note, that in conjunction with the multicast permission specified above, a multicast lock must be acquired to make streams _from_ Android devices discoverable. This is due to the fact that Android devices, by default, do not accept multicast packet traffic. [carp_multicast_lock](rttps://pub.dev/packages/carp_multicast_lock) is for example used in the more opinionated [lsl_flutter](rttps://pub.dev/packages/lsl_flutter) package.
 
 ## iOS
 
@@ -98,6 +93,6 @@ Furthermore, the entitlement `com.apple.developer.networking.multicast` must be 
 
 ## macOS
 
-To develop an application that utilises UDP multicast, special permission is required from Apple. Therefore, when developing within a sandbox for macOS applications LSL will not be able to discovers streams on the network. So it is best to simply remove the sandbox from the app.
+The same entitlement as in [iOS](#iOS) must be granted or the app can be de-sandboxed as illustrated in the image below.
 
 ![image](https://github.com/user-attachments/assets/6ccc2e9c-485a-4b77-88c3-3b9a220314fc)
