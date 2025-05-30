@@ -54,6 +54,7 @@ class OutletManager<S> {
   double _lastBase = 0;
   double? _lastOffset;
   final List<double> _offsets = [];
+  final List<Timestamp> _offsetRecordingTimestamps = [];
 
   /// Creates a new [OutletManager].
   ///
@@ -140,7 +141,13 @@ class OutletManager<S> {
       _outletAdapter.waitForConsumers(timeout);
 
   /// Returns the list of recorded time offsets between host and device clocks.
-  List<double> get offsets => _offsets;
+  List<(double, Timestamp)> get offsets {
+    final List<(double, Timestamp)> offsets = [];
+    for (var i = 0; i < _offsets.length; i++) {
+      offsets.add((_offsets[i], _offsetRecordingTimestamps[i]));
+    }
+    return offsets;
+  }
 
   void _updateOffset(Timestamp? timestamp) {
     if (_config.mode == OffsetMode.none) return;
@@ -162,6 +169,7 @@ class OutletManager<S> {
     final offset = base - timestamp.toLslTime();
     _lastOffset = offset;
     _offsets.add(offset);
+    _offsetRecordingTimestamps.add(DartTimestamp(DateTime.now()));
     _lastBase = base;
   }
 
