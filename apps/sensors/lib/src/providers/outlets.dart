@@ -24,11 +24,7 @@ class OutletProvider extends ChangeNotifier {
   List<String> _muses = [];
   final List<String> markerButtons = [];
 
-  late MyAudioHandler service;
-
-  OutletProvider() {
-    if (Platform.isIOS) _init();
-  }
+  late MyAudioHandler? service;
 
   void addButton(String text) {
     markerButtons.add(text);
@@ -328,8 +324,9 @@ class OutletProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  _init() async {
-    service = await AudioService.init(
+  _audioPlay() async {
+    if (!Platform.isIOS) return;
+    service ??= await AudioService.init(
         builder: () => MyAudioHandler(),
         config: AudioServiceConfig(
           androidNotificationChannelId: 'dk.carp.sensors.audio',
@@ -337,14 +334,12 @@ class OutletProvider extends ChangeNotifier {
           androidNotificationOngoing: true,
           // androidStopForegroundOnPause: false,
         ));
-  }
 
-  _audioPlay() {
-    if (Platform.isIOS) service.play();
+    service?.play();
   }
 
   _audioStop() {
-    if (Platform.isIOS) service.stop();
+    if (Platform.isIOS) service?.stop();
   }
 
   _addDevice(String name, StreamType streamType) {
