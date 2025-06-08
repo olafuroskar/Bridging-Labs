@@ -26,6 +26,7 @@ option(LSL_UNITTESTS "Build LSL library unit tests" OFF)
 option(LSL_BUNDLED_BOOST "Use the bundled Boost by default" ON)
 option(LSL_BUNDLED_PUGIXML "Use the bundled pugixml by default" ON)
 option(LSL_TOOLS "Build some experimental tools for in-depth tests" OFF)
+option(LSL_SKIP_INSTALL "Skip installation" OFF)
 
 mark_as_advanced(LSL_FORCE_FANCY_LIBNAME)
 
@@ -289,6 +290,7 @@ if(LSL_BUILD_STATIC)
 	list(APPEND LSLTargets lslobj lslboost)
 endif()
 
+if(NOT LSL_SKIP_INSTALL)
 install(TARGETS ${LSLTargets}
 	EXPORT LSLTargets
 	COMPONENT liblsl
@@ -355,3 +357,4 @@ if(LSL_BUILD_EXAMPLES)
 endif()
 
 LSLGenerateCPackConfig()
+endif()
