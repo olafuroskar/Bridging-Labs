@@ -138,7 +138,7 @@ class InletProvider extends ChangeNotifier {
 
   Future<IOSink> openCsvFile(String fileName) async {
     final directory = await getApplicationDocumentsDirectory();
-    final filePath = '${directory.path}/$fileName.csv';
+    final filePath = '${directory.path}${Platform.isWindows ? '\\' : '/'}$fileName.csv';
     File file = File(filePath);
 
     int i = 2;
