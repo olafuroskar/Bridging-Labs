@@ -17,3 +17,4 @@ workspace:
   - plugins/muse_sdk
   - apps/sensors
   - apps/scripted
+  - apps/test_windows
