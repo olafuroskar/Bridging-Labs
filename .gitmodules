@@ -1,3 +1,6 @@
 [submodule "plugins/lsl_bindings/src"]
 	path = plugins/lsl_bindings/src
 	url = https://github.com/sccn/liblsl/
+[submodule "liblsl"]
+	path = liblsl
+	url = https://github.com/sccn/liblsl/
