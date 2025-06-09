@@ -17,6 +17,7 @@ echo "✅ liblsl successfully updated and patched."
 echo "🖨️ Copying patched liblsl to apple"
 cp -r . ../apple/liblsl-1.16
 rm -rf ../apple/liblsl-1.16/.git
+rm -rf ../apple/liblsl-1.16/.github
 
 echo "🧹 Cleaning up submodule"
 git restore .

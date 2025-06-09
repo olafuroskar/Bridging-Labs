@@ -289,7 +289,6 @@ if(LSL_BUILD_STATIC)
 	list(APPEND LSLTargets lslobj lslboost)
 endif()
 
-# +++ Apple specific settings for generating a framework
 if(APPLE)
 	set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64") # Universal binary support
 	set(CMAKE_MACOSX_RPATH 1)
@@ -302,7 +301,6 @@ if(APPLE)
 		MACOSX_FRAMEWORK_BUNDLE_VERSION "1.0"
 	)
 endif()
-# +++
 
 install(TARGETS ${LSLTargets}
 	EXPORT LSLTargets
@@ -311,9 +309,7 @@ install(TARGETS ${LSLTargets}
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-	# +++ Apple specific settings for generating a framework
 	FRAMEWORK DESTINATION Library/Frameworks
-	# +++
 )
 
 export(EXPORT LSLTargets
@@ -346,13 +342,6 @@ install(FILES
 )
 
 include(cmake/LSLCMake.cmake)
-
-# Applied https://github.com/sccn/liblsl/issues/186#issuecomment-1824833598
-# ---
-# add_executable(lslver testing/lslver.c)
-# target_link_libraries(lslver PRIVATE lsl)
-# installLSLApp(lslver)
-# ---
 
 if(NOT WIN32 AND LSL_TOOLS)
 	add_executable(blackhole testing/blackhole.cpp)
