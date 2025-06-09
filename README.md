@@ -1,10 +1,14 @@
 # Bridging Labs
 
-This repository contains all necessary source code to build the `lsl_plugin` for the Lab Streaming Layer in Flutter.
+This repository contains all necessary source code to build the `lsl_bindings` and `lsl_flutter` packages for the Lab Streaming Layer in Flutter.
 
-- `apple/` contains the necessary files to build the `liblsl` library for Apple devices.
 - `plugins/` contains the most importantly the `lsl_plugin` plugin for Flutter, but may contain other plugins if needed in the future.
 - `apps/` contains example apps using the `lsl_plugin`
+- `apple/` contains the necessary files to build the `liblsl` library for Apple devices.
+
+## `lsl_bindings`
+
+For iOS and macOS `lsl_bindings` relies on a cross-platform framework generated from the `liblsl` source code. Furthermore, `install()` rules from the `CMakeLists.txt` make the Flutter build process fail on Windows. In both cases, slight modifications to the `CMakeLists.txt` in the `liblsl` source are needed. For maintainability `liblsl` is included as a submodule in this repository master, with scripts in the `scripts` folder that apply the needed patches to `liblsl` as well as copying the library to the correct place.
 
 <!--
 
