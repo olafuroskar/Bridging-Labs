@@ -10,7 +10,6 @@ project(${PROJECT_NAME} LANGUAGES CXX)
 
 set(LSL_SLIMARCHIVE ON CACHE BOOL "" FORCE)
 set(LSL_SKIP_INSTALL ON CACHE INTERNAL "")
-# set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/../src/build/install")
 
 # Invoke the build for native code shared with the other target platforms.
 # This can be changed to accommodate different builds.
