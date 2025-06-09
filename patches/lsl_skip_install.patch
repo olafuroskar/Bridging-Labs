@@ -1,0 +1,26 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f86958f7..1016e545 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -26,6 +26,8 @@ option(LSL_UNITTESTS "Build LSL library unit tests" OFF)
+ option(LSL_BUNDLED_BOOST "Use the bundled Boost by default" ON)
+ option(LSL_BUNDLED_PUGIXML "Use the bundled pugixml by default" ON)
+ option(LSL_TOOLS "Build some experimental tools for in-depth tests" OFF)
++# For lsl_bindings Windows
++option(LSL_SKIP_INSTALL "Skip install() rules" OFF)
+ 
+ mark_as_advanced(LSL_FORCE_FANCY_LIBNAME)
+ 
+@@ -289,6 +291,7 @@ if(LSL_BUILD_STATIC)
+ 	list(APPEND LSLTargets lslobj lslboost)
+ endif()
+ 
++if(NOT LSL_SKIP_INSTALL)
+ install(TARGETS ${LSLTargets}
+ 	EXPORT LSLTargets
+ 	COMPONENT liblsl
+@@ -350,3 +353,4 @@ if(LSL_BUILD_EXAMPLES)
+ endif()
+ 
+ LSLGenerateCPackConfig()
++endif()
