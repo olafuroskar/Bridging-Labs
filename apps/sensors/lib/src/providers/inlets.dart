@@ -141,9 +141,9 @@ class InletProvider extends ChangeNotifier {
     final filePath = '${directory.path}/$fileName.csv';
     File file = File(filePath);
 
-    int i = 2;
-    while (await file.exists() && i < 100) {
-      file = File("$filePath-${i++}");
+    if (await file.exists()) {
+      await file.delete();
+      file = File(filePath);
     }
 
     return file.openWrite(mode: FileMode.append);
