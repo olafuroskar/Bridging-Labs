@@ -1,8 +1,6 @@
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index f86958f7..189a461d 100644
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -289,6 +289,19 @@ if(LSL_BUILD_STATIC)
+--- /dev/fd/11	2025-06-09 15:15:07
++++ CMakeLists.txt	2025-06-09 15:08:58
+@@ -289,6 +289,19 @@
  	list(APPEND LSLTargets lslobj lslboost)
  endif()
  
@@ -22,7 +20,7 @@ index f86958f7..189a461d 100644
  install(TARGETS ${LSLTargets}
  	EXPORT LSLTargets
  	COMPONENT liblsl
-@@ -296,6 +309,7 @@ install(TARGETS ${LSLTargets}
+@@ -296,6 +309,7 @@
  	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
  	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
  	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
@@ -30,14 +28,14 @@ index f86958f7..189a461d 100644
  )
  
  export(EXPORT LSLTargets
-@@ -329,10 +343,6 @@ install(FILES
+@@ -328,10 +342,6 @@
+ )
  
  include(cmake/LSLCMake.cmake)
- 
+-
 -add_executable(lslver testing/lslver.c)
 -target_link_libraries(lslver PRIVATE lsl)
 -installLSLApp(lslver)
--
+ 
  if(NOT WIN32 AND LSL_TOOLS)
  	add_executable(blackhole testing/blackhole.cpp)
- 	target_link_libraries(blackhole PRIVATE Threads::Threads)

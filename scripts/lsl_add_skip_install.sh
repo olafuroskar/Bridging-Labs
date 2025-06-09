@@ -8,9 +8,11 @@ if [ ! -f "pubspec.yaml" ]; then
 fi
 
 cd liblsl
+git checkout master
+git pull origin master
 
 echo "📦 Applying patch..."
-git apply ../patches/lsl_skip_install.patch
+patch -p1 <../patches/lsl_skip_install.patch
 
 echo "✅ liblsl successfully updated and patched."
 

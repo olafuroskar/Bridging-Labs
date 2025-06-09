@@ -1,25 +1,23 @@
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 1db6a5e1..30243993 100644
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -29,6 +29,7 @@ option(LSL_BUNDLED_BOOST "Use the bundled Boost by default" ON)
+--- /dev/fd/11	2025-06-09 15:45:36
++++ CMakeLists.txt	2025-06-09 15:45:20
+@@ -26,6 +26,7 @@
+ option(LSL_BUNDLED_BOOST "Use the bundled Boost by default" ON)
  option(LSL_BUNDLED_PUGIXML "Use the bundled pugixml by default" ON)
- option(LSL_SLIMARCHIVE "Use experimental but smaller serialization code" OFF)
  option(LSL_TOOLS "Build some experimental tools for in-depth tests" OFF)
 +option(LSL_SKIP_INSTALL "Skip install() rules" OFF)
  
- mark_as_advanced(LSL_SLIMARCHIVE LSL_FORCE_FANCY_LIBNAME)
+ mark_as_advanced(LSL_FORCE_FANCY_LIBNAME)
  
-@@ -296,6 +297,7 @@ if(LSL_BUILD_STATIC)
+@@ -289,6 +290,7 @@
  	list(APPEND LSLTargets lslobj lslboost)
  endif()
  
-+if(NOT LSL_SKIP_INSTALL)
+++if(NOT LSL_SKIP_INSTALL)
  install(TARGETS ${LSLTargets}
  	EXPORT LSLTargets
  	COMPONENT liblsl
-@@ -357,3 +359,4 @@ if(LSL_BUILD_EXAMPLES)
+@@ -350,3 +352,4 @@
  endif()
  
  LSLGenerateCPackConfig()
-+endif()
+++endif()
