@@ -17,14 +17,14 @@ patch -p1 <../patches/lsl_apple.patch
 echo "✅ liblsl successfully updated and patched."
 
 echo "🖨️ Copying patched liblsl to apple"
-cp -r . ../apple/liblsl-1.16
-rm -rf ../apple/liblsl-1.16/.git
-rm -rf ../apple/liblsl-1.16/.github
+cp -r . ../apple/liblsl
+rm -rf ../apple/liblsl/.git
+rm -rf ../apple/liblsl/.github
 
 echo "🧹 Cleaning up submodule"
 git restore .
 
-cd ../apple/liblsl-1.16
+cd ../apple/liblsl
 
 echo "Building for iOS"
 # For iOS devices
