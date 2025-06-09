@@ -12,7 +12,7 @@
  	list(APPEND LSLTargets lslobj lslboost)
  endif()
  
-++if(NOT LSL_SKIP_INSTALL)
++if(NOT LSL_SKIP_INSTALL)
  install(TARGETS ${LSLTargets}
  	EXPORT LSLTargets
  	COMPONENT liblsl
@@ -20,4 +20,4 @@
  endif()
  
  LSLGenerateCPackConfig()
-++endif()
++endif()
