@@ -60,10 +60,9 @@ Also note, that in conjunction with the multicast permission specified above, a 
 
 ## iOS
 
-Minimum deployment target must be set to at least 14
+Minimum deployment target must be set to at least 14 in `ios/Podfile`
 
 ```ruby
-# Uncomment this line to define a global platform for your project
 platform :ios, '14.0'
 ```
 
@@ -76,7 +75,7 @@ The `Info.plist` for applications using the plugin must specify a reason for acc
 
 Furthermore, the entitlement `com.apple.developer.networking.multicast` must be applied for from Apple with a justification in order to discover streams on iOS devices. This can take several working days.
 
-`Runner*.entitlements` must therefore include the following
+`Runner.entitlements` must therefore include the following
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>

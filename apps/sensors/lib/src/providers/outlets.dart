@@ -295,7 +295,7 @@ class OutletProvider extends ChangeNotifier {
     _deactivate(name);
 
     if (streams.isEmpty) {
-      worker?.close();
+      worker?.shutdown();
       worker = null;
       _audioStop();
       WakelockPlus.disable();
@@ -315,7 +315,7 @@ class OutletProvider extends ChangeNotifier {
     }
     // Disconnects all Muse devices
     _museSdkPlugin.disconnect();
-    worker?.close();
+    worker?.shutdown();
     worker = null;
   }
 

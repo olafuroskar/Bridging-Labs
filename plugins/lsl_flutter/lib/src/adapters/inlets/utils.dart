@@ -4,14 +4,13 @@ import 'package:ffi/ffi.dart';
 import 'package:lsl_bindings/lsl_bindings.dart';
 import 'package:lsl_flutter/lsl_flutter.dart';
 import 'package:lsl_flutter/src/adapters/inlets/inlets.dart';
-import 'package:lsl_flutter/src/adapters/inlets/processing_options.dart';
 import 'package:lsl_flutter/src/adapters/utils.dart';
 import 'package:lsl_flutter/src/liblsl.dart';
 import 'package:lsl_flutter/src/utils/error_code.dart';
 import 'package:lsl_flutter/src/utils/stream_info.dart';
 
 /// {@macro open_stream}
-void openStream(lsl_inlet inlet, double timeout) async {
+void openStream(lsl_inlet inlet, double timeout) {
   // Allocate the memory needed on the heap
   final ec = malloc.allocate<Int32>(sizeOf<Int32>());
 

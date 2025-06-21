@@ -6,8 +6,8 @@ class StreamManager {
   StreamManager();
 
   /// {@macro resolve_all}
-  void resolveStreams(double waitTime) {
-    return _streamAdapter.resolveAllStreams(waitTime);
+  void resolveStreams(double timeout) {
+    return _streamAdapter.resolveAllStreams(timeout);
   }
 
   /// {@macro resolve_prop}

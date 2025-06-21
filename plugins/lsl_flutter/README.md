@@ -17,9 +17,7 @@ Powered by native bindings via [`lsl_ffi`](https://pub.dev/packages/lsl_ffi) and
 
 | Android | iOS | MacOS | Windows |
 | :-----: | :-: | :---: | :-----: |
-|   ✅    | ✅  |  ✅   |  ⚠️\*   |
-
-\* Usage on Windows has not been tested extensively.
+|   ✅    | ✅  |  ✅   |   ✅    |
 
 ## 🚀 Getting started
 

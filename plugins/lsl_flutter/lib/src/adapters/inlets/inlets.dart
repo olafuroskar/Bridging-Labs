@@ -5,7 +5,6 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 import 'package:lsl_bindings/lsl_bindings.dart';
 import 'package:lsl_flutter/lsl_flutter.dart';
-import 'package:lsl_flutter/src/adapters/inlets/processing_options.dart';
 import 'package:lsl_flutter/src/adapters/inlets/utils.dart' as utils;
 import 'package:lsl_flutter/src/adapters/streams/resolved_stream.dart';
 import 'package:lsl_flutter/src/adapters/utils.dart';

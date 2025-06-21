@@ -20,7 +20,7 @@ class ShortInletAdapter extends InletAdapter<int> {
 
     /// Allocate an array of length channelCount * maxChunkLen
     ///
-    /// Example: 2 channels and max chunk length of 3
+    /// Example: 3 channels and max chunk length of 2
     /// [ [1, 2, 3], [4, 5, 6] ] -> [1, 2, 3, 4, 5, 6]
     final nativeSample =
         malloc.allocate<Int16>(dataBufferLength * sizeOf<Int16>());

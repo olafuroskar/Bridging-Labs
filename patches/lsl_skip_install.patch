@@ -1,0 +1,23 @@
+--- /dev/fd/11	2025-06-09 15:45:36
++++ CMakeLists.txt	2025-06-09 15:45:20
+@@ -26,6 +26,7 @@
+ option(LSL_BUNDLED_BOOST "Use the bundled Boost by default" ON)
+ option(LSL_BUNDLED_PUGIXML "Use the bundled pugixml by default" ON)
+ option(LSL_TOOLS "Build some experimental tools for in-depth tests" OFF)
++option(LSL_SKIP_INSTALL "Skip install() rules" OFF)
+ 
+ mark_as_advanced(LSL_FORCE_FANCY_LIBNAME)
+ 
+@@ -289,6 +290,7 @@
+ 	list(APPEND LSLTargets lslobj lslboost)
+ endif()
+ 
++if(NOT LSL_SKIP_INSTALL)
+ install(TARGETS ${LSLTargets}
+ 	EXPORT LSLTargets
+ 	COMPONENT liblsl
+@@ -350,3 +352,4 @@
+ endif()
+ 
+ LSLGenerateCPackConfig()
++endif()

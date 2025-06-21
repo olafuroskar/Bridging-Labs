@@ -8,7 +8,6 @@ import 'dart:isolate';
 import 'package:flutter/services.dart';
 import 'package:lsl_bindings/lsl_bindings.dart';
 import 'package:lsl_flutter/lsl_flutter.dart';
-import 'package:lsl_flutter/src/adapters/inlets/processing_options.dart';
 import 'package:lsl_flutter/src/liblsl.dart';
 
 // Managers
@@ -41,3 +40,4 @@ part 'src/workers/inlet_worker.dart';
 // Helpers
 part 'src/utils/helpers.dart';
 part 'src/utils/timestamp.dart';
+part "src/processing_options.dart";

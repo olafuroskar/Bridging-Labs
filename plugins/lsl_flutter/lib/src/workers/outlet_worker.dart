@@ -346,7 +346,7 @@ class OutletWorker {
     _handleCommandsToIsolate(receivePort, args.sendPort);
   }
 
-  void close() {
+  void shutdown() {
     if (!_closed) {
       _closed = true;
       _commands.send('shutdown');
