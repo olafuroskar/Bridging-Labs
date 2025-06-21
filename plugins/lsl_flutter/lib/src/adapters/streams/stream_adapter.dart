@@ -25,12 +25,12 @@ class StreamAdapter {
   /// The network is usually the subnet specified at the local router, but may also include a multicast
   /// group of machines (given that the network supports it), or a list of hostnames.
   ///
-  /// [waitTime] The waiting time for the operation, in seconds, to search for streams.
+  /// [timeout] The waiting time for the operation, in seconds, to search for streams.
   /// The recommended wait time is 1 second (or 2 for a busy and large recording operation).
   /// If this is too short (<0.5s) only a subset (or none) of the outlets that are present on
   /// the network may be returned.
   /// {@endtemplate}
-  void resolveAllStreams(double waitTime) {
+  void resolveAllStreams(double timeout) {
     /// Clear the resolved streams before re-resolving
     destroyStreams();
 
@@ -40,7 +40,7 @@ class StreamAdapter {
 
     // Resolve all streams on the network and write them to the buffer.
     // Return the number of streams found
-    var numStreams = lsl.bindings.lsl_resolve_all(buffer, bufferSize, waitTime);
+    var numStreams = lsl.bindings.lsl_resolve_all(buffer, bufferSize, timeout);
 
     checkErrorValue(numStreams);
 

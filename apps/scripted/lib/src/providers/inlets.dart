@@ -2,7 +2,7 @@ part of '../../main.dart';
 
 class InletProvider extends ChangeNotifier {
   int maxBufferSize = 150;
-  bool? synchronize = false;
+  bool synchronize = false;
 
   Map<String, (ResolvedStreamHandle handle, double threshold)> handles = {};
 
@@ -25,7 +25,7 @@ class InletProvider extends ChangeNotifier {
   update(OutletProvider outletProvider) {}
 
   void setSynchronization(bool? val) {
-    synchronize = val;
+    synchronize = val != null && val;
     notifyListeners();
   }
 
@@ -68,7 +68,7 @@ class InletProvider extends ChangeNotifier {
 
   void closeInlet(String key) async {
     await inlets[key]?.cancel();
-    worker?.stop(key);
+    worker?.stopSampleStream(key);
     if (firstInlet == key) firstInlet = null;
   }
 
@@ -102,8 +102,10 @@ class InletProvider extends ChangeNotifier {
     );
 
     for (var inlet in selectedInlets) {
-      final opened =
-          await worker?.open(inlet, synchronize: synchronize ?? false);
+      final opened = await worker?.open(inlet,
+          processingOptions: synchronize
+              ? [ProcessingOptions.clockSync, ProcessingOptions.dejitter]
+              : null);
 
       if (opened ?? false) {
         final sampleStream =

@@ -3,11 +3,13 @@ part of '../../lsl_flutter.dart';
 enum InletCommandType {
   resolve("RESOLVE"),
   open("OPEN"),
+  close("CLOSE_STREAM"),
   startSampleStream("START_SAMPLE_STREAM"),
   startChunkStream("START_CHUNK_STREAM"),
-  startTimeCorrection("START_TIME_CORRECTION"),
-  close("CLOSE_STREAM"),
-  stop("STOP");
+  startTimeCorrection("START_TIME_CORRECTION_STREAM"),
+  stopSampleStream("STOP_SAMPLE_STREAM"),
+  stopChunkStream("STOP_CHUNK_STREAM"),
+  stopTimeCorrectionStream("STOP_TIME_CORRECTION_STREAM");
 
   const InletCommandType(this.value);
   final String value;
@@ -60,7 +62,7 @@ class InletWorker {
     InletCommandType command, {
     String? streamId,
     double? waitTime,
-    bool? synchronize,
+    List<ProcessingOptions>? processingOptions,
     String? prop,
     String? value,
     String? pred,
@@ -71,7 +73,7 @@ class InletWorker {
       command,
       streamId,
       waitTime,
-      synchronize,
+      processingOptions,
       prop,
       value,
       pred,
@@ -153,20 +155,25 @@ class InletWorker {
   /// Open an inlet on a given stream.
   ///
   /// [streamId] The id of the stream on which an inlets should be opened
-  Future<bool> open(String streamId, {bool synchronize = false}) async {
+  /// [processingOptions] The processing actions to be performed on the incoming timestamps.
+  Future<bool> open(String streamId,
+      {List<ProcessingOptions>? processingOptions = const [
+        ProcessingOptions.none
+      ]}) async {
     if (_closed) throw StateError('Closed');
 
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
     _sendCommand(id, InletCommandType.open,
-        streamId: streamId, synchronize: synchronize);
+        streamId: streamId, processingOptions: processingOptions);
     final success = await completer.future;
 
     // Add the stream to active inlets
     if (success) {
       _activeInlets.add(streamId);
-      _isAutoSync = synchronize;
+      _isAutoSync = processingOptions != null &&
+          processingOptions.contains(ProcessingOptions.clockSync);
     }
 
     return success;
@@ -281,24 +288,52 @@ class InletWorker {
     return streamController.stream;
   }
 
-  /// Stop pulling data from a given inlet
+  /// Stop pulling samples from a given inlet
   ///
   /// [streamId] Id of the stream.
   ///
   /// After stop has been called, calling [close] is also recommended to clean up the inlet
-  Future<bool> stop(String streamId) async {
+  Future<bool> stopSampleStream(String streamId) async {
     if (_closed) throw StateError('Closed');
 
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    _sendCommand(id, InletCommandType.stop, streamId: streamId);
+    _sendCommand(id, InletCommandType.stopSampleStream, streamId: streamId);
     final success = await completer.future;
 
-    // Add the stream to active inlets
-    if (success) {
-      _activeInlets.remove(streamId);
-    }
+    return success;
+  }
+
+  /// Stop pulling chunks from a given inlet
+  ///
+  /// [streamId] Id of the stream.
+  ///
+  /// After stop has been called, calling [close] is also recommended to clean up the inlet
+  Future<bool> stopChunkStream(String streamId) async {
+    if (_closed) throw StateError('Closed');
+
+    final completer = Completer<bool>.sync();
+    final id = _idCounter++;
+    _activeRequests[id] = completer;
+    _sendCommand(id, InletCommandType.stopChunkStream, streamId: streamId);
+    final success = await completer.future;
+
+    return success;
+  }
+
+  /// Stop the time correction stream of the given inlet
+  ///
+  /// [streamId] Id of the stream.
+  Future<bool> stopTimeCorrectionStream(String streamId) async {
+    if (_closed) throw StateError('Closed');
+
+    final completer = Completer<bool>.sync();
+    final id = _idCounter++;
+    _activeRequests[id] = completer;
+    _sendCommand(id, InletCommandType.stopTimeCorrectionStream,
+        streamId: streamId);
+    final success = await completer.future;
 
     return success;
   }
@@ -314,6 +349,11 @@ class InletWorker {
     _activeRequests[id] = completer;
     _sendCommand(id, InletCommandType.close, streamId: streamId);
     final success = await completer.future;
+
+    // Add the stream to active inlets
+    if (success) {
+      _activeInlets.remove(streamId);
+    }
 
     return success;
   }
@@ -366,8 +406,14 @@ class InletWorker {
   }
 
   void _handleResponsesFromIsolate(message) {
-    final (id, response, streamId, stopping) =
-        message as (int, Object?, String?, bool?);
+    final (
+      id,
+      response,
+      streamId,
+      stoppingSampleStream,
+      stoppingChunkStream,
+      stoppingTimeCorrectionStream
+    ) = message as (int, Object?, String?, bool?, bool?, bool?);
 
     if (response is Sample<Object?>) {
       final controller = _activeSampleRequests[streamId]!;
@@ -382,11 +428,17 @@ class InletWorker {
       final completer = _activeHandleRequests.remove(id)!;
       _handleResponse(completer, response);
     } else {
-      if (stopping ?? false) {
+      if (stoppingSampleStream ?? false) {
         _activeSampleRequests[streamId]?.close();
         _activeSampleRequests.remove(streamId);
+      }
+      if (stoppingChunkStream ?? false) {
         _activeChunkRequests[streamId]?.close();
         _activeChunkRequests.remove(streamId);
+      }
+      if (stoppingTimeCorrectionStream ?? false) {
+        _activeTimeCorrectionRequests[streamId]?.close();
+        _activeTimeCorrectionRequests.remove(streamId);
       }
       final completer = _activeRequests.remove(id)!;
       _handleResponse(completer, response);
@@ -404,9 +456,22 @@ class InletWorker {
     final StreamManager streamManager = StreamManager();
     final Map<String, InletManager<Object?>> inlets = {};
 
-    void sendMessageFromWorker(int id, Object? response,
-        {String? streamId, bool stopping = false}) {
-      sendPort.send((id, response, streamId, stopping));
+    void sendMessageFromWorker(
+      int id,
+      Object? response, {
+      String? streamId,
+      bool stoppingSampleStream = false,
+      bool stoppingChunkStream = false,
+      bool stoppingTimeCorrectionStream = false,
+    }) {
+      sendPort.send((
+        id,
+        response,
+        streamId,
+        stoppingSampleStream,
+        stoppingChunkStream,
+        stoppingTimeCorrectionStream
+      ));
     }
 
     // Listen to messages *from* the main isolate
@@ -422,7 +487,7 @@ class InletWorker {
         command,
         streamId,
         waitTime,
-        synchronize,
+        processingOptions,
         prop,
         value,
         pred,
@@ -432,7 +497,7 @@ class InletWorker {
         InletCommandType,
         String?,
         double?,
-        bool?,
+        List<ProcessingOptions>?,
         String?,
         String?,
         String?,
@@ -462,9 +527,8 @@ class InletWorker {
             final inlet = streamManager.createInletFromId(streamId);
 
             if (inlet != null) {
-              if (synchronize ?? false) {
-                inlet.setPostProcessing(
-                    [ProcessingOptions.clockSync, ProcessingOptions.dejitter]);
+              if (processingOptions != null && processingOptions.isNotEmpty) {
+                inlet.setPostProcessing(processingOptions);
               }
               inlet.openStream();
               inlets[streamId] = inlet;
@@ -499,9 +563,20 @@ class InletWorker {
             });
             sendMessageFromWorker(id, subscription != null, streamId: streamId);
             break;
-          case InletCommandType.stop:
-            inlets[streamId]?.stopStream();
-            sendMessageFromWorker(id, true, streamId: streamId, stopping: true);
+          case InletCommandType.stopSampleStream:
+            inlets[streamId]?.stopSampleStream();
+            sendMessageFromWorker(id, true,
+                streamId: streamId, stoppingSampleStream: true);
+            break;
+          case InletCommandType.stopChunkStream:
+            inlets[streamId]?.stopChunkStream();
+            sendMessageFromWorker(id, true,
+                streamId: streamId, stoppingChunkStream: true);
+            break;
+          case InletCommandType.stopTimeCorrectionStream:
+            inlets[streamId]?.stopTimeCorrectionStream();
+            sendMessageFromWorker(id, true,
+                streamId: streamId, stoppingTimeCorrectionStream: true);
             break;
           case InletCommandType.close:
             inlets[streamId]?.closeStream();
