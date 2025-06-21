@@ -26,7 +26,7 @@ class OutletConfig {
   final OffsetMode mode;
   final double offsetCalculationInterval;
 
-  /// [chunkSize] Optionally the desired chunk granularity (in samples) for transmission.
+  /// [chunkSize] The desired chunk granularity (in samples) for transmission.
   /// If specified as 0, each push operation yields one chunk.
   /// [maxBuffered] Optionally the maximum amount of data to buffer (in seconds if there is a
   /// nominal sampling rate, otherwise x100 in samples). A good default is 360, which corresponds to 6

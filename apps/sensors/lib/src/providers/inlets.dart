@@ -2,7 +2,7 @@ part of '../../main.dart';
 
 class InletProvider extends ChangeNotifier {
   int maxBufferSize = 150;
-  bool? synchronize = false;
+  bool synchronize = false;
   double? resolutionTime = 0;
 
   Map<String, int> writtenLines = {};
@@ -18,7 +18,7 @@ class InletProvider extends ChangeNotifier {
   InletWorker? worker;
 
   void setSynchronization(bool? val) {
-    synchronize = val;
+    synchronize = val != null && val;
     notifyListeners();
   }
 
@@ -55,7 +55,7 @@ class InletProvider extends ChangeNotifier {
 
   void closeInlet(String key) async {
     await inlets[key]?.cancel();
-    worker?.stop(key);
+    worker?.stopChunkStream(key);
   }
 
   void shareResult(String key, String name) async {
@@ -85,8 +85,10 @@ class InletProvider extends ChangeNotifier {
       final List<List<dynamic>> buffer = [];
       writtenLines[inlet] = 0;
 
-      final opened =
-          await worker?.open(inlet, synchronize: synchronize ?? false);
+      final opened = await worker?.open(inlet,
+          processingOptions: synchronize
+              ? [ProcessingOptions.clockSync, ProcessingOptions.dejitter]
+              : null);
 
       if (opened ?? false) {
         final chunkStream = await worker?.startChunkStream(inlet, onCancel: () {
@@ -117,7 +119,7 @@ class InletProvider extends ChangeNotifier {
           sink.close();
         });
 
-        if (synchronize == null || !synchronize!) {
+        if (!synchronize) {
           final offsetStream =
               await worker?.startTimeCorrectionStream(inlet, onCancel: () {
             sink.close();

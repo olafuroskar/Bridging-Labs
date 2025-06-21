@@ -1,3 +1,5 @@
+part of '../../lsl_flutter.dart';
+
 enum ProcessingOptions {
   /// No automatic post-processing; return the ground-truth time stamps for manual
   /// post-processing (this is the default behavior of the inlet).
