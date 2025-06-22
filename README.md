@@ -1,10 +1,44 @@
 # Bridging Labs
 
-This repository contains all necessary source code to build the `lsl_plugin` for the Lab Streaming Layer in Flutter.
+This repository contains all necessary source code to build the `lsl_bindings` and `lsl_flutter` packages for the Lab Streaming Layer in Flutter.
 
-- `apple/` contains the necessary files to build the `liblsl` library for Apple devices.
 - `plugins/` contains the most importantly the `lsl_plugin` plugin for Flutter, but may contain other plugins if needed in the future.
 - `apps/` contains example apps using the `lsl_plugin`
+- `apple/` contains the necessary files to build the `liblsl` library for Apple devices.
+
+## `lsl_bindings`
+
+### Scripts and patches
+
+For iOS and macOS `lsl_bindings` relies on a cross-platform framework generated from the `liblsl` source code. Furthermore, `install()` rules from the `CMakeLists.txt` make the Flutter build process fail on Windows. In both cases, slight modifications to the `CMakeLists.txt` in the `liblsl` source are needed. For maintainability `liblsl` is included as a submodule in this repository master, with scripts in the `scripts` folder that apply the needed patches to `liblsl` as well as copying the library to the correct place.
+
+The following steps require `git`, `cmake` and the `xcode` CLI tools to be installed.
+
+To regenerate the `xcframeworks` for the Apple platforms, simply run from the workspace root:
+
+```
+./scripts/lsl_apple.sh
+```
+
+This will:
+
+- fetch the latest commits to master in `liblsl`,
+- try to apply the needed patch in `patches/lsl_apple.patch`,
+- copy the patched library to the `apple` directory,
+- from the `apple` directory build the needed frameworks,
+- and finally merge the frameworks into an `xcframework`.
+
+In the same vein, in order to regenerate the library without any `install()` rules, simply run from the workspace root:
+
+```
+./scripts/lsl_add_skip_install.sh
+```
+
+This will:
+
+- fetch the latest commits to master in `liblsl`,
+- try to apply the needed patch in `patches/lsl_add_skip_install.patch`,
+- and copy the patched library to the `plugins/lsl_bindings/src` directory.
 
 <!--
 

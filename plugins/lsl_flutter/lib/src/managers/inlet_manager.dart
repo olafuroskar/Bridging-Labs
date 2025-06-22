@@ -3,12 +3,14 @@ part of 'managers.dart';
 class InletManager<S> {
   late final InletAdapter<S> _inletAdapter;
   final UtilsAdapter _utilsAdapter = UtilsAdapter();
-  bool _isStreaming = false;
+  bool _isStreamingSamples = false;
+  bool _isStreamingChunks = false;
+  bool _isStreamingTimeCorrections = false;
 
   InletManager._(this._inletAdapter);
 
   /// {@macro open_stream}
-  Future<void> openStream([double timeout = double.infinity]) async {
+  void openStream([double timeout = double.infinity]) {
     _inletAdapter.openStream();
   }
 
@@ -47,6 +49,7 @@ class InletManager<S> {
     return _inletAdapter.wasClockReset();
   }
 
+  /// Sets the post processing option ([ProcessingOptions]) of the inlet
   ErrorCode setPostProcessing(List<ProcessingOptions> flags) {
     return _inletAdapter.setPostProcessing(flags);
   }
@@ -56,21 +59,18 @@ class InletManager<S> {
     return Duration(milliseconds: (1000 / nominalSRate).toInt());
   }
 
-  stopStream() {
-    _isStreaming = false;
-  }
-
+  /// Starts a stream that pulls samples from the inlet with the [samplingRate]
   Stream<Sample<S>> startSampleStream(double? samplingRate) async* {
     // Early return if manager is already streaming.
-    if (_isStreaming) return;
-    _isStreaming = true;
+    if (_isStreamingSamples) return;
+    _isStreamingSamples = true;
     final nominalSRate = getStreamInfo().nominalSRate;
     final delay = _delay(samplingRate ?? nominalSRate);
 
     while (true) {
       await Future.delayed(delay);
 
-      if (!_isStreaming) break;
+      if (!_isStreamingSamples) break;
 
       try {
         final sample = pullSample();
@@ -83,17 +83,23 @@ class InletManager<S> {
     }
   }
 
+  /// Stops an active sample stream, that has been started with [startSampleStream]
+  void stopSampleStream() {
+    _isStreamingSamples = false;
+  }
+
+  /// Starts a stream that pulls chunks from the inlet with the [samplingRate]
   Stream<Chunk<S>> startChunkStream(double? samplingRate) async* {
     // Early return if manager is already streaming.
-    if (_isStreaming) return;
-    _isStreaming = true;
+    if (_isStreamingChunks) return;
+    _isStreamingChunks = true;
     final nominalSRate = getStreamInfo().nominalSRate;
     final delay = _delay(samplingRate ?? nominalSRate);
 
     while (true) {
       await Future.delayed(delay);
 
-      if (!_isStreaming) break;
+      if (!_isStreamingChunks) break;
 
       try {
         final chunk = pullChunk();
@@ -106,20 +112,31 @@ class InletManager<S> {
     }
   }
 
+  /// Stops an active chunk stream, that has been started with [startChunkStream]
+  void stopChunkStream() {
+    _isStreamingChunks = false;
+  }
+
+  /// Starts a stream that gets the [timeCorrection] offset of the inlet in intervals of duration [interval]
   Stream<TimeOffset> startTimeCorrectionStream(
       {Duration interval = const Duration(seconds: 5),
       double timeout = double.infinity}) async* {
-    if (_isStreaming) return;
-    _isStreaming = true;
+    if (_isStreamingTimeCorrections) return;
+    _isStreamingTimeCorrections = true;
 
     while (true) {
       await Future.delayed(interval);
 
-      if (!_isStreaming) break;
+      if (!_isStreamingTimeCorrections) break;
 
       final offset = timeCorrection(timeout);
       final now = _utilsAdapter.localClock();
       yield (now, offset);
     }
+  }
+
+  /// Stops an active time correction stream, that has been started with [startTimeCorrectionStream]
+  void stopTimeCorrectionStream() {
+    _isStreamingTimeCorrections = false;
   }
 }

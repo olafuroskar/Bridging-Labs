@@ -131,7 +131,7 @@ class OutletProvider extends ChangeNotifier {
     _deactivate(name);
 
     if (streams.isEmpty) {
-      worker?.close();
+      worker?.shutdown();
       worker = null;
       _audioStop();
     }
@@ -146,7 +146,7 @@ class OutletProvider extends ChangeNotifier {
       stream.value.$1?.cancel();
     }
 
-    worker?.close();
+    worker?.shutdown();
     worker = null;
   }
 
