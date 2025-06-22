@@ -2,9 +2,19 @@
 
 This repository contains all necessary source code to build the `lsl_bindings` and `lsl_flutter` packages for the Lab Streaming Layer in Flutter.
 
-- `plugins/` contains the most importantly the `lsl_plugin` plugin for Flutter, but may contain other plugins if needed in the future.
+The repository has a submodule so when cloning use
+
+```
+git clone --recursive git@github.com:olafuroskar/Bridging-Labs.git
+
+```
+
 - `apps/` contains example apps using the `lsl_plugin`
 - `apple/` contains the necessary files to build the `liblsl` library for Apple devices.
+- `liblsl/` contains a submodule of [`liblsl`](https://github.com/sccn/liblsl)
+- `patches/` contains the patches that can be applied to `liblsl` for enabling building on different platforms.
+- `plugins/` contains the packages of the system, most importantly `lsl_bindings` and `lsl_flutter`, but also `carp_multicast_lock` and `muse_sdk`.
+- `scripts/` contains scripts that facilitate applying patches and building `xcframeworks`.
 
 ## `lsl_bindings`
 
