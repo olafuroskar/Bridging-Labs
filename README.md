@@ -6,7 +6,6 @@ The repository has a submodule so when cloning use
 
 ```
 git clone --recursive git@github.com:olafuroskar/Bridging-Labs.git
-
 ```
 
 - `apps/` contains example apps using the `lsl_plugin`
