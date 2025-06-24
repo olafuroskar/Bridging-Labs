@@ -22,6 +22,28 @@ class IsolateArguments {
 ///
 /// Spawns an isolate which handles keeping track of and pushing to streams.
 /// Based on https://dart.dev/language/isolates
+///
+/// ```dart
+/// final OutletWorker worker = await OutletWorker.spawn();
+///
+/// final StreamInfo<double> streamInfo =
+///     StreamInfoFactory.createDoubleStreamInfo(
+///         "Polar Verity Sense", "PPG", Double64ChannelFormat(),
+///         channelCount: 3, nominalSRate: 135, sourceId: "Polar Verity Sense");
+///
+/// final OutletConfig config =
+///     OutletConfig.fromOffsetConfig(mode: OffsetMode.applyFirstToSamples);
+///
+/// await worker.addStream(streamInfo, config);
+///
+/// final List<double> sample = [1.2, 2.0, 3.4];
+/// await worker.pushSample(
+///     streamInfo.name, sample, DartTimestamp(DateTime.now()));
+///
+/// await worker.removeStream(streamInfo.name);
+///
+/// worker.shutdown();
+/// ```
 class OutletWorker {
   // Tied to instances
   final SendPort _commands;

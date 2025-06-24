@@ -1,14 +1,14 @@
 part of 'managers.dart';
 
-/// How should host/device time offsets be handled in the outlet manager.
+/// How should offsets between the devices current time and provided timestamps be handled in the outlet manager.
 enum OffsetMode {
-  /// Don't handle host/device time offsets
+  /// Don't handle time offsets
   none("none"),
 
-  /// Records the estimated host/device time offset periodically.
+  /// Records the estimated time offset periodically.
   record("record"),
 
-  /// Applies the first recorded host/device offset and ignores subsequent offsets.
+  /// Applies the first recorded offset and ignores subsequent offsets.
   ///
   /// This option is only meant to offset the streamed samples once. Changing the offsets
   /// during the lifetime of the outlet may skew the data, as the data may also be post-
@@ -46,6 +46,27 @@ class OutletConfig {
 ///
 /// An instance can be reused for multiple outlets (after being destroyed),
 /// but creating new instances instead is encouraged for clarity.
+///
+/// ```dart
+/// final streamInfo = StreamInfoFactory.createDoubleStreamInfo(
+///     "Polar 123", "PPG", Double64ChannelFormat(),
+///     channelCount: 3, nominalSRate: 135, sourceId: "Polar 123");
+///
+/// final StreamInfo<double> streamInfo =
+///     StreamInfoFactory.createDoubleStreamInfo(
+///         "Polar Verity Sense", "PPG", Double64ChannelFormat(),
+///         channelCount: 3, nominalSRate: 135, sourceId: "Polar Verity Sense");
+///
+/// final OutletConfig config =
+///     OutletConfig.fromOffsetConfig(mode: OffsetMode.applyFirstToSamples);
+///
+/// final OutletManager<double> outlet = OutletManager(streamInfo, config);
+///
+/// final List<double> sample = [1.2, 2.0, 3.4];
+/// outlet.pushSample(sample, DartTimestamp(DateTime.now()));
+///
+/// outlet.destroy();
+/// ```
 class OutletManager<S> {
   late final StreamInfo<S> _streamInfo;
   late final OutletAdapter<S> _outletAdapter;

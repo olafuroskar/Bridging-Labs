@@ -1,5 +1,22 @@
 part of 'managers.dart';
 
+/// An object used to manage inlets and its associated functions.
+///
+/// Only has a private constructor, used by [StreamManager].
+///
+/// ```dart
+/// final InletManager<dynamic> inlet = streamManager.createInlet(handles[0]);
+///
+/// final samplingRate = inlet.getStreamInfo().nominalSRate;
+///
+/// final chunkStream = inlet.startChunkStream(samplingRate);
+///
+/// chunkStream.listen((Chunk<dynamic> chunk) {
+///   print("Chunk recieved with ${chunk.length} samples");
+/// });
+///
+/// inlet.closeStream();
+/// ```
 class InletManager<S> {
   late final InletAdapter<S> _inletAdapter;
   final UtilsAdapter _utilsAdapter = UtilsAdapter();

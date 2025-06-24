@@ -19,6 +19,33 @@ enum InletCommandType {
 ///
 /// Spawns an isolate which handles keeping track of and pulling from streams.
 /// Based on https://dart.dev/language/isolates
+///
+/// ```dart
+/// final InletWorker worker = await InletWorker.spawn();
+///
+/// final List<ResolvedStreamHandle> handles =
+///     await worker.resolveStreams();
+///
+/// final String streamId = handles[0].id;
+///
+/// await worker.open(streamId, processingOptions: [
+///   ProcessingOptions.clockSync,
+///   ProcessingOptions.dejitter
+/// ]);
+///
+/// final Stream<Chunk<Object?>> chunkStream =
+///     await worker.startChunkStream(streamId, onCancel: () {
+///   print("Stream stopped");
+/// });
+///
+/// chunkStream.listen((chunk) {
+///   print("Chunk received with ${chunk.length} samples");
+/// });
+///
+/// await worker.stopChunkStream(streamId);
+///
+/// worker.shutdown();
+/// ```
 class InletWorker {
   // Tied to instances
   final SendPort _commands;

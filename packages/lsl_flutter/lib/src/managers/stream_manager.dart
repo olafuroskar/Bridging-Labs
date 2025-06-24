@@ -1,5 +1,16 @@
 part of 'managers.dart';
 
+/// A service for interacting with stream, e.g. resolving them.
+///
+/// ```dart
+/// final StreamManager streamManager = StreamManager();
+///
+/// streamManager.resolveStreams(2.0);
+///
+/// final List<ResolvedStreamHandle> handles = streamManager.getStreamHandles();
+///
+/// final InletManager<dynamic> inlet = streamManager.createInlet(handles[0]);
+/// ```
 class StreamManager {
   final StreamAdapter _streamAdapter = StreamAdapter();
 
