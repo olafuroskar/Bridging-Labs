@@ -11,10 +11,10 @@ environment:
 # ```
 # to the pubspec.yaml file of the package
 workspace:
-  - plugins/lsl_bindings
-  - plugins/lsl_flutter
-  - plugins/carp_multicast_lock
-  - plugins/muse_sdk
+  - packages/lsl_bindings
+  - packages/lsl_flutter
+  - packages/carp_multicast_lock
+  - packages/muse_sdk
   - apps/sensors
   - apps/scripted
   - apps/test_windows

@@ -12,7 +12,7 @@ git clone --recursive git@github.com:olafuroskar/Bridging-Labs.git
 - `apple/` contains the necessary files to build the `liblsl` library for Apple devices.
 - `liblsl/` contains a submodule of [`liblsl`](https://github.com/sccn/liblsl)
 - `patches/` contains the patches that can be applied to `liblsl` for enabling building on different platforms.
-- `plugins/` contains the packages of the system, most importantly `lsl_bindings` and `lsl_flutter`, but also `carp_multicast_lock` and `muse_sdk`.
+- `packages/` contains the packages of the system, most importantly `lsl_bindings` and `lsl_flutter`, but also `carp_multicast_lock` and `muse_sdk`.
 - `scripts/` contains scripts that facilitate applying patches and building `xcframeworks`.
 
 ## `lsl_bindings`
@@ -47,7 +47,7 @@ This will:
 
 - fetch the latest commits to master in `liblsl`,
 - try to apply the needed patch in `patches/lsl_add_skip_install.patch`,
-- and copy the patched library to the `plugins/lsl_bindings/src` directory.
+- and copy the patched library to the `packages/lsl_bindings/src` directory.
 
 <!--
 

@@ -38,7 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.8
 
   lsl_flutter:
-    path: ../../plugins/lsl_flutter
+    path: ../../packages/lsl_flutter
 
 dev_dependencies:
   flutter_test:

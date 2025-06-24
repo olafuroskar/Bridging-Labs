@@ -33,7 +33,7 @@ dependencies:
   flutter:
     sdk: flutter
   lsl_flutter:
-    path: ../../plugins/lsl_flutter
+    path: ../../packages/lsl_flutter
   provider: ^6.1.2
   csv: ^6.0.0
   just_audio: ^0.10.0

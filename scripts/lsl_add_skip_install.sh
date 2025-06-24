@@ -17,9 +17,9 @@ patch -p1 <../patches/lsl_skip_install.patch
 echo "✅ liblsl successfully updated and patched."
 
 echo "🖨️ Copying patched liblsl to lsl_bindings"
-cp -r . ../plugins/lsl_bindings/src
-rm -rf ../plugins/lsl_bindings/src/.git
-rm -rf ../plugins/lsl_bindings/src/.github
+cp -r . ../packages/lsl_bindings/src
+rm -rf ../packages/lsl_bindings/src/.git
+rm -rf ../packages/lsl_bindings/src/.github
 
 echo "🧹 Cleaning up submodule"
 git restore .
