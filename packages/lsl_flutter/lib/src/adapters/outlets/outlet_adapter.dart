@@ -64,7 +64,7 @@ abstract class OutletAdapter<S> {
     final nativeInfo =
         lsl.bindings.lsl_get_info(_outletContainer._nativeOutlet);
 
-    return stream_utils.getStreamInfo(nativeInfo);
+    return stream_utils.extractStreamInfo(nativeInfo);
   }
 
   /// {@template have_consumers}

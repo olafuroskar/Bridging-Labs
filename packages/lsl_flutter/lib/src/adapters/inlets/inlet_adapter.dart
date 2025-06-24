@@ -45,7 +45,13 @@ abstract class InletAdapter<S> {
   /// [timeout] Optional timeout of the operation (default: no timeout).
   /// {@endtemplate}
   void openStream([double timeout = double.infinity]) {
-    return utils.openStream(_inletContainer._nativeInlet, timeout);
+    // Allocate the memory needed on the heap
+    final ec = malloc.allocate<Int32>(sizeOf<Int32>());
+
+    lsl.bindings.lsl_open_stream(_inletContainer._nativeInlet, timeout, ec);
+
+    checkError(ec);
+    malloc.free(ec);
   }
 
   /// {@template close_stream}
@@ -58,7 +64,7 @@ abstract class InletAdapter<S> {
   /// resources.
   /// {@endtemplate}
   void closeStream() {
-    return utils.closeStream(_inletContainer._nativeInlet);
+    lsl.bindings.lsl_close_stream(_inletContainer._nativeInlet);
   }
 
   /// {@template get_inlet_stream_info}
@@ -69,7 +75,14 @@ abstract class InletAdapter<S> {
   /// [timeout] Timeout of the operation (default: no timeout).
   /// {@endtemplate}
   StreamInfo getStreamInfo([double timeout = double.infinity]) {
-    return utils.getInletStreamInfo(_inletContainer._nativeInlet, timeout);
+    final ec = malloc.allocate<Int32>(sizeOf<Int32>());
+    final nativeInfo = lsl.bindings
+        .lsl_get_fullinfo(_inletContainer._nativeInlet, timeout, ec);
+
+    checkError(ec);
+    malloc.free(ec);
+
+    return extractStreamInfo(nativeInfo);
   }
 
   /// {@template time_correction}
@@ -84,7 +97,15 @@ abstract class InletAdapter<S> {
   /// [timeout] Timeout to acquire the first time-correction estimate (default: no timeout).
   /// {@endtemplate}
   double timeCorrection([double timeout = double.infinity]) {
-    return utils.timeCorrection(_inletContainer._nativeInlet, timeout);
+    // Allocate the memory needed on the heap
+    final ec = malloc.allocate<Int32>(sizeOf<Int32>());
+    final offset = lsl.bindings
+        .lsl_time_correction(_inletContainer._nativeInlet, timeout, ec);
+
+    checkError(ec);
+    malloc.free(ec);
+
+    return offset;
   }
 
   /// {@template samples_available}
@@ -96,7 +117,7 @@ abstract class InletAdapter<S> {
   ///  samples available (otherwise it will be 1 or 0).
   /// {@endtemplate}
   int samplesAvailable() {
-    return utils.samplesAvailable(_inletContainer._nativeInlet);
+    return lsl.bindings.lsl_samples_available(_inletContainer._nativeInlet);
   }
 
   /// {@template was_clock_reset}
@@ -107,7 +128,9 @@ abstract class InletAdapter<S> {
   /// hot-swapped or restarted in between two measurements.
   /// {@endtemplate}
   bool wasClockReset() {
-    return utils.wasClockReset(_inletContainer._nativeInlet);
+    final clockWasReset =
+        lsl.bindings.lsl_was_clock_reset(_inletContainer._nativeInlet);
+    return clockWasReset == 1;
   }
 
   /// {@template set_post_processing}
@@ -124,6 +147,17 @@ abstract class InletAdapter<S> {
   /// returns an error code if nonzero, can be #lsl_argument_error if an unknown flag was passed in.
   /// {@endtemplate}
   ErrorCode setPostProcessing(List<ProcessingOptions> flags) {
-    return utils.setPostProcessing(_inletContainer._nativeInlet, flags);
+    // Bitwise OR the elements of the flags list to get the desired postprocessing setting.
+    final flagsValue = flags.fold(0, (prev, curr) => prev | curr.value);
+    final code = lsl.bindings
+        .lsl_set_postprocessing(_inletContainer._nativeInlet, flagsValue);
+    return switch (code) {
+      0 => ErrorCode.noError,
+      -1 => ErrorCode.timeoutError,
+      -2 => ErrorCode.lostError,
+      -3 => ErrorCode.argumentError,
+      -4 => ErrorCode.internalError,
+      _ => ErrorCode.internalError
+    };
   }
 }

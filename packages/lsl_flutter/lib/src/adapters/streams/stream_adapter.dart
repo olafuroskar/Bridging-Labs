@@ -192,7 +192,7 @@ class StreamAdapter {
 
   void _storeStreams(Pointer<lsl_streaminfo> buffer, int numStreams) {
     for (var i = 0; i < numStreams; i++) {
-      final info = getStreamInfo(buffer[i]);
+      final info = extractStreamInfo(buffer[i]);
       switch (info.channelFormat) {
         case Int8ChannelFormat():
         case Int16ChannelFormat():

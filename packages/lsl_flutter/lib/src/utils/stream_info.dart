@@ -31,7 +31,7 @@ StreamInfo getStreamInfoFromChannelFormat(
 }
 
 /// Extracts the information from a native [lsl_streaminfo] object to a [StreamInfo] object
-StreamInfo getStreamInfo(lsl_streaminfo nativeInfo) {
+StreamInfo extractStreamInfo(lsl_streaminfo nativeInfo) {
   // User defined
   final name = lsl.bindings.lsl_get_name(nativeInfo);
   final type = lsl.bindings.lsl_get_type(nativeInfo);

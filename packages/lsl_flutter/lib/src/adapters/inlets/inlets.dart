@@ -10,6 +10,7 @@ import 'package:lsl_flutter/src/adapters/streams/resolved_stream.dart';
 import 'package:lsl_flutter/src/adapters/utils.dart';
 import 'package:lsl_flutter/src/liblsl.dart';
 import 'package:lsl_flutter/src/utils/error_code.dart';
+import 'package:lsl_flutter/src/utils/stream_info.dart';
 
 part 'implementations/char_inlet_adapter.dart';
 part 'implementations/int_inlet_adapter.dart';
