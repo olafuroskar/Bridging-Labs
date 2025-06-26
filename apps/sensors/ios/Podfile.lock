@@ -1,5 +1,4 @@
 PODS:
-  - Alamofire (5.8.1)
   - audio_service (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -24,13 +23,12 @@ PODS:
     - Flutter
   - polar (0.0.1):
     - Flutter
-    - PolarBleSdk (~> 5.7.0)
-  - PolarBleSdk (5.7.0):
-    - Alamofire (~> 5.8.1)
-    - RxSwift (~> 6.5.0)
+    - PolarBleSdk (~> 6.1.0)
+  - PolarBleSdk (6.1.0):
+    - RxSwift (~> 6.8.0)
     - SwiftProtobuf (~> 1.0)
     - Zip (~> 2.1.2)
-  - RxSwift (6.5.0)
+  - RxSwift (6.8.0)
   - sensors_plus (0.0.1):
     - Flutter
   - share_plus (0.0.1):
@@ -62,7 +60,6 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - Alamofire
     - PolarBleSdk
     - RxSwift
     - SwiftProtobuf
@@ -101,7 +98,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/wakelock_plus/ios"
 
 SPEC CHECKSUMS:
-  Alamofire: 3ca42e259043ee0dc5c0cdd76c4bc568b8e42af7
   audio_service: cab6c1a0eaf01b5a35b567e11fa67d3cc1956910
   audio_session: 19e9480dbdd4e5f6c4543826b2e8b0e4ab6145fe
   device_info_plus: bf2e3232933866d73fe290f2942f2156cdd10342
@@ -112,9 +108,9 @@ SPEC CHECKSUMS:
   package_info_plus: c0502532a26c7662a62a356cebe2692ec5fe4ec4
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
-  polar: 72c115bddd9aef3e3cc3eaba1196ecd99c59b8b6
-  PolarBleSdk: e3df6f62b6ed34701d2e1d74ebe24fd8245062ca
-  RxSwift: 5710a9e6b17f3c3d6e40d6e559b9fa1e813b2ef8
+  polar: 0b84526f717123ae89648b83b5010b7fe1fcc858
+  PolarBleSdk: bfb57cf8350f0c53d441b8632ba6df363ce7c79f
+  RxSwift: 4e28be97cbcfeee614af26d83415febbf2bf6f45
   sensors_plus: 7229095999f30740798f0eeef5cd120357a8f4f2
   share_plus: 8b6f8b3447e494cca5317c8c3073de39b3600d1f
   sqflite_darwin: 5a7236e3b501866c1c9befc6771dfd73ffb8702d

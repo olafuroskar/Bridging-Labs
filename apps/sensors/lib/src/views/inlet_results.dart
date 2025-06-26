@@ -26,7 +26,15 @@ class _InletResultScreenState extends State<InletResultScreen> {
                 onPressed: () {
                   appState.createInlet();
                 },
-                icon: Icon(Icons.play_arrow))
+                icon: Icon(Icons.play_arrow)),
+            IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ChartScreen()),
+                  );
+                },
+                icon: Icon(Icons.pivot_table_chart))
           ]),
           body: ListView(
               children: appState.writtenLines.entries.map((entry) {

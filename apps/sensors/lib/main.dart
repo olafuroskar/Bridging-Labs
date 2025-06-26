@@ -1,9 +1,13 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
+import "dart:math" as math;
 
 import 'package:audio_service/audio_service.dart';
+import 'package:crypto/crypto.dart';
 import 'package:csv/csv.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:lsl_flutter/lsl_flutter.dart';
 import 'package:muse_sdk/muse_sdk.dart';
@@ -27,6 +31,7 @@ part 'src/views/inlet_results.dart';
 part 'src/views/available_devices.dart';
 part 'src/views/active_outlets.dart';
 part 'src/views/marker_screen.dart';
+part 'src/views/chart.dart';
 
 part 'src/providers/outlets.dart';
 part 'src/providers/inlets.dart';

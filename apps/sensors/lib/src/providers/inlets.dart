@@ -17,6 +17,8 @@ class InletProvider extends ChangeNotifier {
 
   InletWorker? worker;
 
+  Map<String, List<List<dynamic>>> buffers = {};
+
   void setSynchronization(bool? val) {
     synchronize = val != null && val;
     notifyListeners();
@@ -83,6 +85,8 @@ class InletProvider extends ChangeNotifier {
       ]);
 
       final List<List<dynamic>> buffer = [];
+      buffers[inlet] = buffer;
+
       writtenLines[inlet] = 0;
 
       final opened = await worker?.open(inlet,
@@ -140,7 +144,8 @@ class InletProvider extends ChangeNotifier {
 
   Future<IOSink> openCsvFile(String fileName) async {
     final directory = await getApplicationDocumentsDirectory();
-    final filePath = '${directory.path}${Platform.isWindows ? '\\' : '/'}$fileName.csv';
+    final filePath =
+        '${directory.path}${Platform.isWindows ? '\\' : '/'}$fileName.csv';
     File file = File(filePath);
 
     if (await file.exists()) {
