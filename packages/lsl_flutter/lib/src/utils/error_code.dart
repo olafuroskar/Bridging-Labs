@@ -15,6 +15,7 @@ enum ErrorCode {
   /// Some other internal error has happened.
   internalError(-4);
 
+  /// Value of error code
   final int value;
   const ErrorCode(this.value);
 }

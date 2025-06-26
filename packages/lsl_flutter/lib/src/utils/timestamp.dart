@@ -8,6 +8,8 @@ part of '../../lsl_flutter.dart';
 /// confident in doing so.
 sealed class Timestamp {
   const Timestamp();
+
+  /// Returns the timestamp in Lsl format, i.e. seconds.
   double toLslTime();
 }
 
@@ -16,8 +18,12 @@ sealed class Timestamp {
 /// If a user has access to samples that provide a timestamp in Dart DateTime format then this is convenient
 /// to use.
 class DartTimestamp extends Timestamp {
+  /// The date time the object was created with
   final DateTime time;
+
+  /// Creates an instance of [DartTimestamp] from the given datetime
   DartTimestamp(this.time);
+
   @override
   double toLslTime() {
     final unixSeconds = time.millisecondsSinceEpoch / 1000;
@@ -31,10 +37,11 @@ class DartTimestamp extends Timestamp {
 ///
 /// If performing the timestamp formatting manually is preferred, this class can be used.
 class LslTimestamp extends Timestamp {
+  /// The datetime in Lsl format that the object was created with
   final double time;
+
+  /// Creates an instance of [LslTimestamp] from the given datetime in Lsl format
   LslTimestamp(this.time);
   @override
   double toLslTime() => time;
 }
-
-// TODO: Users must then be able to access the lsl_local_clock

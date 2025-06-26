@@ -1,5 +1,6 @@
 part of 'inlets.dart';
 
+/// Abstract inlet adapter class
 abstract class InletAdapter<S> {
   /// The inlet container for the adapter instance
   ///

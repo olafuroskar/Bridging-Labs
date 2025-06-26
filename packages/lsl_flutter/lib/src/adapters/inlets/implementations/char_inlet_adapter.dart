@@ -1,5 +1,6 @@
 part of '../inlets.dart';
 
+/// Inlet adapter for streams with channel format of 8-bit integer
 class CharInletAdapter extends InletAdapter<int> {
   /// {@macro create_inlet}
   CharInletAdapter._(Inlet<int> inlet, ResolvedStream stream) {

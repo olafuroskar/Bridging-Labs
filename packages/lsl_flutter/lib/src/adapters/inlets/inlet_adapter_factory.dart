@@ -1,6 +1,8 @@
 part of 'inlets.dart';
 
+/// A factory class for creating [InletManager]s from an [Inlet] and a [ResolvedStream]
 class InletAdapterFactory {
+  /// Creates an [InletManager] with the relevant integer channel format given an [inlet] and a [stream]
   static InletAdapter<int> createIntAdapterFromStream(
       Inlet<int> inlet, ResolvedStream stream) {
     switch (stream.info.channelFormat) {
@@ -17,6 +19,7 @@ class InletAdapterFactory {
     }
   }
 
+  /// Creates an [InletManager] with the relevant double channel format given an [inlet] and a [stream]
   static InletAdapter<double> createDoubleAdapterFromStream(
       Inlet<double> inlet, ResolvedStream stream) {
     switch (stream.info.channelFormat) {
@@ -29,6 +32,7 @@ class InletAdapterFactory {
     }
   }
 
+  /// Creates an [InletManager] with the relevant string channel format given an [inlet] and a [stream]
   static InletAdapter<String> createStringAdapterFromStream(
       Inlet<String> inlet, ResolvedStream stream) {
     switch (stream.info.channelFormat) {

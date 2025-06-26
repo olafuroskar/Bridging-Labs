@@ -15,28 +15,37 @@ enum OffsetMode {
   /// processed when it reaches an inlet.
   applyFirstToSamples("apply first to samples");
 
+  /// The string value of the offset mode
   final String value;
 
   const OffsetMode(this.value);
 }
 
+/// An outlet configuration object
+///
+/// Encapsulates the configuration parameters of an [OutletManager]
 class OutletConfig {
-  final int chunkSize;
-  final int maxBuffered;
-  final OffsetMode mode;
-  final double offsetCalculationInterval;
-
   /// [chunkSize] The desired chunk granularity (in samples) for transmission.
   /// If specified as 0, each push operation yields one chunk.
+  final int chunkSize;
+
   /// [maxBuffered] Optionally the maximum amount of data to buffer (in seconds if there is a
   /// nominal sampling rate, otherwise x100 in samples). A good default is 360, which corresponds to 6
   /// minutes of data. Note that, for high-bandwidth data you will almost certainly want to use a lower
   /// value here to avoid  running out of RAM.
+  final int maxBuffered;
+
   /// [mode] The mode to use for processing host/device time offsets.
+  final OffsetMode mode;
+
   /// [offsetCalculationInterval] - Interval (in seconds) for computing new offsets.
+  final double offsetCalculationInterval;
+
+  /// Creates an [OutletConfig] instance
   const OutletConfig(this.chunkSize, this.maxBuffered,
       [this.mode = OffsetMode.none, this.offsetCalculationInterval = 5.0]);
 
+  /// Creates an [OutletConfig] instance given a [mode] and a [offsetCalculationInterval].
   OutletConfig.fromOffsetConfig(
       {OffsetMode mode = OffsetMode.none, double offsetCalculationInterval = 5})
       : this(0, 360, mode, offsetCalculationInterval);

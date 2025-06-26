@@ -1,21 +1,21 @@
 part of '../../lsl_flutter.dart';
 
-enum OutletCommandType {
+enum _OutletCommandType {
   start("START"),
   pushSample("PUSH_SAMPLE"),
   pushChunk("PUSH_CHUNK"),
   pushChunkWithTimestamp("PUSH_CHUNK_WITH_TIMESTAMP"),
   stop("STOP");
 
-  const OutletCommandType(this.value);
+  const _OutletCommandType(this.value);
   final String value;
 }
 
-class IsolateArguments {
+class _IsolateArguments {
   final SendPort sendPort;
   final RootIsolateToken rootIsolateToken;
 
-  IsolateArguments(this.sendPort, this.rootIsolateToken);
+  _IsolateArguments(this.sendPort, this.rootIsolateToken);
 }
 
 /// An isolate worker class for outlets
@@ -54,7 +54,7 @@ class OutletWorker {
 
   final Map<String, StreamInfo> _streams = {};
 
-  void _sendCommand<T extends Object?>(int id, OutletCommandType command,
+  void _sendCommand<T extends Object?>(int id, _OutletCommandType command,
       {String? name,
       StreamInfo<Object?>? streamInfo,
       List<T>? sample,
@@ -94,7 +94,7 @@ class OutletWorker {
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    _sendCommand(id, OutletCommandType.start,
+    _sendCommand(id, _OutletCommandType.start,
         name: streamInfo.name, streamInfo: streamInfo, config: config);
     final success = await completer.future;
 
@@ -121,7 +121,7 @@ class OutletWorker {
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    _sendCommand(id, OutletCommandType.pushSample,
+    _sendCommand(id, _OutletCommandType.pushSample,
         name: name, sample: sample, timestamp: timestamp);
     return await completer.future;
   }
@@ -139,7 +139,7 @@ class OutletWorker {
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    _sendCommand(id, OutletCommandType.pushChunk, name: name, chunk: chunk);
+    _sendCommand(id, _OutletCommandType.pushChunk, name: name, chunk: chunk);
     return await completer.future;
   }
 
@@ -158,7 +158,7 @@ class OutletWorker {
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    _sendCommand(id, OutletCommandType.pushChunkWithTimestamp,
+    _sendCommand(id, _OutletCommandType.pushChunkWithTimestamp,
         name: name, chunk: chunk, timestamps: timestamps);
     return await completer.future;
   }
@@ -175,7 +175,7 @@ class OutletWorker {
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    _sendCommand(id, OutletCommandType.stop, name: name);
+    _sendCommand(id, _OutletCommandType.stop, name: name);
 
     final result = await completer.future;
     if (result) {
@@ -200,7 +200,7 @@ class OutletWorker {
     // Spawn the isolate.
     try {
       await Isolate.spawn(_startRemoteIsolate,
-          IsolateArguments(initPort.sendPort, RootIsolateToken.instance!));
+          _IsolateArguments(initPort.sendPort, RootIsolateToken.instance!));
     } on Object {
       initPort.close();
       rethrow;
@@ -270,7 +270,7 @@ class OutletWorker {
         config
       ) = message as (
         int,
-        OutletCommandType,
+        _OutletCommandType,
         String,
         StreamInfo<int>?,
         StreamInfo<double>?,
@@ -287,7 +287,7 @@ class OutletWorker {
       );
       try {
         switch (command) {
-          case OutletCommandType.start:
+          case _OutletCommandType.start:
             OutletManager? manager;
             if (intStreamInfo != null) {
               manager = _addStream<int>(intStreamInfo, config);
@@ -302,7 +302,7 @@ class OutletWorker {
             }
             sendPort.send((id, manager != null));
             break;
-          case OutletCommandType.pushSample:
+          case _OutletCommandType.pushSample:
             if (intSample != null) {
               outlets[name]?.pushSample(intSample, timestamp);
             } else if (doubleSample != null) {
@@ -315,7 +315,7 @@ class OutletWorker {
             }
             sendPort.send((id, true));
             break;
-          case OutletCommandType.pushChunk:
+          case _OutletCommandType.pushChunk:
             if (intChunk != null) {
               outlets[name]?.pushChunk(intChunk);
             } else if (doubleChunk != null) {
@@ -328,7 +328,7 @@ class OutletWorker {
             }
             sendPort.send((id, true));
             break;
-          case OutletCommandType.pushChunkWithTimestamp:
+          case _OutletCommandType.pushChunkWithTimestamp:
             if (timestamps == null) {
               sendPort.send((id, false));
               break;
@@ -345,7 +345,7 @@ class OutletWorker {
             }
             sendPort.send((id, true));
             break;
-          case OutletCommandType.stop:
+          case _OutletCommandType.stop:
             outlets[name]?.destroy();
             outlets.remove(name);
             sendPort.send((id, true));
@@ -358,7 +358,7 @@ class OutletWorker {
   }
 
   /// Creates the needed ports for the worker and sends them back to the main isolate
-  static void _startRemoteIsolate(IsolateArguments args) {
+  static void _startRemoteIsolate(_IsolateArguments args) {
     BackgroundIsolateBinaryMessenger.ensureInitialized(args.rootIsolateToken);
 
     final receivePort = ReceivePort();
@@ -368,6 +368,7 @@ class OutletWorker {
     _handleCommandsToIsolate(receivePort, args.sendPort);
   }
 
+  /// Shuts down the worker
   void shutdown() {
     if (!_closed) {
       _closed = true;

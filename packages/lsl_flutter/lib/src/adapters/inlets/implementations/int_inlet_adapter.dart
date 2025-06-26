@@ -1,5 +1,6 @@
 part of '../inlets.dart';
 
+/// Inlet adapter for streams with channel format of 32-bit integer
 class IntInletAdapter extends InletAdapter<int> {
   /// {@template create_inlet}
   /// Construct a new stream inlet from a resolved stream info.
