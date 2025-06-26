@@ -47,7 +47,7 @@ The `AndroidManifest.xml` must contain
 <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
 ```
 
-This package uses the [carp_multicast_lock](rttps://pub.dev/packages/carp_multicast_lock) plugin to acquire and release multicast locks on Android.
+This package uses the [carp_multicast_lock](https://pub.dev/packages/carp_multicast_lock) plugin to acquire and release multicast locks on Android.
 
 ## iOS
 
