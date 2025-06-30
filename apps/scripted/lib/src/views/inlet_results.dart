@@ -38,12 +38,6 @@ class _InletResultScreenState extends State<InletResultScreen> {
                     case InletAction.stop:
                       appState.closeInlet(entry.key);
                       break;
-                    // case InletAction.share:
-                    //   appState.shareResult(entry.key, name);
-                    //   break;
-                    // case InletAction.shareOffset:
-                    //   appState.shareResult("${entry.key}-offset", name);
-                    //   break;
                     default:
                   }
                 },
@@ -53,14 +47,6 @@ class _InletResultScreenState extends State<InletResultScreen> {
                     value: InletAction.stop,
                     child: Text('Stop'),
                   ),
-                  // const PopupMenuItem<InletAction>(
-                  //   value: InletAction.share,
-                  //   child: Text('Share'),
-                  // ),
-                  // const PopupMenuItem<InletAction>(
-                  //   value: InletAction.shareOffset,
-                  //   child: Text('Share offset'),
-                  // ),
                 ],
               ),
             );
