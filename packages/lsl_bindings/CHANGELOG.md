@@ -13,3 +13,7 @@ Update docs.
 ## 0.0.4
 
 Update docs.
+
+## 0.0.5
+
+Repository moved.

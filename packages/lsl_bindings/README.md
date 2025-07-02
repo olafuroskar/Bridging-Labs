@@ -21,7 +21,7 @@ If you're looking for a higher-level, idiomatic Flutter API for working with LSL
 dev_dependencies:
   ffi: ^2.1.3
 dependencies:
-  lsl_bindings: ^0.0.4
+  lsl_bindings: ^0.0.5
 ```
 
 ## Usage

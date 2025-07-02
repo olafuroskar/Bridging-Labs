@@ -27,7 +27,7 @@ Install via `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  lsl_flutter: ^0.0.5
+  lsl_flutter: ^0.0.6
 ```
 
 ## Android
