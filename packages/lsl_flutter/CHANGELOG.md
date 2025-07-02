@@ -13,3 +13,7 @@ Updated docs, and some minor code fixes.
 ## 0.0.4
 
 Update docs.
+
+## 0.0.5
+
+Update docs.
