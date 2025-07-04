@@ -1,5 +1,6 @@
 part of '../inlets.dart';
 
+/// Inlet adapter for streams with channel format of 64-bit integer
 class LongInletAdapter extends InletAdapter<int> {
   /// {@macro create_inlet}
   LongInletAdapter._(Inlet<int> inlet, ResolvedStream stream) {

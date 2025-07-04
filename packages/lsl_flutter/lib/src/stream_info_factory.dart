@@ -8,8 +8,7 @@ part of '../../lsl_flutter.dart';
 class StreamInfoFactory {
   /// Creates a stream info object with an integer channel format.
   ///
-  /// {@macro stream_info}
-  /// [channelFormat] An integer channel format
+  /// See [StreamInfo] for parameters
   static StreamInfo<int> createIntStreamInfo(
       String name, String type, ChannelFormat<int> channelFormat,
       {int channelCount = 1, double nominalSRate = 0, String sourceId = ""}) {
@@ -19,8 +18,7 @@ class StreamInfoFactory {
 
   /// Creates a stream info object with an double channel format.
   ///
-  /// {@macro stream_info}
-  /// [channelFormat] An double channel format
+  /// See [StreamInfo] for parameters
   static StreamInfo<double> createDoubleStreamInfo(
       String name, String type, ChannelFormat<double> channelFormat,
       {int channelCount = 1, double nominalSRate = 0, String sourceId = ""}) {
@@ -30,8 +28,7 @@ class StreamInfoFactory {
 
   /// Creates a stream info object with an string channel format.
   ///
-  /// {@macro stream_info}
-  /// [channelFormat] An string channel format
+  /// See [StreamInfo] for parameters
   static StreamInfo<String> createStringStreamInfo(
       String name, String type, ChannelFormat<String> channelFormat,
       {int channelCount = 1, double nominalSRate = 0, String sourceId = ""}) {

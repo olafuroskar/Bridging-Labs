@@ -1,18 +1,13 @@
 part of '../../lsl_flutter.dart';
 
+/// Represents all double channel formats
 sealed class DoubleChannelFormat implements ChannelFormat<double> {
   const DoubleChannelFormat();
-
-  static const float32 = Float32ChannelFormat();
-  static const double64 = Double64ChannelFormat();
-
-  static const List<DoubleChannelFormat> formats = [
-    float32,
-    double64,
-  ];
 }
 
+/// Represents a 32-bit float channel format
 class Float32ChannelFormat extends DoubleChannelFormat {
+  /// Creates a [Float32ChannelFormat] instance
   const Float32ChannelFormat();
 
   @override
@@ -23,7 +18,9 @@ class Float32ChannelFormat extends DoubleChannelFormat {
   String toString() => "float32";
 }
 
+/// Represents a 32-bit float channel format
 class Double64ChannelFormat extends DoubleChannelFormat {
+  /// Creates a [Double64ChannelFormat] instance
   const Double64ChannelFormat();
 
   @override

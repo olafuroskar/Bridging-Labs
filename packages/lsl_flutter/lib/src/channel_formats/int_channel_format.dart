@@ -1,17 +1,13 @@
 part of '../../lsl_flutter.dart';
 
+/// Represents all integer channel formats
 sealed class IntChannelFormat implements ChannelFormat<int> {
   const IntChannelFormat();
-
-  static const int8 = Int8ChannelFormat();
-  static const int16 = Int16ChannelFormat();
-  static const int32 = Int32ChannelFormat();
-  static const int64 = Int64ChannelFormat();
-
-  static const List<IntChannelFormat> formats = [int8, int16, int32, int64];
 }
 
+/// Represents an 8-bit integer channel format
 class Int8ChannelFormat extends IntChannelFormat {
+  /// Creates an [Int8ChannelFormat] instance
   const Int8ChannelFormat();
 
   @override
@@ -21,7 +17,9 @@ class Int8ChannelFormat extends IntChannelFormat {
   String toString() => "int8";
 }
 
+/// Represents a 16-bit integer channel format
 class Int16ChannelFormat extends IntChannelFormat {
+  /// Creates an [Int16ChannelFormat] instance
   const Int16ChannelFormat();
 
   @override
@@ -32,7 +30,9 @@ class Int16ChannelFormat extends IntChannelFormat {
   String toString() => "int16";
 }
 
+/// Represents a 32-bit integer channel format
 class Int32ChannelFormat extends IntChannelFormat {
+  /// Creates an [Int32ChannelFormat] instance
   const Int32ChannelFormat();
 
   @override
@@ -43,7 +43,9 @@ class Int32ChannelFormat extends IntChannelFormat {
   String toString() => "int32";
 }
 
+/// Represents a 64-bit integer channel format
 class Int64ChannelFormat extends IntChannelFormat {
+  /// Creates an [Int64ChannelFormat] instance
   const Int64ChannelFormat();
 
   @override

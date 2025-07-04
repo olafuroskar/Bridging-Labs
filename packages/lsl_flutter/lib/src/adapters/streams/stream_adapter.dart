@@ -9,6 +9,7 @@ import 'package:lsl_flutter/src/adapters/utils.dart';
 import 'package:lsl_flutter/src/liblsl.dart';
 import 'package:lsl_flutter/src/utils/stream_info.dart';
 
+/// An adapter for stream resolving
 class StreamAdapter {
   /// A map of the currently resolved streams
   final Map<String, ResolvedStream> _resolvedStreams = {};
@@ -16,6 +17,7 @@ class StreamAdapter {
   /// Arbitrary buffer size for stream resolving
   final bufferSize = 1024;
 
+  /// Creates a [StreamAdapter] instance
   StreamAdapter();
 
   /// {@template resolve_all}

@@ -1,5 +1,6 @@
 part of '../inlets.dart';
 
+/// Inlet adapter for streams with channel format of string
 class StringInletAdapter extends InletAdapter<String> {
   /// {@macro create_inlet}
   StringInletAdapter._(Inlet<String> inlet, ResolvedStream stream) {

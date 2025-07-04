@@ -9,3 +9,7 @@ Fix markdown in readme
 ## 0.0.3
 
 Fix title typo
+
+## 0.0.4
+
+Repository moved.

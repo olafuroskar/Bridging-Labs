@@ -1,5 +1,6 @@
 part of '../inlets.dart';
 
+/// Inlet adapter for streams with channel format of 32-bit float
 class FloatInletAdapter extends InletAdapter<double> {
   /// {@macro create_inlet}
   FloatInletAdapter._(Inlet<double> inlet, ResolvedStream stream) {

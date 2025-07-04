@@ -1,5 +1,6 @@
 part of '../inlets.dart';
 
+/// Inlet adapter for streams with channel format of 64-bit double
 class DoubleInletAdapter extends InletAdapter<double> {
   /// {@macro create_inlet}
   DoubleInletAdapter._(Inlet<double> inlet, ResolvedStream stream) {

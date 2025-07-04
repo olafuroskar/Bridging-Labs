@@ -11,16 +11,20 @@ class Lsl {
   static LslBindings _bindings = lslBindings;
   static MulticastLock _multicastLock = MulticastLock();
 
+  /// A set of all active outlets using [Lsl]
   static Set<String> activeOutlets = {};
 
+  /// Initialises an [Lsl] singleton
   factory Lsl() {
     return _singleton;
   }
 
+  /// Set the [LslBindings] instance in use
   static void setBindings(LslBindings bindings) {
     _bindings = bindings;
   }
 
+  /// Set the [MulticastLock] instance in use
   static void setMulticastLock(MulticastLock multicastLock) {
     _multicastLock = multicastLock;
   }
@@ -54,9 +58,11 @@ class Lsl {
     }
   }
 
+  /// Get the [LslBindings] instance in use
   LslBindings get bindings => _bindings;
 
   Lsl._internal();
 }
 
+/// The global [Lsl] object used in the adapters.
 final lsl = Lsl();

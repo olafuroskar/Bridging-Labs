@@ -1,16 +1,15 @@
 part of '../../lsl_flutter.dart';
 
+/// Represents all string channel formats
 sealed class StringChannelFormat implements ChannelFormat<String> {
   const StringChannelFormat();
-
-  static const cftString = CftStringChannelFormat();
-
-  static const List<StringChannelFormat> formats = [
-    cftString,
-  ];
 }
 
+/// Represents a string channel format
+///
+/// Cft just stands for channel format
 class CftStringChannelFormat extends StringChannelFormat {
+  /// Creates an [CftStringChannelFormat] instance
   const CftStringChannelFormat();
 
   @override

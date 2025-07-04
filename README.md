@@ -5,7 +5,7 @@ This repository contains all necessary source code to build the `lsl_bindings` a
 The repository has a submodule so when cloning use
 
 ```
-git clone --recursive git@github.com:olafuroskar/Bridging-Labs.git
+git clone --recursive git@github.com:dtu-digital-health/Bridging-Labs.git
 ```
 
 - `apps/` contains example apps using the `lsl_plugin`

@@ -1,9 +1,9 @@
 name: lsl_bindings
 description: "A plugin for interacting with the Lab Streeming Layer"
-version: 0.0.1
-homepage: https://github.com/olafuroskar/Bridging-Labs/tree/main/packages/lsl_bindings#readme
-repository: https://github.com/olafuroskar/Bridging-Labs/tree/main/packages/lsl_bindings
-issue_tracker: https://github.com/olafuroskar/Bridging-Labs/issues
+version: 0.0.5
+homepage: https://github.com/dtu-digital-health/Bridging-Labs/tree/main/packages/lsl_bindings#readme
+repository: https://github.com/dtu-digital-health/Bridging-Labs/tree/main/packages/lsl_bindings
+issue_tracker: https://github.com/dtu-digital-health/Bridging-Labs/issues
 
 environment:
   sdk: ^3.6.0

@@ -1,6 +1,6 @@
 part of '../../lsl_flutter.dart';
 
-enum InletCommandType {
+enum _InletCommandType {
   resolve("RESOLVE"),
   open("OPEN"),
   close("CLOSE_STREAM"),
@@ -11,7 +11,7 @@ enum InletCommandType {
   stopChunkStream("STOP_CHUNK_STREAM"),
   stopTimeCorrectionStream("STOP_TIME_CORRECTION_STREAM");
 
-  const InletCommandType(this.value);
+  const _InletCommandType(this.value);
   final String value;
 }
 
@@ -86,7 +86,7 @@ class InletWorker {
 
   void _sendCommand<T extends Object?>(
     int id,
-    InletCommandType command, {
+    _InletCommandType command, {
     String? streamId,
     double? waitTime,
     List<ProcessingOptions>? processingOptions,
@@ -118,7 +118,7 @@ class InletWorker {
     final completer = Completer<List<ResolvedStreamHandle>>.sync();
     final id = _idCounter++;
     _activeHandleRequests[id] = completer;
-    _sendCommand(id, InletCommandType.resolve, waitTime: waitTime);
+    _sendCommand(id, _InletCommandType.resolve, waitTime: waitTime);
     final handles = await completer.future;
 
     // Add the resolved streams to the streams list for lookup
@@ -142,7 +142,7 @@ class InletWorker {
     final completer = Completer<List<ResolvedStreamHandle>>.sync();
     final id = _idCounter++;
     _activeHandleRequests[id] = completer;
-    _sendCommand(id, InletCommandType.resolve,
+    _sendCommand(id, _InletCommandType.resolve,
         waitTime: waitTime, prop: prop, value: value);
     final handles = await completer.future;
 
@@ -166,7 +166,7 @@ class InletWorker {
     final completer = Completer<List<ResolvedStreamHandle>>.sync();
     final id = _idCounter++;
     _activeHandleRequests[id] = completer;
-    _sendCommand(id, InletCommandType.resolve, waitTime: waitTime, pred: pred);
+    _sendCommand(id, _InletCommandType.resolve, waitTime: waitTime, pred: pred);
     final handles = await completer.future;
 
     // Add the resolved streams to the streams list for lookup
@@ -192,7 +192,7 @@ class InletWorker {
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    _sendCommand(id, InletCommandType.open,
+    _sendCommand(id, _InletCommandType.open,
         streamId: streamId, processingOptions: processingOptions);
     final success = await completer.future;
 
@@ -229,7 +229,7 @@ class InletWorker {
     /// Initialise a sample stream on the inlet worker
     _sendCommand(
       id,
-      InletCommandType.startSampleStream,
+      _InletCommandType.startSampleStream,
       streamId: streamId,
       samplingRate: samplingRate,
     );
@@ -266,7 +266,7 @@ class InletWorker {
     /// Initialise a chunk stream on the inlet worker
     _sendCommand(
       id,
-      InletCommandType.startChunkStream,
+      _InletCommandType.startChunkStream,
       streamId: streamId,
       samplingRate: samplingRate,
     );
@@ -304,7 +304,7 @@ class InletWorker {
     final streamController = StreamController<TimeOffset>();
 
     /// Initialise a time correction stream on the inlet worker
-    _sendCommand(id, InletCommandType.startTimeCorrection, streamId: streamId);
+    _sendCommand(id, _InletCommandType.startTimeCorrection, streamId: streamId);
     final success = await completer.future;
 
     if (success) {
@@ -326,7 +326,7 @@ class InletWorker {
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    _sendCommand(id, InletCommandType.stopSampleStream, streamId: streamId);
+    _sendCommand(id, _InletCommandType.stopSampleStream, streamId: streamId);
     final success = await completer.future;
 
     return success;
@@ -343,7 +343,7 @@ class InletWorker {
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    _sendCommand(id, InletCommandType.stopChunkStream, streamId: streamId);
+    _sendCommand(id, _InletCommandType.stopChunkStream, streamId: streamId);
     final success = await completer.future;
 
     return success;
@@ -358,7 +358,7 @@ class InletWorker {
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    _sendCommand(id, InletCommandType.stopTimeCorrectionStream,
+    _sendCommand(id, _InletCommandType.stopTimeCorrectionStream,
         streamId: streamId);
     final success = await completer.future;
 
@@ -374,7 +374,7 @@ class InletWorker {
     final completer = Completer<bool>.sync();
     final id = _idCounter++;
     _activeRequests[id] = completer;
-    _sendCommand(id, InletCommandType.close, streamId: streamId);
+    _sendCommand(id, _InletCommandType.close, streamId: streamId);
     final success = await completer.future;
 
     // Add the stream to active inlets
@@ -521,7 +521,7 @@ class InletWorker {
         samplingRate,
       ) = message as (
         int,
-        InletCommandType,
+        _InletCommandType,
         String?,
         double?,
         List<ProcessingOptions>?,
@@ -533,7 +533,7 @@ class InletWorker {
 
       try {
         switch (command) {
-          case InletCommandType.resolve:
+          case _InletCommandType.resolve:
             List<ResolvedStreamHandle> resolvedStreams = [];
 
             if (prop != null && value != null) {
@@ -546,7 +546,7 @@ class InletWorker {
             resolvedStreams = streamManager.getStreamHandles();
             sendMessageFromWorker(id, resolvedStreams);
             break;
-          case InletCommandType.open:
+          case _InletCommandType.open:
             if (streamId == null) {
               sendMessageFromWorker(id, false);
               break;
@@ -563,7 +563,7 @@ class InletWorker {
 
             sendMessageFromWorker(id, inlet != null, streamId: streamId);
             break;
-          case InletCommandType.startSampleStream:
+          case _InletCommandType.startSampleStream:
             final inlet = inlets[streamId];
 
             final subscription =
@@ -572,7 +572,7 @@ class InletWorker {
             });
             sendMessageFromWorker(id, subscription != null, streamId: streamId);
             break;
-          case InletCommandType.startChunkStream:
+          case _InletCommandType.startChunkStream:
             final inlet = inlets[streamId];
 
             final subscription =
@@ -581,7 +581,7 @@ class InletWorker {
             });
             sendMessageFromWorker(id, subscription != null, streamId: streamId);
             break;
-          case InletCommandType.startTimeCorrection:
+          case _InletCommandType.startTimeCorrection:
             final inlet = inlets[streamId];
 
             final subscription =
@@ -590,22 +590,22 @@ class InletWorker {
             });
             sendMessageFromWorker(id, subscription != null, streamId: streamId);
             break;
-          case InletCommandType.stopSampleStream:
+          case _InletCommandType.stopSampleStream:
             inlets[streamId]?.stopSampleStream();
             sendMessageFromWorker(id, true,
                 streamId: streamId, stoppingSampleStream: true);
             break;
-          case InletCommandType.stopChunkStream:
+          case _InletCommandType.stopChunkStream:
             inlets[streamId]?.stopChunkStream();
             sendMessageFromWorker(id, true,
                 streamId: streamId, stoppingChunkStream: true);
             break;
-          case InletCommandType.stopTimeCorrectionStream:
+          case _InletCommandType.stopTimeCorrectionStream:
             inlets[streamId]?.stopTimeCorrectionStream();
             sendMessageFromWorker(id, true,
                 streamId: streamId, stoppingTimeCorrectionStream: true);
             break;
-          case InletCommandType.close:
+          case _InletCommandType.close:
             inlets[streamId]?.closeStream();
             inlets.remove(streamId);
             sendMessageFromWorker(id, true, streamId: streamId);
